@@ -160,6 +160,7 @@ pub fn run() {
             commands::settings::set_scoop_path,
             commands::settings::get_virustotal_api_key,
             commands::settings::set_virustotal_api_key,
+            commands::settings::detect_scoop_path,
             commands::virustotal::scan_package,
             commands::doctor::checkup::run_scoop_checkup,
             commands::doctor::cleanup::cleanup_all_apps,

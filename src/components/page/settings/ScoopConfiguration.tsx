@@ -1,12 +1,13 @@
 import { createSignal, onMount } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
-import { FolderCog, Save } from "lucide-solid";
+import { FolderCog, Save, RefreshCw } from "lucide-solid";
 
 export default function ScoopConfiguration() {
     const [scoopPath, setScoopPath] = createSignal("");
     const [pathIsLoading, setPathIsLoading] = createSignal(true);
     const [pathError, setPathError] = createSignal<string | null>(null);
     const [pathSuccessMessage, setPathSuccessMessage] = createSignal<string | null>(null);
+    const [isDetecting, setIsDetecting] = createSignal(false);
 
     const fetchScoopPath = async () => {
         setPathIsLoading(true);
@@ -37,6 +38,23 @@ export default function ScoopConfiguration() {
         }
     };
     
+    const detectScoopPath = async () => {
+        setIsDetecting(true);
+        setPathError(null);
+        try {
+            const detectedPath = await invoke<string>("detect_scoop_path");
+            setScoopPath(detectedPath);
+            setPathSuccessMessage("Scoop path detected successfully!");
+            setTimeout(() => setPathSuccessMessage(null), 5000);
+        } catch (err) {
+            const errorMsg = err instanceof Error ? err.message : String(err);
+            console.error("Failed to detect scoop path:", errorMsg);
+            setPathError(`Failed to detect Scoop path. Please make sure the SCOOP environment variable is set correctly.`);
+        } finally {
+            setIsDetecting(false);
+        }
+    };
+    
     onMount(() => {
         fetchScoopPath();
     });
@@ -64,12 +82,27 @@ export default function ScoopConfiguration() {
                             class="input input-bordered join-item w-full" 
                             value={scoopPath()}
                             onInput={(e) => setScoopPath(e.currentTarget.value)}
-                            disabled={pathIsLoading()}
+                            disabled={pathIsLoading() || isDetecting()}
                         />
-                        <button class="btn btn-primary join-item" onClick={handleSavePath} disabled={pathIsLoading()}>
+                        <button 
+                            class="btn btn-primary join-item" 
+                            onClick={handleSavePath} 
+                            disabled={pathIsLoading() || isDetecting()}
+                        >
                             <Save class="w-4 h-4 mr-1" />
                             Save
                         </button>
+                        <button 
+                            class="btn btn-success join-item text-white" 
+                            onClick={detectScoopPath} 
+                            disabled={pathIsLoading() || isDetecting()}
+                        >
+                            <RefreshCw class={`w-4 h-4 mr-1 ${isDetecting() ? 'animate-spin' : ''}`} />
+                            Auto-detect
+                        </button>
+                    </div>
+                    <div class="text-sm text-base-content/70 mt-2">
+                        Automatically detects Scoop installation directory from the SCOOP environment variable.
                     </div>
                 </div>
                 {pathError() && <div class="alert alert-error mt-4 text-sm">{pathError()}</div>}
@@ -77,4 +110,4 @@ export default function ScoopConfiguration() {
             </div>
         </div>
     );
-} 
+}
