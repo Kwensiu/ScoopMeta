@@ -18,7 +18,6 @@ import { invoke } from "@tauri-apps/api/core";
 import installedPackagesStore from "./stores/installedPackagesStore";
 import { checkCwdMismatch } from "./utils/installCheck";
 
-
 function App() {
     // Persist selected view across sessions.
     const [view, setView] = createStoredSignal<View>(
@@ -32,6 +31,7 @@ function App() {
     // Track if the app is installed via Scoop
     const [isScoopInstalled, setIsScoopInstalled] = createSignal<boolean>(false);
 
+
     const isReady = createMemo(() => readyFlag() === "true");
 
     const [error, setError] = createSignal<string | null>(null);
@@ -43,6 +43,9 @@ function App() {
 
     // Dev mode: allow bypassing the MSI modal for this session
     const [bypassCwdMismatch, setBypassCwdMismatch] = createSignal(false);
+
+    // Track initialization timeout
+    const [initTimedOut, setInitTimedOut] = createSignal(false);
 
     // Debug: track state changes
     createEffect(() => {
@@ -177,6 +180,14 @@ function App() {
                             .catch(err => {
                                 logError(`Failed to refetch installed packages on cold start: ${err}`);
                             });
+
+                        // Fetch and cache buckets list after initialization
+                        invoke<string[]>("get_buckets")
+                            .then(() => {})
+                            .catch((err) => {
+                                logError(`Failed to fetch buckets: ${err}`);
+                                setError("Failed to load bucket list.");
+                            });
                     }, 100);
                 } else {
                     setError(
@@ -191,9 +202,10 @@ function App() {
         const timeoutId = setTimeout(() => {
             if (!isReady() && !error()) {
                 info("Forcing ready state after timeout");
+                setInitTimedOut(true);
                 setReadyFlag("true");
             }
-        }, 10000); // 10 second timeout
+        }, 15000); // 15 second timeout
 
         // Clean up on unmount
         return () => {
@@ -283,6 +295,12 @@ function App() {
                     <h1 class="text-2xl font-bold mb-4">Rscoop</h1>
                     <p>Getting things ready... (upon install/update please be patient)</p>
                     <span class="loading loading-spinner loading-lg mt-4"></span>
+                    <Show when={initTimedOut()}>
+                        <div class="mt-4 text-warning text-center max-w-md">
+                            <p>Initialization is taking longer than expected.</p>
+                            <p class="text-sm mt-2">This might be due to a slow system or Scoop configuration issue.</p>
+                        </div>
+                    </Show>
                 </div>
             </Show>
 
@@ -290,10 +308,15 @@ function App() {
                 <div class="flex flex-col items-center justify-center h-screen bg-base-100">
                     <h1 class="text-2xl font-bold text-error mb-4">Error</h1>
                     <p>{error()}</p>
+                    <Show when={initTimedOut()}>
+                        <div class="mt-4 text-center max-w-md">
+                            <p class="text-sm">Initialization timed out. Showing interface anyway...</p>
+                        </div>
+                    </Show>
                 </div>
             </Show>
 
-            <Show when={isReady() && !error() && (!hasCwdMismatch() || bypassCwdMismatch())}>
+            <Show when={isReady() && (!hasCwdMismatch() || bypassCwdMismatch())}>
                 <div class="drawer">
                     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
                     <div class="drawer-content flex flex-col h-screen">

@@ -21,7 +21,7 @@ interface BucketUpdateResult {
 }
 
 function BucketPage() {
-  const { buckets, loading, error, fetchBuckets, getBucketManifests } = useBuckets();
+  const { buckets, loading, error, fetchBuckets, markForRefresh, getBucketManifests } = useBuckets();
   const packageInfo = usePackageInfo();
   const packageOperations = usePackageOperations();
   
@@ -134,7 +134,8 @@ function BucketPage() {
   // Handle bucket installation/removal - refresh bucket list
   const handleBucketInstalled = async () => {
     console.log('Bucket operation completed, refreshing bucket list...');
-    await fetchBuckets();
+    markForRefresh();
+    await fetchBuckets(true);
     console.log('Bucket list refreshed successfully');
   };
 
@@ -173,7 +174,8 @@ function BucketPage() {
       
       if (result.success) {
         // Refresh bucket list to reflect any changes
-        await fetchBuckets();
+        markForRefresh();
+        await fetchBuckets(true);
         
         // If this bucket is currently selected, refresh its manifests
         const currentBucket = selectedBucket();
@@ -208,6 +210,14 @@ function BucketPage() {
     await Promise.all(
       gitBuckets.map(bucket => handleUpdateBucket(bucket.name))
     );
+  };
+
+  // Handle manual reload of local buckets
+  const handleReloadLocalBuckets = async () => {
+    console.log('Reloading local buckets...');
+    markForRefresh();
+    await fetchBuckets(true);
+    console.log('Local buckets reloaded successfully');
   };
 
   return (
@@ -278,7 +288,7 @@ function BucketPage() {
               <BucketGrid 
                 buckets={buckets()}
                 onViewBucket={handleViewBucket}
-                onRefresh={fetchBuckets}
+                onRefresh={handleReloadLocalBuckets}
                 onUpdateBucket={handleUpdateBucket}
                 onUpdateAll={handleUpdateAllBuckets}
                 updatingBuckets={updatingBuckets()}

@@ -20,14 +20,25 @@ function BucketGrid(props: BucketGridProps) {
         <div class="flex justify-between items-center mb-4">
           <h2 class="card-title">Installed Buckets</h2>
           <Show when={props.onUpdateAll && props.buckets.some(b => b.is_git_repo)}>
-            <button 
-              class="btn btn-secondary btn-sm gap-2"
-              onClick={props.onUpdateAll}
-              disabled={props.updatingBuckets && props.updatingBuckets.size > 0}
-            >
-              <RefreshCw class="w-4 h-4" />
-              Update All Git Buckets
-            </button>
+            <div class="flex gap-2">
+              <button 
+                class="btn btn-secondary btn-sm gap-2"
+                onClick={props.onUpdateAll}
+                disabled={props.updatingBuckets && props.updatingBuckets.size > 0}
+              >
+                <RefreshCw class="w-4 h-4" />
+                Update All Git Buckets
+              </button>
+              <Show when={props.onRefresh}>
+                <button 
+                  class="btn btn-outline btn-sm gap-2"
+                  onClick={props.onRefresh}
+                >
+                  <RefreshCw class="w-4 h-4" />
+                  Reload Local Buckets
+                </button>
+              </Show>
+            </div>
           </Show>
         </div>
         <Show when={props.buckets.length === 0} fallback={
