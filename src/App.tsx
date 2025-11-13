@@ -17,6 +17,7 @@ import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { invoke } from "@tauri-apps/api/core";
 import installedPackagesStore from "./stores/installedPackagesStore";
 import { checkCwdMismatch } from "./utils/installCheck";
+import { BucketInfo } from "./hooks/useBuckets";
 
 function App() {
     // Persist selected view across sessions.
@@ -182,8 +183,12 @@ function App() {
                             });
 
                         // Fetch and cache buckets list after initialization
-                        invoke<string[]>("get_buckets")
-                            .then(() => {})
+                        invoke<BucketInfo[]>("get_buckets")
+                            .then((buckets) => {
+                                if (buckets && buckets.length > 0) {
+                                    console.log(`Preloaded ${buckets.length} buckets`);
+                                }
+                            })
                             .catch((err) => {
                                 logError(`Failed to fetch buckets: ${err}`);
                                 setError("Failed to load bucket list.");

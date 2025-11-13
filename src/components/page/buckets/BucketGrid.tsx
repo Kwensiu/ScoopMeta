@@ -11,6 +11,7 @@ interface BucketGridProps {
   onUpdateAll?: () => void;
   updatingBuckets?: Set<string>;
   updateResults?: {[key: string]: string};
+  loading?: boolean;
 }
 
 function BucketGrid(props: BucketGridProps) {
@@ -41,34 +42,44 @@ function BucketGrid(props: BucketGridProps) {
             </div>
           </Show>
         </div>
-        <Show when={props.buckets.length === 0} fallback={
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <For each={props.buckets}>
-              {(bucket) => (
-                <BucketCard 
-                  bucket={bucket} 
-                  onViewBucket={props.onViewBucket}
-                  onUpdateBucket={props.onUpdateBucket}
-                  isUpdating={props.updatingBuckets?.has(bucket.name) || false}
-                  updateResult={props.updateResults?.[bucket.name]}
-                />
-              )}
-            </For>
+        
+        <Show when={props.loading}>
+          <div class="flex justify-center items-center py-8">
+            <span class="loading loading-spinner loading-md"></span>
+            <span class="ml-2">Loading buckets...</span>
           </div>
-        }>
-          <div class="text-center py-8">
-            <p class="text-base-content/70">No buckets found</p>
-            <p class="text-sm text-base-content/50 mt-2">
-              Buckets are typically located in your Scoop installation's buckets directory
-            </p>
-            <Show when={props.onRefresh}>
-              <div class="mt-4">
-                <button class="btn btn-primary" onClick={props.onRefresh}>
-                  Refresh
-                </button>
-              </div>
-            </Show>
-          </div>
+        </Show>
+        
+        <Show when={!props.loading}>
+          <Show when={props.buckets.length > 0} fallback={
+            <div class="text-center py-8">
+              <p class="text-base-content/70">No buckets found</p>
+              <p class="text-sm text-base-content/50 mt-2">
+                Buckets are typically located in your Scoop installation's buckets directory
+              </p>
+              <Show when={props.onRefresh}>
+                <div class="mt-4">
+                  <button class="btn btn-primary" onClick={props.onRefresh}>
+                    Refresh
+                  </button>
+                </div>
+              </Show>
+            </div>
+          }>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <For each={props.buckets}>
+                {(bucket) => (
+                  <BucketCard 
+                    bucket={bucket} 
+                    onViewBucket={props.onViewBucket}
+                    onUpdateBucket={props.onUpdateBucket}
+                    isUpdating={props.updatingBuckets?.has(bucket.name) || false}
+                    updateResult={props.updateResults?.[bucket.name]}
+                  />
+                )}
+              </For>
+            </div>
+          </Show>
         </Show>
       </div>
     </div>

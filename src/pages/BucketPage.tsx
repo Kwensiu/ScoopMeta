@@ -241,14 +241,6 @@ function BucketPage() {
           </div>
         </div>
 
-        {/* Loading State */}
-        <Show when={loading() && !isSearchActive()}>
-          <div class="flex justify-center items-center py-8">
-            <span class="loading loading-spinner loading-lg"></span>
-            <span class="ml-2">Loading buckets...</span>
-          </div>
-        </Show>
-
         {/* Error State */}
         <Show when={error() && !isSearchActive()}>
           <div class="alert alert-error mb-4">
@@ -257,34 +249,34 @@ function BucketPage() {
         </Show>
 
         {/* Main Content */}
-        <Show when={!loading() && !error()}>
-          {/* Search Results */}
-          <Show when={isSearchActive()}>
-            <div class={`transition-all duration-300 ${
-              isSearchActive() ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}>
-              <div class="card bg-base-100">
-                <div class="card-body">
-                  <BucketSearchResults
-                    buckets={searchResults()}
-                    loading={searchLoading()}
-                    error={searchError()}
-                    totalCount={searchTotalCount()}
-                    isExpandedSearch={isExpandedSearch()}
-                    installedBuckets={buckets()}
-                    onBucketSelect={handleSearchBucketSelect}
-                    onBucketInstalled={handleBucketInstalled}
-                  />
-                </div>
+        {/* Search Results */}
+        <Show when={isSearchActive()}>
+          <div class={`transition-all duration-300 ${
+            isSearchActive() ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}>
+            <div class="card bg-base-100">
+              <div class="card-body">
+                <BucketSearchResults
+                  buckets={searchResults()}
+                  loading={searchLoading()}
+                  error={searchError()}
+                  totalCount={searchTotalCount()}
+                  isExpandedSearch={isExpandedSearch()}
+                  installedBuckets={buckets()}
+                  onBucketSelect={handleSearchBucketSelect}
+                  onBucketInstalled={handleBucketInstalled}
+                />
               </div>
             </div>
-          </Show>
+          </div>
+        </Show>
 
-          {/* Regular Buckets View */}
-          <Show when={!isSearchActive()}>
-            <div class={`transition-all duration-300 ${
-              !isSearchActive() ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}>
+        {/* Regular Buckets View */}
+        <Show when={!isSearchActive()}>
+          <div class={`transition-all duration-300 ${
+            !isSearchActive() ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}>
+            <Show when={loading()} fallback={
               <BucketGrid 
                 buckets={buckets()}
                 onViewBucket={handleViewBucket}
@@ -293,9 +285,15 @@ function BucketPage() {
                 onUpdateAll={handleUpdateAllBuckets}
                 updatingBuckets={updatingBuckets()}
                 updateResults={updateResults()}
+                loading={loading()}
               />
-            </div>
-          </Show>
+            }>
+              <div class="flex items-center justify-center py-12">
+                <span class="loading loading-spinner loading-lg"></span>
+                <span class="ml-3 text-lg">Loading buckets...</span>
+              </div>
+            </Show>
+          </div>
         </Show>
       </div>
 
