@@ -1,17 +1,24 @@
 ### Release Notes
 
-#### Added
-- **MSI Installation Support**: The app now detects when you install via the Windows .msi installer and shows a helpful notice with simple instructions to relaunch for full functionality.
-- **Proper App Close**: Fixed the app close button to work reliably.
+## [1.4.2] - 2025-11-14
 
-#### Improved
-- **Cleaner Logging**: Simplified backend logging for easier troubleshooting.
-- **Faster Startup**: Optimized the cold-start initialization process.
-- **Better User Experience**: App no longer attempts to run in a limited state—just ask you to restart, which takes about a second.
+### Added
+- **Package Update Icons**: Added clickable update icons in package lists for quicker updates
+- **Proxy Settings Management**: Added ability to configure Scoop proxy settings directly in Rscoop
+- **Startup Settings**: Added option to configure Rscoop to start automatically with Windows
+- **Scoop Path Auto-detection**: Added auto-detection functionality for Scoop installation path
+- **Package Bucket Changing**: Added ability to change the bucket of installed packages
+- **Refresh Button**: Added refresh button to installed packages view
 
-#### Fixed
-- **MSI Installation Issue**: When you install Rscoop via the .msi installer, Windows temporarily runs it in a restricted mode. The app now detects this and politely asks you to close and reopen it from the Start Menu for normal functionality.
+### Improved
+- **Bucket Management**: Enhanced bucket handling with better cache management and loading indicators
+- **UI/UX Improvements**: Various UI improvements including better loading states and error handling
+- **Package Search**: Enhanced package search functionality with better type handling
+- **Bucket Update Process**: Improved bucket update process with quieter background updates
+- **Performance**: Various performance improvements throughout the application
 
-#### Documentation
-- Updated guides to reflect the improved .msi installation experience.
-- Cleaned up outdated notes about restart requirements.
+### Fixed
+- **Bucket Path Handling**: Refactored bucket path handling to use state-based Scoop path
+- **Initialization Timeout**: Extended initialization timeout and added better timeout handling
+- **UI Responsiveness**: Improved UI responsiveness during bucket operations
+- **Various Bug Fixes**: Fixed several smaller bugs
