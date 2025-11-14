@@ -26,7 +26,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDgxMkUyQTdCQkJEQjI2NTUKUldSVkp0dTdleW91Z2FmUlZJa2pRMEkwNFo5TlVxQkt0YmhIb3pXVGl2RExlSFphL29NdDE4QXEK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEExNUZENjFBOUYyMkNFREUKUldUZXppS2ZHdFpmb1JjbCt1NDAyRGg0SnNsUXBZY2lIOTFRTTkvNjFNYWZQZE12NHd1U3N5ejYK",
       "endpoints": [
         "https://github.com/AmarBego/Rscoop/releases/latest/download/update.json"
       ],
