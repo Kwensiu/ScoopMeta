@@ -9,6 +9,8 @@ Or refer to [README.md.old](README.md.old)
 
 ## 写给用户：
 
+推荐使用exe而非MSI安装。
+
 这是一个Scoop的GUI，用于管理 Windows 下的 Scoop仓库/软件 的 安装、卸载、更新。
 
 添加了一些功能，至少不再需要打开终端管理了。
