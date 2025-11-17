@@ -41,16 +41,36 @@ function SettingsPage(props: SettingsPageProps) {
                 <h1 class="text-3xl font-bold mb-6">Settings</h1>
 
                 <div class="space-y-8">
-                    <ScoopConfiguration />
-                    <ScoopProxySettings />
-                    <StartupSettings />
-                    <VirusTotalSettings />
-                    <HeldPackagesManagement
-                        onUnhold={handleUnhold}
-                        operationInProgress={!!operationTitle()}
-                    />
-                    <WindowBehaviorSettings />
-                    <DebugSettings />
+                    <div class="space-y-8" classList={{ 'pb-8': true }}>
+                        <ScoopConfiguration />
+                        <ScoopProxySettings />
+                        <StartupSettings />
+                    </div>
+                    
+                    <div class="divider">Security</div>
+                    
+                    <div class="space-y-8" classList={{ 'pb-8': true }}>
+                        <VirusTotalSettings />
+                    </div>
+                    
+                    <div class="divider">Package Management</div>
+                    
+                    <div class="space-y-8" classList={{ 'pb-8': true }}>
+                        <HeldPackagesManagement
+                            onUnhold={handleUnhold}
+                            operationInProgress={!!operationTitle()}
+                        />
+                    </div>
+                    
+                    <div class="divider">Application</div>
+                    
+                    <div class="space-y-8" classList={{ 'pb-8': true }}>
+                        <WindowBehaviorSettings />
+                        <DebugSettings />
+                    </div>
+                    
+                    <div class="divider">About</div>
+                    
                     <AboutSection
                         ref={(r) => (aboutSectionRef = r)}
                         isScoopInstalled={props.isScoopInstalled}

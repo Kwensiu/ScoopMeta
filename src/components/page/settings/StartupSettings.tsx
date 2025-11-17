@@ -5,6 +5,7 @@ import { Power } from "lucide-solid";
 export default function StartupSettings() {
     const [isAutoStartEnabled, setIsAutoStartEnabled] = createSignal(false);
     const [isLoading, setIsLoading] = createSignal(true);
+    const [isToggling, setIsToggling] = createSignal(false);
     const [error, setError] = createSignal<string | null>(null);
     const [successMessage, setSuccessMessage] = createSignal<string | null>(null);
 
@@ -24,10 +25,13 @@ export default function StartupSettings() {
     };
 
     const toggleAutoStart = async () => {
+        setIsToggling(true);
         setError(null);
         setSuccessMessage(null);
+        const previousState = isAutoStartEnabled();
+        
         try {
-            const newState = !isAutoStartEnabled();
+            const newState = !previousState;
             await invoke("set_auto_start_enabled", { enabled: newState });
             setIsAutoStartEnabled(newState);
             setSuccessMessage(
@@ -40,6 +44,10 @@ export default function StartupSettings() {
             const errorMsg = err instanceof Error ? err.message : String(err);
             console.error("Failed to toggle auto-start:", errorMsg);
             setError("Failed to update auto-start setting: " + errorMsg);
+            // Restore to previous state to prevent UI inconsistency with actual state
+            setIsAutoStartEnabled(previousState);
+        } finally {
+            setIsToggling(false);
         }
     };
 
@@ -65,15 +73,15 @@ export default function StartupSettings() {
                             class="toggle toggle-primary"
                             checked={isAutoStartEnabled()}
                             onChange={toggleAutoStart}
-                            disabled={isLoading()}
+                            disabled={isLoading() || isToggling()}
                         />
                     </label>
+                    {(isLoading() || isToggling()) && (
+                        <div class="text-sm text-base-content/70 mt-2">
+                            {isLoading() ? "Loading..." : "Updating..."}
+                        </div>
+                    )}
                 </div>
-                {isLoading() && (
-                    <div class="text-sm text-base-content/70 mt-2">
-                        Loading...
-                    </div>
-                )}
                 {error() && <div class="alert alert-error mt-4 text-sm">{error()}</div>}
                 {successMessage() && <div class="alert alert-success mt-4 text-sm">{successMessage()}</div>}
             </div>

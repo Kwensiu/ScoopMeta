@@ -11,9 +11,10 @@ export interface CheckupItem {
 interface CheckupProps {
     checkupResult: CheckupItem[];
     isLoading: boolean;
+    isRetrying?: boolean;
     error: string | null;
     onRerun: () => void;
-    onInstallHelper: (id: string) => void;
+    onInstallHelper: (helperId: string) => void;
     installingHelper: string | null;
 }
 
@@ -86,6 +87,25 @@ function Checkup(props: CheckupProps) {
                         </For>
                     </ul>
                 </Show>
+                <div class="card-actions justify-between items-center">
+                    <div class="text-sm text-base-content/70">
+                        {props.isLoading ? "Running system checkup..." : props.isRetrying ? "Retrying checkup..." : "Checkup completed"}
+                    </div>
+                    <button 
+                        class="btn btn-sm btn-primary" 
+                        onClick={props.onRerun}
+                        disabled={props.isLoading || props.isRetrying}
+                    >
+                        {props.isRetrying ? (
+                            <>
+                                <span class="loading loading-spinner loading-xs"></span>
+                                Retrying...
+                            </>
+                        ) : (
+                            "Rerun Checkup"
+                        )}
+                    </button>
+                </div>
             </div>
         </div>
     );

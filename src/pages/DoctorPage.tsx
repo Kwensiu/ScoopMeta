@@ -15,10 +15,15 @@ function DoctorPage() {
     const [checkupResult, setCheckupResult] = createSignal<CheckupItem[]>([]);
     const [isCheckupLoading, setIsCheckupLoading] = createSignal(true);
     const [checkupError, setCheckupError] = createSignal<string | null>(null);
+    const [isRetrying, setIsRetrying] = createSignal(false);
 
     // Logic for running checkup, now in the parent component
-    const runCheckup = async () => {
-        setIsCheckupLoading(true);
+    const runCheckup = async (isRetry = false) => {
+        if (isRetry) {
+            setIsRetrying(true);
+        } else {
+            setIsCheckupLoading(true);
+        }
         setCheckupError(null);
         try {
             const result = await invoke<CheckupItem[]>("run_scoop_checkup");
@@ -29,7 +34,11 @@ function DoctorPage() {
             setCheckupError("Could not run sfsu checkup. Please ensure 'sfsu' is installed and accessible in your PATH.");
             setCheckupResult([]);
         } finally {
-            setIsCheckupLoading(false);
+            if (isRetry) {
+                setIsRetrying(false);
+            } else {
+                setIsCheckupLoading(false);
+            }
         }
     };
 
@@ -94,8 +103,9 @@ function DoctorPage() {
                         <Checkup
                             checkupResult={checkupResult()}
                             isLoading={isCheckupLoading()}
+                            isRetrying={isRetrying()}
                             error={checkupError()}
-                            onRerun={runCheckup}
+                            onRerun={() => runCheckup(true)}
                             onInstallHelper={handleInstallHelper}
                             installingHelper={installingHelper()}
                         />
@@ -112,8 +122,9 @@ function DoctorPage() {
                          <Checkup
                             checkupResult={checkupResult()}
                             isLoading={isCheckupLoading()}
+                            isRetrying={isRetrying()}
                             error={checkupError()}
-                            onRerun={runCheckup}
+                            onRerun={() => runCheckup(true)}
                             onInstallHelper={handleInstallHelper}
                             installingHelper={installingHelper()}
                         />
@@ -128,4 +139,4 @@ function DoctorPage() {
     );
 }
 
-export default DoctorPage; 
+export default DoctorPage;

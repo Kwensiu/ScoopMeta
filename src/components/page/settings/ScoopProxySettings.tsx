@@ -111,6 +111,8 @@ function ScoopProxySettings() {
                         <br />
                         Leave empty to disable proxy.
                     </div>
+                    
+
                 </div>
                 
                 {error() && <div class="alert alert-error mt-4 text-sm">{error()}</div>}

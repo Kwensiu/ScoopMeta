@@ -80,6 +80,12 @@ pub fn run() {
             };
 
             app.manage(state::AppState::new(scoop_path));
+            
+            // Ensure main window is shown
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.set_focus();
+            }
 
             // Set up system tray
             let _ = tray::setup_system_tray(&app.handle());
@@ -192,6 +198,7 @@ pub fn run() {
             commands::app_info::is_scoop_installation,
             commands::app_info::is_cwd_mismatch,
             commands::app_info::close_app,
+            commands::linker::get_package_versions,
             commands::linker::get_package_versions,
             commands::linker::switch_package_version,
             commands::linker::get_versioned_packages,

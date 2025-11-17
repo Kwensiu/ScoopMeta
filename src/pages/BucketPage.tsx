@@ -209,7 +209,7 @@ function BucketPage() {
     }
   };
 
-  // Handle updating all buckets
+  // Handle updating all buckets with limited concurrency
   const handleUpdateAllBuckets = async () => {
     const gitBuckets = buckets().filter(bucket => bucket.is_git_repo);
     
@@ -217,10 +217,14 @@ function BucketPage() {
     setIsUpdatingAll(true);
     
     try {
-      // Update all git buckets in parallel
-      await Promise.all(
-        gitBuckets.map(bucket => handleUpdateBucket(bucket.name))
-      );
+      // Limit concurrent updates to 3 buckets at a time to prevent system overload
+      const concurrencyLimit = 3;
+      for (let i = 0; i < gitBuckets.length; i += concurrencyLimit) {
+        const batch = gitBuckets.slice(i, i + concurrencyLimit);
+        await Promise.all(
+          batch.map(bucket => handleUpdateBucket(bucket.name))
+        );
+      }
     } catch (error) {
       console.error("Error updating all buckets:", error);
     } finally {

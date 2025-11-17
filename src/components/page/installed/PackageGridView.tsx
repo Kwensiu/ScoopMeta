@@ -21,6 +21,68 @@ interface PackageGridViewProps {
   isPackageVersioned: (packageName: string) => boolean;
 }
 
+// Extract operation button component to avoid repeated creation
+const HoldToggleButton = (props: {
+  pkgName: string;
+  isHeld: boolean;
+  isVersioned: boolean;
+  operatingOn: string | null;
+  onHold: (pkgName: string) => void;
+  onUnhold: (pkgName: string) => void;
+}) => {
+  return (
+    <Show when={props.operatingOn === props.pkgName}
+      fallback={
+        <Show when={props.isVersioned}
+          fallback={
+            <Show when={props.isHeld}
+              fallback={
+                <a onClick={() => props.onHold(props.pkgName)}>
+                  <Lock class="w-4 h-4 mr-2" />
+                  <span>Hold Package</span>
+                </a>
+              }
+            >
+              <a onClick={() => props.onUnhold(props.pkgName)}>
+                <Unlock class="w-4 h-4 mr-2" />
+                <span>Unhold Package</span>
+              </a>
+            </Show>
+          }
+        >
+          <a class="btn-disabled cursor-not-allowed">
+            <Lock class="w-4 h-4 mr-2 text-cyan-400" />
+            <span>Cannot Unhold (Versioned)</span>
+          </a>
+        </Show>
+      }
+    >
+      <span class="flex items-center justify-center p-2">
+        <span class="loading loading-spinner loading-xs"></span>
+      </span>
+    </Show>
+  );
+};
+
+// Extract version switch button component
+const SwitchVersionButton = (props: {
+  pkgName: string;
+  isPackageVersioned: (packageName: string) => boolean;
+  onViewInfoForVersions: (pkg: ScoopPackage) => void;
+  pkg: ScoopPackage;
+}) => {
+  return (
+    <Show when={props.isPackageVersioned(props.pkgName)}>
+      <li>
+        <a onClick={() => props.onViewInfoForVersions(props.pkg)}>
+          <RefreshCw class="w-4 h-4 mr-2" />
+          Switch Version
+        </a>
+      </li>
+    </Show>
+  );
+};
+
 function PackageGridView(props: PackageGridViewProps) {
   return (
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -63,47 +125,21 @@ function PackageGridView(props: PackageGridViewProps) {
                         </li>
                       </Show>
                       <li>
-                        <Show when={props.operatingOn() === pkg.name}
-                            fallback={
-                                <Show when={pkg.is_versioned_install}
-                                    fallback={
-                                        <Show when={heldStore.isHeld(pkg.name)}
-                                            fallback={
-                                                <a onClick={() => props.onHold(pkg.name)}>
-                                                    <Lock class="w-4 h-4 mr-2" />
-                                                    <span>Hold Package</span>
-                                                </a>
-                                            }
-                                        >
-                                            <a onClick={() => props.onUnhold(pkg.name)}>
-                                                <Unlock class="w-4 h-4 mr-2" />
-                                                <span>Unhold Package</span>
-                                            </a>
-                                        </Show>
-                                    }
-                                >
-                                    <a class="btn-disabled cursor-not-allowed">
-                                        <Lock class="w-4 h-4 mr-2 text-cyan-400" />
-                                        <span>Cannot Unhold (Versioned)</span>
-                                    </a>
-                                </Show>
-                            }
-                        >
-                            <span class="flex items-center justify-center p-2">
-                                <span class="loading loading-spinner loading-xs"></span>
-                            </span>
-                        </Show>
+                        <HoldToggleButton 
+                          pkgName={pkg.name}
+                          isHeld={heldStore.isHeld(pkg.name)}
+                          isVersioned={!!pkg.is_versioned_install}
+                          operatingOn={props.operatingOn()}
+                          onHold={props.onHold}
+                          onUnhold={props.onUnhold}
+                        />
                       </li>
-                      <Show when={props.isPackageVersioned(pkg.name)}>
-                        <li>
-                          <a onClick={() => {
-                            props.onViewInfoForVersions(pkg);
-                          }}>
-                            <RefreshCw class="w-4 h-4 mr-2" />
-                            Switch Version
-                          </a>
-                        </li>
-                      </Show>
+                      <SwitchVersionButton
+                        pkgName={pkg.name}
+                        isPackageVersioned={props.isPackageVersioned}
+                        onViewInfoForVersions={props.onViewInfoForVersions}
+                        pkg={pkg}
+                      />
                       <li>
                         <a onClick={() => props.onChangeBucket(pkg)}>
                           <RefreshCw class="w-4 h-4 mr-2" />

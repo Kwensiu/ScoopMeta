@@ -8,6 +8,7 @@ import PackageListView from "../components/page/installed/PackageListView";
 import PackageGridView from "../components/page/installed/PackageGridView";
 import { View } from "../types/scoop";
 import ConfirmationModal from "../components/ConfirmationModal";
+import { createStoredSignal } from "../hooks/createStoredSignal";
 
 interface InstalledPageProps {
   onNavigate?: (view: View) => void;
@@ -59,7 +60,7 @@ function InstalledPage(props: InstalledPageProps) {
     buckets
   } = useInstalledPackages();
 
-  const [searchQuery, setSearchQuery] = createSignal("");
+  const [searchQuery, setSearchQuery] = createStoredSignal<string>('installedSearchQuery', "");
   const [showStatusModal, setShowStatusModal] = createSignal(false);
 
   const handleCheckStatus = async () => {
@@ -109,8 +110,40 @@ function InstalledPage(props: InstalledPageProps) {
       </Show>
 
       <Show when={!loading() && !error() && filteredPackages().length === 0}>
-        <div class="text-center py-16">
-          <p class="text-xl">No packages installed match the current filter</p>
+        <div class="flex flex-col items-center justify-center py-16 text-center">
+          <div class="bg-base-300 rounded-full p-4 mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-base-content/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-2">No packages found</h3>
+          <p class="text-lg text-base-content/70 mb-6 max-w-md">
+            <Show when={searchQuery() || selectedBucket() !== 'all'}>
+              No installed packages match your current filter criteria.
+            </Show>
+            <Show when={!searchQuery() && selectedBucket() === 'all'}>
+              You don't have any packages installed yet.
+            </Show>
+          </p>
+          <Show when={searchQuery() || selectedBucket() !== 'all'}>
+            <button 
+              class="btn btn-primary mb-4"
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedBucket("all");
+              }}
+            >
+              Clear Filters
+            </button>
+          </Show>
+          <Show when={!searchQuery() && selectedBucket() === 'all'}>
+            <button 
+              class="btn btn-primary"
+              onClick={() => props.onNavigate?.("search")}
+            >
+              Browse Packages
+            </button>
+          </Show>
         </div>
       </Show>
 

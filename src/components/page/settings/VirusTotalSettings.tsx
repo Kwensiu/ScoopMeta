@@ -1,6 +1,6 @@
-import { createSignal, onMount, Show } from "solid-js";
+import { createSignal, onMount, Show, createEffect } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
-import { ShieldCheck, KeyRound, Save } from "lucide-solid";
+import { ShieldCheck, KeyRound, Save, AlertCircle } from "lucide-solid";
 import settingsStore from "../../../stores/settings";
 
 export default function VirusTotalSettings() {
@@ -9,6 +9,7 @@ export default function VirusTotalSettings() {
     const [isLoading, setIsLoading] = createSignal(true);
     const [error, setError] = createSignal<string | null>(null);
     const [successMessage, setSuccessMessage] = createSignal<string | null>(null);
+    const [isValidFormat, setIsValidFormat] = createSignal(true);
 
     const fetchApiKey = async () => {
         setIsLoading(true);
@@ -38,6 +39,12 @@ export default function VirusTotalSettings() {
         const isValid = /^[a-f0-9]{64}$/.test(key);
         return isValid;
     };
+
+    // Real-time validation of format when API key changes
+    createEffect(() => {
+        const key = apiKey();
+        setIsValidFormat(validateApiKey(key));
+    });
 
     const handleSave = async () => {
         setError(null);
@@ -83,7 +90,7 @@ export default function VirusTotalSettings() {
                                 class="toggle toggle-primary" 
                                 checked={settings.virustotal.enabled} 
                                 onchange={(e) => setVirusTotalSettings({ enabled: e.currentTarget.checked })}
-                                disabled={!apiKey()}
+                                disabled={!apiKey() || !isValidFormat()}
                             />
                         </label>
                     </div>
@@ -104,16 +111,27 @@ export default function VirusTotalSettings() {
                         <input 
                             type="password"
                             placeholder={isLoading() ? "Loading..." : "Enter your API key"}
-                            class="input input-bordered join-item w-full bg-base-100" 
+                            class={`input input-bordered join-item w-full bg-base-100 ${!isValidFormat() && apiKey() ? 'input-error' : ''}`} 
                             value={apiKey()}
                             onInput={(e) => setApiKey(e.currentTarget.value)}
                             disabled={isLoading()}
                         />
-                        <button class="btn btn-primary join-item" onClick={handleSave} disabled={isLoading()}>
+                        <button class="btn btn-primary join-item" onClick={handleSave} disabled={isLoading() || !isValidFormat()}>
                             <Save class="w-4 h-4 mr-1" />
                             Save
                         </button>
                     </div>
+                    {!isValidFormat() && apiKey() && (
+                        <div class="text-sm text-error flex items-center mt-2">
+                            <AlertCircle class="w-4 h-4 mr-1" />
+                            Invalid format: API key must be 64 lowercase hexadecimal characters
+                        </div>
+                    )}
+                    {isValidFormat() && apiKey() && (
+                        <div class="text-sm text-success mt-2">
+                            API key format is valid
+                        </div>
+                    )}
                 </div>
 
                 <Show when={settings.virustotal.enabled}>
@@ -138,4 +156,4 @@ export default function VirusTotalSettings() {
             </div>
         </div>
     );
-} 
+}

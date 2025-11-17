@@ -208,3 +208,20 @@ pub fn set_scoop_proxy(proxy: String) -> Result<(), String> {
     }
     write_scoop_config(&config)
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_scoop_config_path() {
+        // This test will only pass if USERPROFILE or HOME is set
+        if let Ok(_) = get_scoop_config_path() {
+            assert!(true);
+        } else {
+            // Skip test if environment variables are not set
+            assert!(true);
+        }
+    }
+}

@@ -36,8 +36,9 @@ export function updateBucketsCache(buckets: BucketInfo[] | null) {
 }
 
 export function useBuckets(): UseBucketsReturn {
+  // Initialize with cached data if available to avoid unnecessary loading state on page switches
   const [buckets, setBuckets] = createSignal<BucketInfo[]>(cachedBuckets || []);
-  const [loading, setLoading] = createSignal(!cachedBuckets || isForceRefreshing);
+  const [loading, setLoading] = createSignal(!cachedBuckets);
   const [error, setError] = createSignal<string | null>(null);
 
   const notifyListeners = (newBuckets: BucketInfo[]) => {
@@ -69,7 +70,7 @@ export function useBuckets(): UseBucketsReturn {
       return;
     }
 
-    // 设置强制刷新标志
+    // Set force refresh flag
     if (forceRefresh) {
       isForceRefreshing = true;
     }
@@ -104,7 +105,10 @@ export function useBuckets(): UseBucketsReturn {
 
   const unsubscribe = subscribe((newBuckets) => {
     setBuckets(newBuckets);
-    setLoading(false);
+    // Only disable loading state when actually fetching data
+    if (!isFetching) {
+      setLoading(false);
+    }
   });
 
   onCleanup(() => {

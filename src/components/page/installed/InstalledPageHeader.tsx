@@ -56,7 +56,7 @@ function InstalledPageHeader(props: InstalledPageHeaderProps) {
     }
   });
 
-  // 切换视图模式的函数
+  // Function to toggle view mode
   const toggleViewMode = () => {
     props.setViewMode(props.viewMode() === 'grid' ? 'list' : 'grid');
   };
