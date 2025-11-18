@@ -13,7 +13,11 @@ export interface Shim {
     isHidden: boolean;
 }
 
-function ShimManager() {
+export interface ShimManagerProps {
+    onOpenDirectory?: () => void;
+}
+
+function ShimManager(props: ShimManagerProps) {
     const [allShims, setAllShims] = createSignal<Shim[]>([]);
     const [filter, setFilter] = createSignal("");
     const [isLoading, setIsLoading] = createSignal(true);
@@ -112,12 +116,23 @@ function ShimManager() {
                             <Plus class="w-4 h-4" /> Add Shim
                         </button>
                         <div class="divider divider-horizontal m-1" />
+                        <Show when={props.onOpenDirectory}>
+                            <button 
+                                class="btn btn-sm btn-ghost"
+                                onClick={props.onOpenDirectory}
+                                title="Open Shim Directory"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                                </svg>
+                            </button>
+                        </Show>
                         <button 
                             class="btn btn-ghost btn-sm"
                             onClick={fetchShims} 
                             disabled={isLoading() || isProcessing()}
                         >
-                            <RefreshCw classList={{"animate-spin": isLoading()}} />
+                            <RefreshCw class="w-4 h-4" classList={{"animate-spin": isLoading()}} />
                         </button>
                     </div>
                 </div>

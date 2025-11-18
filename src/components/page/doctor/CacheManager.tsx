@@ -14,12 +14,16 @@ interface CacheEntry {
 // A unique identifier for a cache entry
 type CacheIdentifier = string; 
 
+export interface CacheManagerProps {
+    onOpenDirectory?: () => void;
+}
+
 function getCacheIdentifier(entry: CacheEntry): CacheIdentifier {
     // Using the full filename for uniqueness
     return entry.fileName;
 }
 
-function CacheManager() {
+function CacheManager(props: CacheManagerProps) {
     const [cacheContents, setCacheContents] = createSignal<CacheEntry[]>([]);
     const [selectedItems, setSelectedItems] = createSignal<Set<CacheIdentifier>>(new Set());
     const [filter, setFilter] = createSignal("");
@@ -182,12 +186,23 @@ function CacheManager() {
                                 </button>
                                 <div class="divider divider-horizontal m-1" />
                             </Show>
+                            <Show when={props.onOpenDirectory}>
+                                <button 
+                                    class="btn btn-sm btn-ghost"
+                                    onClick={props.onOpenDirectory}
+                                    title="Open Cache Directory"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                                    </svg>
+                                </button>
+                            </Show>
                             <button 
                                 class="btn btn-ghost btn-sm"
                                 onClick={fetchCacheContents} 
                                 disabled={isLoading()}
                             >
-                                <RefreshCw classList={{"animate-spin": isLoading()}} />
+                                <RefreshCw class="w-4 h-4" classList={{"animate-spin": isLoading()}} />
                             </button>
                         </div>
                     </div>

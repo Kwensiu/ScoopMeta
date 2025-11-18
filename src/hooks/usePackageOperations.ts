@@ -92,7 +92,7 @@ export function usePackageOperations(): UsePackageOperationsReturn {
 
     const handleUpdateAll = () => {
         setOperationTitle("Updating all packages");
-        invoke("update_all_packages").catch(err => {
+        return invoke("update_all_packages").catch(err => {
             console.error("Update all invocation failed:", err);
         });
     };

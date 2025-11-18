@@ -10,17 +10,26 @@ interface SearchResultsListProps {
     onViewInfo: (pkg: ScoopPackage) => void;
     onInstall: (pkg: ScoopPackage) => void;
     onPackageStateChanged?: () => void; // Callback for when package state changes
+    currentPage: number;
+    onPageChange: (page: number) => void;
 }
 
 function SearchResultsList(props: SearchResultsListProps) {
-    return (
-        <>
-            <Show when={props.loading}>
-                <div class="flex justify-center items-center h-64">
-                    <span class="loading loading-spinner loading-lg"></span>
-                </div>
-            </Show>
+    // 每页显示的项目数
+    const ITEMS_PER_PAGE = 10;
+    
+    // 计算总页数
+    const totalPages = () => Math.ceil(props.results.length / ITEMS_PER_PAGE);
+    
+    // 计算当前页的项目
+    const paginatedResults = () => {
+        const startIndex = (props.currentPage - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+        return props.results.slice(startIndex, endIndex);
+    };
 
+    return (
+        <div class="relative">
             <Show
                 when={!props.loading && props.results.length === 0 && props.searchTerm.length > 1}
             >
@@ -32,8 +41,8 @@ function SearchResultsList(props: SearchResultsListProps) {
                 </div>
             </Show>
 
-            <div class="space-y-4">
-                <For each={props.results}>
+            <div class="space-y-4 min-h-96">
+                <For each={paginatedResults()}>
                     {(pkg) => (
                         <div
                             class="card bg-base-200 shadow-xl cursor-pointer transition-all duration-200 transform hover:scale-101"
@@ -59,21 +68,49 @@ function SearchResultsList(props: SearchResultsListProps) {
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     props.onInstall(pkg);
-                                                    // Notify parent that package state may change
-                                                    props.onPackageStateChanged?.();
                                                 }}
                                             >
-                                                <Download />
+                                                <Download class="w-4 h-4" />
                                             </button>
                                         )}
                                     </div>
                                 </div>
+                                <Show when={pkg.info}>
+                                    <p class="text-base-content/70 mt-2 line-clamp-2">
+                                        {pkg.info}
+                                    </p>
+                                </Show>
                             </div>
                         </div>
                     )}
                 </For>
             </div>
-        </>
+
+            {/* 分页控件 */}
+            <Show when={props.results.length > ITEMS_PER_PAGE}>
+                <div class="flex justify-center items-center mt-6 space-x-2">
+                    <button
+                        class="btn btn-sm"
+                        disabled={props.currentPage <= 1}
+                        onClick={() => props.onPageChange(props.currentPage - 1)}
+                    >
+                        &lt;
+                    </button>
+                    
+                    <span class="text-sm">
+                        Page {props.currentPage} / {totalPages()}
+                    </span>
+                    
+                    <button
+                        class="btn btn-sm"
+                        disabled={props.currentPage >= totalPages()}
+                        onClick={() => props.onPageChange(props.currentPage + 1)}
+                    >
+                        &gt;
+                    </button>
+                </div>
+            </Show>
+        </div>
     );
 }
 

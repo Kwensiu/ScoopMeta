@@ -199,7 +199,6 @@ pub fn run() {
             commands::app_info::is_cwd_mismatch,
             commands::app_info::close_app,
             commands::linker::get_package_versions,
-            commands::linker::get_package_versions,
             commands::linker::switch_package_version,
             commands::linker::get_versioned_packages,
             commands::linker::debug_package_structure,

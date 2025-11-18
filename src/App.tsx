@@ -8,6 +8,8 @@ import { View } from "./types/scoop.ts";
 import SettingsPage from "./pages/SettingsPage.tsx";
 import DoctorPage from "./pages/DoctorPage.tsx";
 import DebugModal from "./components/DebugModal.tsx";
+import FloatingOperationPanel from "./components/FloatingOperationPanel.tsx";
+import AnimatedButton from "./components/AnimatedButton";
 import { listen } from "@tauri-apps/api/event";
 import { info, error as logError } from "@tauri-apps/plugin-log";
 import { createStoredSignal } from "./hooks/createStoredSignal";
@@ -18,6 +20,7 @@ import { invoke } from "@tauri-apps/api/core";
 import installedPackagesStore from "./stores/installedPackagesStore";
 import { checkCwdMismatch } from "./utils/installCheck";
 import { BucketInfo, updateBucketsCache } from "./hooks/useBuckets";
+import { usePackageOperations } from "./hooks/usePackageOperations";
 
 function App() {
     // Persist selected view across sessions.
@@ -25,6 +28,8 @@ function App() {
         "rscoop-view",
         "search"
     );
+
+    const packageOperations = usePackageOperations();
 
     // Always start with false on app launch to ensure loading screen shows
     const [readyFlag, setReadyFlag] = createSignal<"true" | "false">("false");
@@ -48,11 +53,6 @@ function App() {
     // Track initialization timeout
     const [initTimedOut, setInitTimedOut] = createSignal(false);
 
-    // Track update all operation
-    const [isUpdatingAll, setIsUpdatingAll] = createSignal(false);
-    
-    // Track update completion state
-    const [updateCompleted, setUpdateCompleted] = createSignal(false);
 
     // Debug: track state changes
     createEffect(() => {
@@ -80,21 +80,8 @@ function App() {
         }
     };
 
-    const handleUpdateAll = async () => {
-        setIsUpdatingAll(true);
-        try {
-            await invoke("update_all_packages");
-            // Show completion state
-            setUpdateCompleted(true);
-            // Reset completion state after 2 seconds
-            setTimeout(() => {
-                setUpdateCompleted(false);
-            }, 2000);
-        } catch (e) {
-            console.error("Failed to update all packages", e);
-        } finally {
-            setIsUpdatingAll(false);
-        }
+    const handleUpdateAll = () => {
+        return packageOperations.handleUpdateAll();
     };
 
     onMount(async () => {
@@ -387,29 +374,15 @@ function App() {
                     </div>
                 </div>
                 {/* Update ALL floating button in the bottom-right corner */}
-                <button 
-                    classList={{
-                        "fixed bottom-6 right-6 bg-gray-500 hover:bg-gray-600 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg transition-all duration-200 ease-in-out": true,
-                        "transform scale-95": isUpdatingAll(), // Slightly compress when updating
-                        "bg-success": updateCompleted(), // Green when completed
-                        "w-auto px-4 rounded-xl": isUpdatingAll() || updateCompleted() // Expand when showing text
-                    }}
-                    onClick={handleUpdateAll}
-                    disabled={isUpdatingAll()}
-                >
-                    <Show when={isUpdatingAll() || updateCompleted()} fallback={
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                    }>
-                        <Show when={updateCompleted()} fallback={
-                            <span>Updating All...</span>
-                        }>
-                            <span>Finish!</span>
-                        </Show>
-                    </Show>
-                </button>
+                <AnimatedButton
+                  onClick={handleUpdateAll}
+                  initialState="circle"
+                />
                 <DebugModal />
+                <FloatingOperationPanel
+                    title={packageOperations.operationTitle()}
+                    onClose={packageOperations.closeOperationModal}
+                />
             </Show>
         </>
     );

@@ -2,9 +2,30 @@ import { createSignal, createEffect, onCleanup, For, Show, Component } from "sol
 import { listen, emit } from "@tauri-apps/api/event";
 import type { UnlistenFn } from "@tauri-apps/api/event";
 import { VirustotalResult } from "../types/scoop";
-import { ShieldAlert, AlertTriangle, ExternalLink } from "lucide-solid";
+import { ShieldAlert, AlertTriangle, ExternalLink, X } from "lucide-solid";
 
-// Shared types for backend operations
+// Custom hook for tracking window size
+const useWindowSize = () => {
+  const [windowSize, setWindowSize] = createSignal({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  createEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    onCleanup(() => window.removeEventListener("resize", handleResize));
+  });
+
+  return windowSize;
+};
+
 interface OperationOutput {
   line: string;
   source: string; // "stdout" or "stderr"
@@ -44,8 +65,8 @@ const LineWithLinks: Component<{ line: string }> = (props) => {
   );
 };
 
-interface OperationModalProps {
-  // Title for the modal, e.g., "Installing vscode" or "Updating all packages"
+interface FloatingOperationPanelProps {
+  // Title for the panel, e.g., "Installing vscode" or "Updating all packages"
   title: string | null;
   onClose: (wasSuccess: boolean) => void;
   nextStep?: {
@@ -57,12 +78,24 @@ interface OperationModalProps {
   onInstallConfirm?: () => void;
 }
 
-function OperationModal(props: OperationModalProps) {
+function FloatingOperationPanel(props: FloatingOperationPanelProps) {
   const [output, setOutput] = createSignal<OperationOutput[]>([]);
   const [result, setResult] = createSignal<OperationResult | null>(null);
   const [showNextStep, setShowNextStep] = createSignal(false);
   const [scanWarning, setScanWarning] = createSignal<VirustotalResult | null>(null);
+  const windowSize = useWindowSize();
   let scrollRef: HTMLDivElement | undefined;
+  
+  // Effect to handle window resize
+  createEffect(() => {
+    // Accessing windowSize() triggers the effect when window is resized
+    windowSize();
+    
+    // Keep scroll at the bottom
+    if (scrollRef) {
+      scrollRef.scrollTop = scrollRef.scrollHeight;
+    }
+  });
   
   // This effect now correctly manages the lifecycle of the listeners
   createEffect(() => {
@@ -97,7 +130,7 @@ function OperationModal(props: OperationModalProps) {
       }
     };
 
-    // Only set up listeners when the modal is active (has a title)
+    // Only set up listeners when the panel is active (has a title)
     if (props.title) {
       // Reset state for the new operation
       setOutput([]);
@@ -150,12 +183,26 @@ function OperationModal(props: OperationModalProps) {
 
   return (
     <Show when={!!props.title}>
-      <div class="modal modal-open backdrop-blur-sm" role="dialog">
-        <div class="modal-box w-11/12 max-w-5xl mx-auto">
-          <h3 class="font-bold text-lg">{props.title}</h3>
+      <div class="fixed inset-0 flex items-center justify-center z-50 p-2">
+        <div 
+          class="absolute inset-0 transition-all duration-300 ease-in-out"
+          style="background-color: rgba(0, 0, 0, 0.3);"
+          onClick={handleCloseOrCancel}
+        ></div>
+        <div class="relative bg-base-200 rounded-lg shadow-xl border border-base-300 w-full max-w-md sm:max-w-lg md:max-w-xl max-h-[90vh] overflow-hidden flex flex-col">
+          <div class="flex justify-between items-center p-3 border-b border-base-300">
+            <h3 class="font-bold text-lg truncate">{props.title}</h3>
+            <button 
+              class="btn btn-sm btn-circle btn-ghost"
+              onClick={handleCloseOrCancel}
+            >
+              <X class="w-4 h-4" />
+            </button>
+          </div>
+          
           <div 
             ref={scrollRef}
-            class="bg-black text-white font-mono text-sm p-4 rounded-lg my-4 max-h-96 overflow-y-auto"
+            class="bg-black text-white font-mono text-xs p-3 rounded-lg m-3 overflow-y-auto flex-grow"
           >
             <For each={output()}>
               {(line) => (
@@ -173,39 +220,38 @@ function OperationModal(props: OperationModalProps) {
           </div>
           
           <Show when={scanWarning()}>
-              <div class="alert alert-warning">
+              <div class="alert alert-warning mx-3">
                   <ShieldAlert class="w-6 h-6" />
                   <span>{scanWarning()!.message}</span>
               </div>
           </Show>
 
           <Show when={result()}>
-              <div class="alert" classList={{ 'alert-success': result()?.success, 'alert-error': !result()?.success }}>
+              <div class="alert mx-3" classList={{ 'alert-success': result()?.success, 'alert-error': !result()?.success }}>
                   <span>{result()!.message}</span>
               </div>
           </Show>
 
-          <div class="modal-action">
+          <div class="flex justify-end p-3 gap-2">
               <Show when={scanWarning()}>
-                  <button class="btn btn-warning" onClick={handleInstallAnyway}>
+                  <button class="btn btn-warning btn-sm" onClick={handleInstallAnyway}>
                       <AlertTriangle class="w-4 h-4 mr-2" />
                       Install Anyway
                   </button>
               </Show>
               <Show when={showNextStep()}>
-                  <button class="btn btn-info" onClick={handleNextStepClick}>
+                  <button class="btn btn-info btn-sm" onClick={handleNextStepClick}>
                       {props.nextStep?.buttonLabel}
                   </button>
               </Show>
-              <button class="btn" onClick={handleCloseOrCancel}>
+              <button class="btn btn-sm" onClick={handleCloseOrCancel}>
                   { result() || scanWarning() ? 'Close' : 'Cancel' }
               </button>
           </div>
         </div>
-        <div class="modal-backdrop" onClick={() => {if (result()) { props.onClose(result()?.success ?? false) } else { props.onClose(false) }}}></div>
       </div>
     </Show>
   );
 }
 
-export default OperationModal; 
+export default FloatingOperationPanel;

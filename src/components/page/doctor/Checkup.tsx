@@ -24,11 +24,11 @@ function Checkup(props: CheckupProps) {
             <div class="card-body">
                 <div class="flex justify-between items-center">
                     <h2 class="card-title text-xl">
-                        System Health Check
+                        Scoop Health Check
                     </h2>
 
                     <button class="btn btn-ghost btn-sm" onClick={props.onRerun} disabled={props.isLoading}>
-                        <RefreshCw classList={{ "animate-spin": props.isLoading }} />
+                        <RefreshCw class="w-4 h-4" classList={{ "animate-spin": props.isLoading }} />
                     </button>
                 </div>
                  <p class="text-base-content/80 mb-4">
@@ -64,48 +64,20 @@ function Checkup(props: CheckupProps) {
                                                 onClick={() => props.onInstallHelper(item.id!)}
                                                 disabled={!!props.installingHelper}
                                             >
-                                                <Show when={props.installingHelper === item.id} fallback={
-                                                    <>
-                                                        <Download class="w-3 h-3 mr-1" />
-                                                        Install
-                                                    </>
-                                                }>
-                                                    <span class="loading loading-spinner loading-xs"></span>
-                                                    Installing...
-                                                </Show>
+                                                <Download class="w-3 h-3 mr-1" />
+                                                Install
                                             </button>
                                         </Show>
                                     </div>
-                                    <Show when={item.suggestion}>
-                                        <div class="mt-2 ml-8 text-sm p-2 bg-base-300 rounded-md">
-                                            <p class="font-semibold mb-1">Suggestion:</p>
-                                            <code class="font-mono text-base-content/80">{item.suggestion}</code>
-                                        </div>
+                                    
+                                    <Show when={item.suggestion && !item.status}>
+                                        <p class="text-sm text-warning mt-1 ml-8">{item.suggestion}</p>
                                     </Show>
                                 </li>
                             )}
                         </For>
                     </ul>
                 </Show>
-                <div class="card-actions justify-between items-center">
-                    <div class="text-sm text-base-content/70">
-                        {props.isLoading ? "Running system checkup..." : props.isRetrying ? "Retrying checkup..." : "Checkup completed"}
-                    </div>
-                    <button 
-                        class="btn btn-sm btn-primary" 
-                        onClick={props.onRerun}
-                        disabled={props.isLoading || props.isRetrying}
-                    >
-                        {props.isRetrying ? (
-                            <>
-                                <span class="loading loading-spinner loading-xs"></span>
-                                Retrying...
-                            </>
-                        ) : (
-                            "Rerun Checkup"
-                        )}
-                    </button>
-                </div>
             </div>
         </div>
     );

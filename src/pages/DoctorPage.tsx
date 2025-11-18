@@ -1,5 +1,6 @@
 import { createSignal, onMount, createMemo, Show } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
+import { openPath } from "@tauri-apps/plugin-opener"; // 添加openPath导入
 import Checkup, { CheckupItem } from "../components/page/doctor/Checkup";
 import Cleanup from "../components/page/doctor/Cleanup";
 import CacheManager from "../components/page/doctor/CacheManager";
@@ -93,10 +94,34 @@ function DoctorPage() {
         setOperationTitle(null);
     };
     
+    // 添加打开缓存目录的函数
+    const handleOpenCacheDirectory = async () => {
+        try {
+            const scoopPath = await invoke<string>("get_scoop_path");
+            const cachePath = `${scoopPath}\\cache`;
+            console.log("Attempting to open cache directory:", cachePath);
+            await openPath(cachePath);
+        } catch (err) {
+            console.error("Failed to open cache directory:", err);
+        }
+    };
+    
+    // 添加打开shim目录的函数
+    const handleOpenShimDirectory = async () => {
+        try {
+            const scoopPath = await invoke<string>("get_scoop_path");
+            const shimPath = `${scoopPath}\\shims`;
+            console.log("Attempting to open shim directory:", shimPath);
+            await openPath(shimPath);
+        } catch (err) {
+            console.error("Failed to open shim directory:", err);
+        }
+    };
+    
     return (
         <>
             <div class="p-4 sm:p-6 md:p-8">
-                <h1 class="text-3xl font-bold mb-6">System Doctor</h1>
+                <h1 class="text-3xl font-bold mb-6">Scoop Doctor</h1>
                 
                 <div class="space-y-8">
                     <Show when={needsAttention()}>
@@ -111,12 +136,23 @@ function DoctorPage() {
                         />
                     </Show>
                     
-                    <Cleanup 
-                        onCleanupApps={handleCleanupApps}
-                        onCleanupCache={handleCleanupCache}
-                    />
-                    <CacheManager />
-                    <ShimManager />
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-2xl font-bold">Scoop Cleanup</h2>
+                        </div>
+                        <Cleanup 
+                            onCleanupApps={handleCleanupApps}
+                            onCleanupCache={handleCleanupCache}
+                        />
+                    </div>
+                    
+                    <div>
+                        <CacheManager onOpenDirectory={handleOpenCacheDirectory} />
+                    </div>
+                    
+                    <div>
+                        <ShimManager onOpenDirectory={handleOpenShimDirectory} />
+                    </div>
 
                     <Show when={!needsAttention()}>
                          <Checkup
