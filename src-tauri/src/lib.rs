@@ -409,9 +409,9 @@ pub fn run() {
             commands::debug::get_debug_info,
             commands::debug::get_app_logs,
             commands::debug::read_app_log_file,
+            commands::version::check_and_update_version,
             commands::startup::is_auto_start_enabled,
             commands::startup::set_auto_start_enabled,
-            commands::version::check_and_update_version,
             cold_start::is_cold_start_ready,
             tray::refresh_tray_apps_menu
         ])
