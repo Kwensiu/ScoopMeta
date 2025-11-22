@@ -8,8 +8,6 @@ use tauri::command;
 use url::Url;
 
 use crate::commands::search::invalidate_manifest_cache;
-use crate::state::AppState;
-use tauri::State;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BucketInstallOptions {
@@ -33,8 +31,39 @@ static GIT_URL_REGEX: Lazy<Regex> = Lazy::new(|| {
 });
 
 // Get the buckets directory path
-fn get_buckets_dir(scoop_path: &Path) -> Result<PathBuf, String> {
-    Ok(scoop_path.join("buckets"))
+fn get_buckets_dir() -> Result<PathBuf, String> {
+    // Use fallback method to get scoop directory
+    let scoop_dir = get_scoop_dir_fallback()?;
+    Ok(scoop_dir.join("buckets"))
+}
+
+// Helper function to get scoop directory using fallback method
+fn get_scoop_dir_fallback() -> Result<PathBuf, String> {
+    use std::env;
+
+    // Try environment variable first
+    if let Ok(scoop_path) = env::var("SCOOP") {
+        let path = PathBuf::from(scoop_path);
+        if path.exists() {
+            return Ok(path);
+        }
+    }
+
+    // Try default user profile location
+    if let Ok(user_profile) = env::var("USERPROFILE") {
+        let scoop_path = PathBuf::from(user_profile).join("scoop");
+        if scoop_path.exists() {
+            return Ok(scoop_path);
+        }
+    }
+
+    // Try system-wide location
+    let program_data = PathBuf::from("C:\\ProgramData\\scoop");
+    if program_data.exists() {
+        return Ok(program_data);
+    }
+
+    Err("Unable to determine Scoop root directory".to_string())
 }
 
 // Validate and normalize repository URL
@@ -120,15 +149,15 @@ fn extract_bucket_name_from_url(url: &str, provided_name: Option<&str>) -> Resul
 }
 
 // Check if bucket already exists
-fn bucket_exists(bucket_name: &str, scoop_path: &Path) -> Result<bool, String> {
-    let buckets_dir = get_buckets_dir(scoop_path)?;
+fn bucket_exists(bucket_name: &str) -> Result<bool, String> {
+    let buckets_dir = get_buckets_dir()?;
     let bucket_path = buckets_dir.join(bucket_name);
     Ok(bucket_path.exists())
 }
 
 // Get bucket directory path
-fn get_bucket_path(bucket_name: &str, scoop_path: &Path) -> Result<PathBuf, String> {
-    let buckets_dir = get_buckets_dir(scoop_path)?;
+fn get_bucket_path(bucket_name: &str) -> Result<PathBuf, String> {
+    let buckets_dir = get_buckets_dir()?;
     Ok(buckets_dir.join(bucket_name))
 }
 
@@ -228,10 +257,8 @@ fn remove_bucket_directory(bucket_path: &Path) -> Result<(), String> {
 // Main function to install a bucket
 async fn install_bucket_internal(
     options: BucketInstallOptions,
-    state: State<'_, AppState>
 ) -> Result<BucketInstallResult, String> {
     let BucketInstallOptions { name, url, force } = options;
-    let scoop_path = state.scoop_path();
 
     // Validate and normalize URL
     let normalized_url = validate_and_normalize_url(&url)?;
@@ -244,7 +271,7 @@ async fn install_bucket_internal(
     };
 
     // Check if bucket already exists
-    if bucket_exists(&bucket_name, &scoop_path)? && !force {
+    if bucket_exists(&bucket_name)? && !force {
         return Ok(BucketInstallResult {
             success: false,
             message: format!(
@@ -252,12 +279,12 @@ async fn install_bucket_internal(
                 bucket_name
             ),
             bucket_name: bucket_name.clone(),
-            bucket_path: Some(get_bucket_path(&bucket_name, &scoop_path)?.to_string_lossy().to_string()),
+            bucket_path: Some(get_bucket_path(&bucket_name)?.to_string_lossy().to_string()),
             manifest_count: None,
         });
     }
 
-    let bucket_path = get_bucket_path(&bucket_name, &scoop_path)?;
+    let bucket_path = get_bucket_path(&bucket_name)?;
 
     // If force is true and bucket exists, remove it first
     if force && bucket_path.exists() {
@@ -305,10 +332,10 @@ async fn install_bucket_internal(
 
 // Tauri command to install a bucket
 #[command]
-pub async fn install_bucket(options: BucketInstallOptions, state: State<'_, AppState>) -> Result<BucketInstallResult, String> {
+pub async fn install_bucket(options: BucketInstallOptions) -> Result<BucketInstallResult, String> {
     log::info!("Installing bucket: {} from {}", options.name, options.url);
 
-    match install_bucket_internal(options, state).await {
+    match install_bucket_internal(options).await {
         Ok(result) => {
             log::info!("Bucket installation result: {:?}", result);
             Ok(result)
@@ -331,23 +358,20 @@ pub async fn install_bucket(options: BucketInstallOptions, state: State<'_, AppS
 pub async fn validate_bucket_install(
     name: String,
     url: String,
-    state: State<'_, AppState>
 ) -> Result<BucketInstallResult, String> {
     log::info!("Validating bucket installation: {} from {}", name, url);
-    let scoop_path = state.scoop_path();
 
     // Validate URL
     let normalized_url = match validate_and_normalize_url(&url) {
         Ok(url) => url,
         Err(e) => {
-            let result = BucketInstallResult {
+            return Ok(BucketInstallResult {
                 success: false,
                 message: format!("Invalid URL: {}", e),
                 bucket_name: name,
                 bucket_path: None,
                 manifest_count: None,
-            };
-            return Ok(result);
+            })
         }
     };
 
@@ -358,23 +382,22 @@ pub async fn validate_bucket_install(
     ) {
         Ok(name) => name,
         Err(e) => {
-            let result = BucketInstallResult {
+            return Ok(BucketInstallResult {
                 success: false,
                 message: format!("Invalid bucket name: {}", e),
                 bucket_name: name,
                 bucket_path: None,
                 manifest_count: None,
-            };
-            return Ok(result);
+            })
         }
     };
 
     // Check if bucket already exists
-    let already_exists = bucket_exists(&bucket_name, &scoop_path).unwrap_or(false);
+    let already_exists = bucket_exists(&bucket_name).unwrap_or(false);
 
     let bucket_path = if already_exists {
         Some(
-            get_bucket_path(&bucket_name, &scoop_path)
+            get_bucket_path(&bucket_name)
                 .unwrap()
                 .to_string_lossy()
                 .to_string(),
@@ -383,36 +406,28 @@ pub async fn validate_bucket_install(
         None
     };
 
-    let message = if already_exists {
-        format!("Bucket '{}' already exists", bucket_name)
-    } else {
-        format!(
-            "Bucket '{}' can be installed from {}",
-            bucket_name, normalized_url
-        )
-    };
-
-    let result = BucketInstallResult {
+    Ok(BucketInstallResult {
         success: !already_exists,
-        message,
+        message: if already_exists {
+            format!("Bucket '{}' already exists", bucket_name)
+        } else {
+            format!(
+                "Bucket '{}' can be installed from {}",
+                bucket_name, normalized_url
+            )
+        },
         bucket_name,
         bucket_path,
         manifest_count: None,
-    };
-    
-    Ok(result)
+    })
 }
 
 // Command to update a bucket (git pull)
 #[command]
-pub fn update_bucket(
-    bucket_name: String, 
-    state: State<AppState>
-) -> Result<BucketInstallResult, String> {
+pub fn update_bucket(bucket_name: String) -> Result<BucketInstallResult, String> {
     log::info!("Updating bucket: {}", bucket_name);
 
-    let scoop_path = state.scoop_path();
-    let bucket_path = get_bucket_path(&bucket_name, &scoop_path)?;
+    let bucket_path = get_bucket_path(&bucket_name)?;
 
     if !bucket_path.exists() {
         return Ok(BucketInstallResult {
@@ -474,8 +489,7 @@ pub fn update_bucket(
             fetch_options.remote_callbacks(callbacks);
 
             // Fetch latest changes
-            let refspecs: &[&str] = &[];
-            match remote.fetch(refspecs, Some(&mut fetch_options), None) {
+            match remote.fetch(&[] as &[&str], Some(&mut fetch_options), None) {
                 Ok(_) => {
                     // Get current branch
                     let head = match repo.head() {
@@ -524,7 +538,7 @@ pub fn update_bucket(
                                 checkout_builder.force();
 
                                 repo.reset(
-                                    &remote_commit.into_object(),
+                                    remote_commit.as_object(),
                                     git2::ResetType::Hard,
                                     Some(&mut checkout_builder),
                                 )
@@ -603,13 +617,60 @@ pub fn update_bucket(
     }
 }
 
+/// Command to update all buckets sequentially.
+/// Returns a list of per-bucket results. Non-fatal errors are captured in each result.
+#[command]
+pub async fn update_all_buckets() -> Result<Vec<BucketInstallResult>, String> {
+    log::info!("Updating all buckets (auto-update task)");
+    let buckets_dir = match get_buckets_dir() {
+        Ok(p) => p,
+        Err(e) => return Err(format!("Failed to resolve buckets directory: {}", e)),
+    };
+
+    if !buckets_dir.is_dir() {
+        log::warn!(
+            "Buckets directory does not exist: {}",
+            buckets_dir.display()
+        );
+        return Ok(vec![]);
+    }
+
+    let mut results = Vec::new();
+
+    let entries = match fs::read_dir(&buckets_dir) {
+        Ok(e) => e,
+        Err(e) => return Err(format!("Failed to read buckets directory: {}", e)),
+    };
+
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if !path.is_dir() {
+            continue;
+        }
+        if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+            match update_bucket(name.to_string()) {
+                Ok(res) => results.push(res),
+                Err(e) => results.push(BucketInstallResult {
+                    success: false,
+                    message: e,
+                    bucket_name: name.to_string(),
+                    bucket_path: Some(path.to_string_lossy().to_string()),
+                    manifest_count: None,
+                }),
+            }
+        }
+    }
+
+    log::info!("Completed updating {} buckets", results.len());
+    Ok(results)
+}
+
 // Command to remove a bucket
 #[command]
-pub async fn remove_bucket(bucket_name: String, state: State<'_, AppState>) -> Result<BucketInstallResult, String> {
+pub async fn remove_bucket(bucket_name: String) -> Result<BucketInstallResult, String> {
     log::info!("Removing bucket: {}", bucket_name);
 
-    let scoop_path = state.scoop_path();
-    let bucket_path = get_bucket_path(&bucket_name, &scoop_path)?;
+    let bucket_path = get_bucket_path(&bucket_name)?;
 
     if !bucket_path.exists() {
         return Ok(BucketInstallResult {

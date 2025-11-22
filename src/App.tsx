@@ -3,13 +3,14 @@ import "./App.css";
 import Header from "./components/Header.tsx";
 import SearchPage from "./pages/SearchPage.tsx";
 import BucketPage from "./pages/BucketPage.tsx";
-import PackagesPage from "./pages/InstalledPage.tsx";
+import InstalledPage from "./pages/InstalledPage.tsx";
 import { View } from "./types/scoop.ts";
 import SettingsPage from "./pages/SettingsPage.tsx";
 import DoctorPage from "./pages/DoctorPage.tsx";
 import DebugModal from "./components/DebugModal.tsx";
 import FloatingOperationPanel from "./components/FloatingOperationPanel.tsx";
 import AnimatedButton from "./components/AnimatedButton";
+import OperationModal from "./components/OperationModal.tsx";
 import { listen } from "@tauri-apps/api/event";
 import { info, error as logError } from "@tauri-apps/plugin-log";
 import { createStoredSignal } from "./hooks/createStoredSignal";
@@ -72,7 +73,9 @@ function App() {
     // Track initialization timeout
     const [initTimedOut, setInitTimedOut] = createSignal(false);
 
-    // Remove unused state signals since we're no longer using refs to track page elements
+    // Auto-update modal state
+    const [autoUpdateTitle, setAutoUpdateTitle] = createSignal<string | null>(null);
+
     // Debug: track state changes
     createEffect(() => {
         console.log("MSI State - hasCwdMismatch:", hasCwdMismatch(), "bypassCwdMismatch:", bypassCwdMismatch());
@@ -103,42 +106,30 @@ function App() {
         return packageOperations.handleUpdateAll();
     };
 
-    onMount(async () => {
-        try {
-            info("App initialization started");
-            
-            // Check for CWD mismatch (MSI installation issue)
-            const cwdMismatch = await checkCwdMismatch();
-            setHasCwdMismatch(cwdMismatch);
-            info(`CWD mismatch check result: ${cwdMismatch}`);
-
-            // Check if app is installed via Scoop
-            const scoopInstalled = await invoke<boolean>("is_scoop_installation");
-            setIsScoopInstalled(scoopInstalled);
-            info(`Scoop installation check result: ${scoopInstalled}`);
-
-            // Only check for updates if not installed via Scoop
-            if (!scoopInstalled) {
-                info("Checking for application updates...");
-                const updateResult = await check();
-                if (updateResult) {
-                    info(`Update ${updateResult.version} is available.`);
-                    setUpdate(updateResult);
-                } else {
-                    info("Application is up to date.");
-                }
-            } else {
-                info("App is installed via Scoop. Auto-update disabled.");
-            }
-        } catch (e) {
-            console.error("Failed to check for updates", e);
-            logError(`Failed to check for updates: ${e}`);
+    const handleCloseAutoUpdateModal = (wasSuccess: boolean) => {
+        setAutoUpdateTitle(null);
+        if (wasSuccess) {
+            // Refresh installed packages after auto-update
+            installedPackagesStore.refetch();
         }
+    };
 
-        // Setup event listeners for both global and window-specific events
+    onMount(async () => {
+        // Setup event listeners FIRST so early backend emits are captured
         const setupColdStartListeners = async () => {
             const webview = getCurrentWebviewWindow();
             const unlistenFunctions: (() => void)[] = [];
+
+            // Listen for auto-update start events
+            try {
+                const unlisten = await listen<string>("auto-operation-start", (event) => {
+                    info(`Auto-operation started: ${event.payload}`);
+                    setAutoUpdateTitle(event.payload);
+                });
+                unlistenFunctions.push(unlisten);
+            } catch (e) {
+                logError(`Failed to register auto-operation-start listener: ${e}`);
+            }
 
             // Listen for window-specific cold-start-finished event
             try {
@@ -198,6 +189,56 @@ function App() {
 
         const cleanup = await setupColdStartListeners();
 
+        // After listeners are in place, perform fast local checks (no network) sequentially
+        let autoStartEnabled = false;
+        try { autoStartEnabled = await invoke<boolean>("is_auto_start_enabled"); } catch (e) { console.warn("Failed to query auto-start status", e); }
+        let isNewVersion = false;
+        try { isNewVersion = await invoke<boolean>("check_and_update_version"); } catch (e) { console.warn("Failed to check/update version file", e); }
+        try {
+            const cwdMismatch = await checkCwdMismatch();
+            if (cwdMismatch) {
+                if (autoStartEnabled && !isNewVersion) {
+                    info("CWD mismatch suppressed (auto-start, not new version)");
+                    setHasCwdMismatch(false);
+                } else {
+                    setHasCwdMismatch(true);
+                }
+            } else {
+                setHasCwdMismatch(false);
+            }
+            const scoopInstalled = await invoke<boolean>("is_scoop_installation");
+            setIsScoopInstalled(scoopInstalled);
+            if (scoopInstalled) {
+                info("App is installed via Scoop. Auto-update disabled.");
+            }
+        } catch (e) {
+            console.error("Failed during initial local startup checks", e);
+        }
+
+        // Deferred / concurrent update check logic (network) with timeout; triggered after ready event
+        const triggerUpdateCheck = async () => {
+            if (isScoopInstalled() || update()) return;
+            const TIMEOUT_MS = 4000;
+            let timedOut = false;
+            const timeoutPromise = new Promise<null>(resolve => setTimeout(() => { timedOut = true; resolve(null); }, TIMEOUT_MS));
+            try {
+                info("Checking for application updates...");
+                const result = await Promise.race([check(), timeoutPromise]);
+                if (timedOut) {
+                    info("Update check timed out; continuing without update info.");
+                    return;
+                }
+                if (result) {
+                    info(`Update ${result.version} is available.`);
+                    setUpdate(result);
+                } else {
+                    info("Application is up to date.");
+                }
+            } catch (e) {
+                console.error("Failed to check for updates", e);
+            }
+        };
+
         // Handle cold start event payload
         const handleColdStartEvent = (payload: boolean) => {
             info(`Handling cold start event with payload: ${payload}`);
@@ -232,6 +273,8 @@ function App() {
                                 setError("Failed to load bucket list.");
                             });
                     }, 100);
+                    // Kick off update check shortly after readiness if applicable
+                    setTimeout(() => { triggerUpdateCheck(); }, 150);
                 } else {
                     const errorMsg = "Scoop initialization failed. Please make sure Scoop is installed correctly and restart.";
                     setError(errorMsg);
@@ -248,8 +291,10 @@ function App() {
                 info(`Forcing ready state after timeout. ${timeoutMsg}`);
                 setInitTimedOut(true);
                 setReadyFlag("true");
+                // Ensure update check still runs even if events were missed
+                triggerUpdateCheck();
             }
-        }, 15000); // 15 second timeout
+        }, 10000);
 
         // Clean up on unmount
         return () => {
@@ -337,7 +382,7 @@ function App() {
             <Show when={!isReady() && !error() && (!hasCwdMismatch() || bypassCwdMismatch())}>
                 <div class="flex flex-col items-center justify-center h-screen bg-base-100">
                     <h1 class="text-2xl font-bold mb-4">Rscoop</h1>
-                    <p>Getting things ready... (upon install/update please be patient)</p>
+                    <p>Getting things ready...</p>
                     <span class="loading loading-spinner loading-lg mt-4"></span>
                     <Show when={initTimedOut()}>
                         <div class="mt-4 text-warning text-center max-w-md">
@@ -373,7 +418,7 @@ function App() {
                                 <BucketPage />
                             </PersistentPage>
                             <PersistentPage view="installed" currentView={view()}>
-                                <PackagesPage onNavigate={setView} />
+                                <InstalledPage onNavigate={setView} />
                             </PersistentPage>
                             <PersistentPage view="settings" currentView={view()}>
                                 <SettingsPage 
@@ -423,6 +468,10 @@ function App() {
                     onClose={packageOperations.closeOperationModal}
                 />
             </Show>
+            <OperationModal
+                title={autoUpdateTitle()}
+                onClose={handleCloseAutoUpdateModal}
+            />
         </>
     );
 }

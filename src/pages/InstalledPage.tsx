@@ -3,7 +3,7 @@ import PackageInfoModal from "../components/PackageInfoModal";
 import OperationModal from "../components/OperationModal";
 import ScoopStatusModal from "../components/ScoopStatusModal";
 import { useInstalledPackages } from "../hooks/useInstalledPackages";
-import PackagesPageHeader from "../components/page/installed/InstalledPageHeader";
+import InstalledPageHeader from "../components/page/installed/InstalledPageHeader";
 import PackageListView from "../components/page/installed/PackageListView";
 import PackageGridView from "../components/page/installed/PackageGridView";
 import { View } from "../types/scoop";
@@ -11,11 +11,11 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import { createStoredSignal } from "../hooks/createStoredSignal";
 import FloatingOperationPanel from "../components/FloatingOperationPanel";
 
-interface PackagesPageProps {
+interface InstalledPageProps {
   onNavigate?: (view: View) => void;
 }
 
-function PackagesPage(props: PackagesPageProps) {
+function InstalledPage(props: InstalledPageProps) {
   const {
     loading,
     error,
@@ -78,7 +78,7 @@ function PackagesPage(props: PackagesPageProps) {
 
   return (
     <div class="p-4 sm:p-6 md:p-8">
-      <PackagesPageHeader 
+      <InstalledPageHeader
         updatableCount={updatableCount}
         onUpdateAll={handleUpdateAll}
         onCheckStatus={handleCheckStatus}
@@ -94,6 +94,7 @@ function PackagesPage(props: PackagesPageProps) {
         isCheckingForUpdates={isCheckingForUpdates}
         onCheckForUpdates={checkForUpdates}
         onRefresh={fetchInstalledPackages}
+        onRefresh={fetchInstalledPackages}
       />
 
       <Show when={loading()}>
@@ -101,7 +102,7 @@ function PackagesPage(props: PackagesPageProps) {
           <span class="loading loading-spinner loading-lg"></span>
         </div>
       </Show>
-      
+
       <Show when={error()}>
         <div role="alert" class="alert alert-error">
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -150,7 +151,7 @@ function PackagesPage(props: PackagesPageProps) {
 
       <Show when={!loading() && !error() && filteredPackages().length > 0}>
         <Show when={viewMode() === 'list'}
-          fallback={<PackageGridView 
+          fallback={<PackageGridView
             packages={filteredPackages}
             onViewInfo={handleFetchPackageInfo}
             onViewInfoForVersions={handleFetchPackageInfoForVersions}
@@ -164,7 +165,7 @@ function PackagesPage(props: PackagesPageProps) {
             isPackageVersioned={isPackageVersioned}
           />}
         >
-          <PackageListView 
+          <PackageListView
             packages={filteredPackages}
             onSort={handleSort}
             sortKey={sortKey}
@@ -250,7 +251,7 @@ function PackagesPage(props: PackagesPageProps) {
         </div>
       </Show>
 
-      <PackageInfoModal 
+      <PackageInfoModal
         pkg={selectedPackage()}
         info={info()}
         loading={infoLoading()}
@@ -265,12 +266,12 @@ function PackagesPage(props: PackagesPageProps) {
         isPackageVersioned={isPackageVersioned}
         onPackageStateChanged={fetchInstalledPackages}
       />
-      <OperationModal 
+      <OperationModal
         title={operationTitle()}
         onClose={handleCloseOperationModal}
         nextStep={operationNextStep() ?? undefined}
       />
-      <ScoopStatusModal 
+      <ScoopStatusModal
         isOpen={showStatusModal()}
         onClose={() => setShowStatusModal(false)}
         status={scoopStatus()}
@@ -282,4 +283,4 @@ function PackagesPage(props: PackagesPageProps) {
   );
 }
 
-export default PackagesPage;
+export default InstalledPage;

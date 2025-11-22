@@ -99,16 +99,11 @@ export default function StartupSettings() {
                 <p class="text-base-content/80 mt-2 mb-3">
                     Auotostart Rscoop when Windows boots up via system registry.
                 </p>
-                {error() && (
-                    <div class="alert alert-error">
-                        <span>{error()}</span>
-                    </div>
+                {isLoading() && (
+                    <div class="text-sm text-base-content/70 mt-2">Loading...</div>
                 )}
-                {successMessage() && (
-                    <div class="alert alert-success">
-                        <span>{successMessage()}</span>
-                    </div>
-                )}
+                {error() && <div class="alert alert-error mt-4 text-sm">{error()}</div>}
+                {successMessage() && <div class="alert alert-success mt-4 text-sm">{successMessage()}</div>}
             </div>
         </div>
     );

@@ -1,5 +1,8 @@
+// Many thanks to Kwensiu for the original code on the forked repo: https://github.com/Kwensiu/Rscoop
 //! Commands for managing application startup settings on Windows.
+
 use std::env;
+use tauri;
 use winreg::enums::*;
 use winreg::RegKey;
 
@@ -11,7 +14,7 @@ const REG_KEY_NAME: &str = "Rscoop";
 pub fn is_auto_start_enabled() -> Result<bool, String> {
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     let startup_key = hkcu.open_subkey(REG_KEY_PATH).map_err(|e| e.to_string())?;
-    
+
     // Check if our registry key exists
     match startup_key.get_value::<String, _>(REG_KEY_NAME) {
         Ok(current_value) => {
@@ -27,12 +30,16 @@ pub fn is_auto_start_enabled() -> Result<bool, String> {
 #[tauri::command]
 pub fn set_auto_start_enabled(enabled: bool) -> Result<(), String> {
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
-    let startup_key = hkcu.open_subkey_with_flags(REG_KEY_PATH, KEY_SET_VALUE).map_err(|e| e.to_string())?;
-    
+    let startup_key = hkcu
+        .open_subkey_with_flags(REG_KEY_PATH, KEY_SET_VALUE)
+        .map_err(|e| e.to_string())?;
+
     if enabled {
         // Enable auto-start by adding registry key
         let current_exe = env::current_exe().map_err(|e| e.to_string())?;
-        startup_key.set_value(REG_KEY_NAME, &current_exe.to_string_lossy().to_string()).map_err(|e| e.to_string())?;
+        startup_key
+            .set_value(REG_KEY_NAME, &current_exe.to_string_lossy().to_string())
+            .map_err(|e| e.to_string())?;
     } else {
         // Disable auto-start by removing registry key
         match startup_key.delete_value(REG_KEY_NAME) {
@@ -45,6 +52,5 @@ pub fn set_auto_start_enabled(enabled: bool) -> Result<(), String> {
             }
         }
     }
-    
     Ok(())
 }

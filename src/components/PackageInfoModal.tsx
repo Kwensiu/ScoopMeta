@@ -256,16 +256,16 @@ function PackageInfoModal(props: PackageInfoModalProps) {
         targetVersion,
         global: false, // TODO: Add support for global packages
       });
-      
+
       // Refresh version info after switching
       await fetchVersionInfo(pkg);
-      
+
       // Notify parent that package state may have changed
       props.onPackageStateChanged?.();
-      
+
       // Call the onSwitchVersion callback if provided
       props.onSwitchVersion?.(pkg, targetVersion);
-      
+
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       console.error(`Failed to switch ${pkg.name} to version ${targetVersion}:`, errorMsg);
@@ -497,10 +497,8 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                   </div>
                 </div>
               }>
-                <div class="bg-base-300 rounded-lg p-4">
-                  <div class="flex justify-center items-center h-20">
-                    <span class="loading loading-spinner loading-lg"></span>
-                  </div>
+                <div class="bg-base-300 rounded-lg p-4 flex items-center justify-center">
+                  <span class="loading loading-spinner"></span>
                 </div>
               </Show>
             </Show>
@@ -508,7 +506,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
           <div class="modal-action p-4 border-t border-base-300">
             <form method="dialog">
               <Show when={!props.pkg?.is_installed && props.onInstall}>
-                <button 
+                <button
                   type="button"
                   class="btn btn-primary mr-2"
                   onClick={() => {

@@ -1,4 +1,5 @@
 pub mod app_info;
+pub mod auto_cleanup;
 pub mod bucket;
 pub mod bucket_install;
 pub mod bucket_parser;
@@ -20,4 +21,5 @@ pub mod status;
 pub mod uninstall;
 pub mod update;
 pub mod updates;
+pub mod version;
 pub mod virustotal;
