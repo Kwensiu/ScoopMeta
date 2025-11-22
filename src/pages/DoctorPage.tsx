@@ -7,6 +7,7 @@ import CacheManager from "../components/page/doctor/CacheManager";
 import ShimManager from "../components/page/doctor/ShimManager";
 import ScoopInfo from "../components/page/doctor/ScoopInfo";
 import ScoopProxySettings from "../components/page/settings/ScoopProxySettings";
+import CommandInputField from "../components/page/doctor/CommandInputField";
 import FloatingOperationPanel from "../components/FloatingOperationPanel";
 import installedPackagesStore from "../stores/installedPackagesStore";
 
@@ -196,6 +197,7 @@ function DoctorPage() {
         
         <div class="space-y-8">
           <ScoopInfo />
+          <CommandInputField />
           <ScoopProxySettings />
           
           <Show when={needsAttention()}>

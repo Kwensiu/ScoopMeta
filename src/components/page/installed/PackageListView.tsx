@@ -1,5 +1,5 @@
 import { For, Show, Accessor } from "solid-js";
-import {
+import { 
   Ellipsis, CircleArrowUp, Trash2, ArrowUp, ArrowDown, Lock, LockOpen, RefreshCw, ArrowLeftRight
 } from 'lucide-solid';
 import type { DisplayPackage } from "../../../stores/installedPackagesStore";
@@ -26,9 +26,9 @@ interface PackageListViewProps {
   isPackageVersioned: (packageName: string) => boolean;
 }
 
-const SortableHeader = (props: {
-  key: SortKey,
-  title: string,
+const SortableHeader = (props: { 
+  key: SortKey, 
+  title: string, 
   onSort: (key: SortKey) => void,
   sortKey: Accessor<SortKey>,
   sortDirection: Accessor<'asc' | 'desc'>
@@ -68,7 +68,7 @@ const HoldToggleButton = (props: {
               }
             >
               <a onClick={() => props.onUnhold(props.pkgName)}>
-                <Unlock class="w-4 h-4 mr-2" />
+                <LockOpen class="w-4 h-4 mr-2" />
                 <span>Unhold Package</span>
               </a>
             </Show>
@@ -89,7 +89,7 @@ const HoldToggleButton = (props: {
 };
 
 // Extract version switch button component
-const SwitchVersionButton = (props: {
+const SwitchBucketButton = (props: {
   pkgName: string;
   isPackageVersioned: (packageName: string) => boolean;
   onViewInfoForVersions: (pkg: ScoopPackage) => void;
@@ -122,7 +122,7 @@ function PackageListView(props: PackageListViewProps) {
         </thead>
         <tbody>
           <For each={props.packages()}>
-            {(pkg) => (
+            {(pkg, index) => (
               <tr data-no-close-search>
                 <td class="max-w-xs">
                   <div class="flex items-center gap-2">
@@ -142,7 +142,7 @@ function PackageListView(props: PackageListViewProps) {
                       </div>
                     </Show>
                     <Show when={heldStore.isHeld(pkg.name) && !pkg.is_versioned_install}>
-                      <div class="tooltip" data-tip="This package is on hold">
+                      <div class="tooltip" data-tip="This package is on hold.">
                         <Lock class="w-4 h-4 text-warning" />
                       </div>
                     </Show>
@@ -164,48 +164,18 @@ function PackageListView(props: PackageListViewProps) {
                     <label tabindex="0" class="btn btn-ghost btn-xs btn-circle bg-base-400">
                       <Ellipsis class="w-4 h-4" />
                     </label>
-                    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-300 rounded-box w-52 z-[1]">
-                      <Show when={pkg.available_version && !heldStore.isHeld(pkg.name) && !pkg.is_versioned_install}>
-                        <li>
-                          <a onClick={() => props.onUpdate(pkg)}>
-                            <CircleArrowUp class="w-4 h-4 mr-2" />
-                            Update to {pkg.available_version}
-                          </a>
-                        </li>
-                      </Show>
+                    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-400 rounded-box w-52 z-[1]">
                       <li>
-                        <Show when={props.operatingOn() === pkg.name}
-                          fallback={
-                            <Show when={pkg.is_versioned_install}
-                              fallback={
-                                <Show when={heldStore.isHeld(pkg.name)}
-                                  fallback={
-                                    <a onClick={() => props.onHold(pkg.name)}>
-                                      <Lock class="w-4 h-4 mr-2" />
-                                      <span>Hold Package</span>
-                                    </a>
-                                  }
-                                >
-                                  <a onClick={() => props.onUnhold(pkg.name)}>
-                                    <LockOpen class="w-4 h-4 mr-2" />
-                                    <span>Unhold Package</span>
-                                  </a>
-                                </Show>
-                              }
-                            >
-                              <a class="btn-disabled cursor-not-allowed">
-                                <Lock class="w-4 h-4 mr-2 text-cyan-400" />
-                                <span>Cannot Unhold (Versioned)</span>
-                              </a>
-                            </Show>
-                          }
-                        >
-                          <span class="flex items-center justify-center p-2">
-                            <span class="loading loading-spinner loading-xs"></span>
-                          </span>
-                        </Show>
+                        <HoldToggleButton 
+                          pkgName={pkg.name}
+                          isHeld={heldStore.isHeld(pkg.name)}
+                          isVersioned={!!pkg.is_versioned_install}
+                          operatingOn={props.operatingOn()}
+                          onHold={props.onHold}
+                          onUnhold={props.onUnhold}
+                        />
                       </li>
-                      <SwitchVersionButton
+                      <SwitchBucketButton
                         pkgName={pkg.name}
                         isPackageVersioned={props.isPackageVersioned}
                         onViewInfoForVersions={props.onViewInfoForVersions}
@@ -213,15 +183,6 @@ function PackageListView(props: PackageListViewProps) {
                       />
                       <li>
                         <a onClick={() => {
-                          // When dropdown is in a modal, we need to close it manually
-                          // Create and dispatch an escape event to close the dropdown
-                          const escEvent = new KeyboardEvent('keydown', {
-                            key: 'Escape',
-                            bubbles: true,
-                            cancelable: true
-                          });
-                          document.dispatchEvent(escEvent);
-                          
                           props.onChangeBucket(pkg);
                         }}>
                           <ArrowLeftRight class="w-4 h-4 mr-2" />

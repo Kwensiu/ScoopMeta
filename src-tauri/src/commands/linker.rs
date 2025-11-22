@@ -294,6 +294,7 @@ async fn remove_junction(junction_path: &Path) -> Result<(), String> {
         // Method 2: Try PowerShell Remove-Item with Force
         let mut cmd = Command::new("powershell");
         cmd.args([
+            "-NoProfile",
             "-Command",
             &format!(
                 "Remove-Item '{}' -Force -Recurse -ErrorAction SilentlyContinue",

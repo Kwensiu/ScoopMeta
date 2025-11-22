@@ -45,7 +45,6 @@ function BucketCard(props: BucketCardProps) {
             </div>
           </Show>
         </div>
-
         
         <Show when={props.bucket.git_url}>
           <div 

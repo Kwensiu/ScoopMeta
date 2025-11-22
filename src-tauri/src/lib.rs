@@ -1,39 +1,10 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 mod cold_start;
-
+mod commands;
 mod models;
 mod state;
 mod tray;
 pub mod utils;
-
-// 确保 powershell 命令模块已在此处声明
-mod commands {
-    pub mod app_info;
-    pub mod bucket;
-    pub mod bucket_install;
-    pub mod bucket_parser;
-    pub mod bucket_search;
-    pub mod debug;
-    pub mod doctor;
-    pub mod hold;
-    pub mod info;
-    pub mod install;
-    pub mod installed;
-    pub mod linker;
-    pub mod manifest;
-    pub mod powershell;
-    pub mod scoop;
-    pub mod search;
-    pub mod settings;
-    pub mod startup;
-    pub mod status;
-    pub mod uninstall;
-    pub mod update;
-    pub mod updates;
-    pub mod virustotal;
-    pub mod auto_cleanup;
-    pub mod version;
-}
 
 use tauri::{Emitter, Manager, WindowEvent};
 use tauri_plugin_log::{Target, TargetKind};
