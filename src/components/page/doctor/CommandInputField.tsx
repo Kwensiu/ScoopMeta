@@ -2,6 +2,7 @@ import { createSignal, For, createEffect } from "solid-js";
 import { Terminal } from "lucide-solid";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
+import { stripAnsi } from "../../../utils/ansiUtils";
 
 interface OperationOutput {
   line: string;
@@ -34,14 +35,18 @@ function CommandInputField() {
             setIsRunning(true);
             
             const unlisten: UnlistenFn = await listen('operation-output', (event: any) => {
-                setOutput(prev => [...prev, event.payload]);
+                const cleanLine = {
+                    line: stripAnsi(event.payload.line),
+                    source: event.payload.source
+                };
+                setOutput(prev => [...prev, cleanLine]);
             });
             
             const unlistenFinished: UnlistenFn = await listen('operation-finished', (event: any) => {
                 unlisten();
                 unlistenFinished();
                 setIsRunning(false);
-                setOutput(prev => [...prev, { line: event.payload.message, source: event.payload.success ? 'success' : 'error' }]);
+                setOutput(prev => [...prev, { line: stripAnsi(event.payload.message), source: event.payload.success ? 'success' : 'error' }]);
             });
             
             if (useScoopPrefix()) {
@@ -132,7 +137,7 @@ function CommandInputField() {
                                     line.source === 'success' ? 'text-green-500' : 
                                     'text-white'
                                 }>
-                                    {line.line}
+                                    {stripAnsi(line.line)}
                                 </div>
                             )}
                         </For>

@@ -4,6 +4,7 @@ import type { UnlistenFn } from "@tauri-apps/api/event";
 import { VirustotalResult } from "../types/scoop";
 import { ShieldAlert, TriangleAlert, ExternalLink } from "lucide-solid";
 import { isErrorLine } from "../utils/errorDetection";
+import { stripAnsi } from "../utils/ansiUtils";
 
 // Shared types for backend operations
 interface OperationOutput {
@@ -19,10 +20,8 @@ interface OperationResult {
 
 // Helper component to find and render links in a line of text
 const LineWithLinks: Component<{ line: string; isError?: boolean }> = (props) => {
-  // This regex is designed to strip ANSI color codes from the string.
-  const ansiRegex = /[\u001b\u009b][[()#;?]*.{0,2}(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-Za-z\[\]\\`_=@:;,.?!#$%&*+\-^_|~<>]/g;
-  const cleanLine = props.line.replace(ansiRegex, '');
-
+  const cleanLine = stripAnsi(props.line);
+  
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   
   // Check if line should be displayed as error

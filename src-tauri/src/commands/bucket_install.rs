@@ -1,15 +1,12 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 use git2::{Repository, RemoteCallbacks, Cred, FetchOptions};
-use regex::Regex;
 use log;
 use crate::state::AppState;
 use tauri::State;
 use serde::{Deserialize, Serialize};
-use lazy_static::lazy_static;
-// Import the invalidate_manifest_cache function from bucket_search module
-use crate::commands::bucket_search::invalidate_manifest_cache;
-// Import shared regex patterns from utils module
+// Import the invalidate_manifest_cache function from search module
+use crate::commands::search::invalidate_manifest_cache;
 use crate::commands::regex_utils::{BUCKET_NAME_REGEX, URL_EXTRACT_REGEX};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

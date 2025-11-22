@@ -50,6 +50,7 @@ lnk = "0.6.3"
 tauri-plugin-opener = "2"
 git2 = "0.20"
 url = "2.5"
+lazy_static = "1.4.0"
 
 [target."cfg(windows)".dependencies]
 tauri-plugin-updater = "2.7.1"
