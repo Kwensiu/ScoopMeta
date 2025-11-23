@@ -410,7 +410,7 @@ function App() {
                     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
                     <div class="drawer-content flex flex-col h-screen">
                         <Header currentView={view()} onNavigate={setView} />
-                        <main class="flex-1 p-8 sm:p-8 md:p-8 overflow-y-auto overflow-x-hidden" style="padding-right: 16px;">
+                        <main class="flex-1 p-4 overflow-y-auto overflow-x-hidden">
                             <PersistentPage view="search" currentView={view()}>
                                 <SearchPage />
                             </PersistentPage>

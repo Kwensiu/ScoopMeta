@@ -67,7 +67,7 @@ const PackageCard = (props: {
               <label tabindex="0" class="btn btn-ghost btn-xs btn-circle bg-base-400">
                 <MoreHorizontal class="w-4 h-4" />
               </label>
-              <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-400 rounded-box w-52 z-[1]">
+              <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-400 rounded-box w-44 z-[1]">
                 <li>
                   <HoldToggleButton 
                     pkgName={pkg.name}

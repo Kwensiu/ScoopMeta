@@ -269,22 +269,6 @@ function CacheManager(props: CacheManagerProps) {
                                         </For>
                                     </tbody>
                                 </table>
-                                <Show when={props.onCleanupApps && props.onCleanupCache}>                            
-                                    <button 
-                                        class="btn btn-primary btn-sm"
-                                        onClick={props.onCleanupApps}
-                                    >
-                                        <Trash2 class="w-4 h-4" />
-                                        Old Versions
-                                    </button>
-                                    <button 
-                                        class="btn btn-secondary btn-sm"
-                                        onClick={props.onCleanupCache}
-                                    >
-                                        <Archive class="w-4 h-4" />
-                                        Outdated Cache
-                                    </button>
-                                </Show>
                             </div>
                         </Show>
                     </div>

@@ -6,7 +6,7 @@ import { usePackageOperations } from "../hooks/usePackageOperations";
 import { ScoopPackage } from "../types/scoop";
 import BucketInfoModal from "../components/BucketInfoModal";
 import PackageInfoModal from "../components/PackageInfoModal";
-import OperationModal from "../components/OperationModal";
+import FloatingOperationPanel from "../components/FloatingOperationPanel";
 import BucketSearch from "../components/page/buckets/BucketSearch";
 import BucketGrid from "../components/page/buckets/BucketGrid";
 import BucketSearchResults from "../components/page/buckets/BucketSearchResults";
@@ -341,9 +341,9 @@ function BucketPage() {
       </Show>
 
       <Show when={packageOperations.operationTitle()}>
-        <OperationModal
+        <FloatingOperationPanel
           title={packageOperations.operationTitle()!}
-          onClose={() => {}}
+          onClose={packageOperations.closeOperationModal}
           nextStep={packageOperations.operationNextStep() || undefined}
         />
       </Show>

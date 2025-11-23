@@ -77,7 +77,7 @@ function InstalledPage(props: InstalledPageProps) {
   });
 
   return (
-    <div class="p-4 sm:p-6 md:p-8">
+    <div class="p-8 sm:p-8 md:p-8">
       <InstalledPageHeader
         updatableCount={updatableCount}
         onUpdateAll={handleUpdateAll}
@@ -250,13 +250,14 @@ function InstalledPage(props: InstalledPageProps) {
         </div>
       </Show>
 
-      <PackageInfoModal
+      <PackageInfoModal 
         pkg={selectedPackage()}
         info={info()}
         loading={infoLoading()}
         error={infoError()}
         onClose={handleCloseInfoModalWithVersions}
         onUninstall={handleUninstall}
+
         onSwitchVersion={(pkg, version) => {
           console.log(`Switched ${pkg.name} to version ${version}`);
           // The PackageInfoModal already calls onPackageStateChanged which triggers a refresh
