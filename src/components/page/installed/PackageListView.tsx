@@ -128,7 +128,7 @@ function PackageListView(props: PackageListViewProps) {
               <tr data-no-close-search>
                 <td class="max-w-xs">
                   <div class="flex items-center gap-2">
-                    <button class="btn btn-soft bg-base-300 sm:btn-sm overflow-hidden hover:shadow-md transition-all duration-300" onClick={() => props.onViewInfo(pkg)}>
+                    <button class="btn btn-soft bg-base-300 sm:btn-sm overflow-hidden hover:shadow-md transition-all duration-200" onClick={() => props.onViewInfo(pkg)}>
                       <div class="truncate font-medium">
                         {pkg.name}
                       </div>
@@ -153,7 +153,7 @@ function PackageListView(props: PackageListViewProps) {
                 <td>{pkg.version}</td>
                 <td>{pkg.source}</td>
                 <td title={pkg.updated}>{formatIsoDate(pkg.updated)}</td>
-                <td class="text-center p-4" style="position: sticky; right: 0; background: linear-gradient(to right, rgba(0, 0, 0, 0), hsl(var(--b2)) 40%); z-index: 1">
+                <td class="text-center p-4" style="position: sticky; right: 0; background: linear-gradient(to right, rgba(0, 0, 0, 0), hsl(var(--b2)) 40%); z-index: 10">
                   <div
                     class="dropdown dropdown-end dropdown-bottom bg-base-200 rounded-box"
                     classList={{
@@ -163,7 +163,7 @@ function PackageListView(props: PackageListViewProps) {
                     <label tabindex="0" class="btn btn-soft btn-xs btn-circle border border-base-300">
                       <Ellipsis class="w-4 h-4" />
                     </label>
-                    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-300 rounded-box w-52 z-[1]">
+                    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-300 rounded-box w-52 z-[11]">
                       <li>
                         <HoldToggleButton 
                           pkgName={pkg.name}

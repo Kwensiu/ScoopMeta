@@ -112,38 +112,35 @@ fn build_tray_menu(
         crate::utils::get_scoop_app_shortcuts()
     };
 
-    match shortcuts_result {
-        Ok(shortcuts) => {
-            if !shortcuts.is_empty() {
-                // Add separator before apps
-                let separator = tauri::menu::PredefinedMenuItem::separator(app)?;
-                menu_items.push(Box::new(separator));
+    if let Ok(shortcuts) = shortcuts_result {
+        if !shortcuts.is_empty() {
+            // Add separator before apps
+            let separator = tauri::menu::PredefinedMenuItem::separator(app)?;
+            menu_items.push(Box::new(separator));
 
-                // Add "Scoop Apps" label
-                let apps_label = tauri::menu::MenuItemBuilder::with_id("apps_label", "Scoop Apps")
-                    .enabled(false)
-                    .build(app)?;
-                menu_items.push(Box::new(apps_label));
+            // Add "Scoop Apps" label
+            let apps_label = tauri::menu::MenuItemBuilder::with_id("apps_label", "Scoop Apps")
+                .enabled(false)
+                .build(app)?;
+            menu_items.push(Box::new(apps_label));
 
-                // Store shortcuts in the map and create menu items
-                if let Ok(mut map) = shortcuts_map.lock() {
-                    map.clear();
+            // Store shortcuts in the map and create menu items
+            if let Ok(mut map) = shortcuts_map.lock() {
+                map.clear();
 
-                    for shortcut in shortcuts {
-                        let menu_id = format!("app_{}", shortcut.name);
-                        map.insert(menu_id.clone(), shortcut.clone());
+                for shortcut in shortcuts {
+                    let menu_id = format!("app_{}", shortcut.name);
+                    map.insert(menu_id.clone(), shortcut.clone());
 
-                        let menu_item =
-                            tauri::menu::MenuItemBuilder::with_id(&menu_id, &shortcut.display_name)
-                                .build(app)?;
-                        menu_items.push(Box::new(menu_item));
-                    }
+                    let menu_item =
+                        tauri::menu::MenuItemBuilder::with_id(&menu_id, &shortcut.display_name)
+                            .build(app)?;
+                    menu_items.push(Box::new(menu_item));
                 }
             }
         }
-        Err(e) => {
-            log::warn!("Failed to get Scoop app shortcuts: {}", e);
-        }
+    } else if let Err(e) = shortcuts_result {
+        log::warn!("Failed to get Scoop app shortcuts: {}", e);
     }
 
     // Add separator and refresh option
@@ -195,8 +192,8 @@ pub fn show_system_notification_blocking(app: &tauri::AppHandle) {
     // Show a nice native dialog with information about tray behavior
     let result = app
         .dialog()
-        .message("rScoop has been minimized to the system tray and will continue running in the background.\n\nYou can:\n• Click the tray icon to restore the window\n• Right-click the tray icon to access the context menu\n• Change this behavior in Settings > Window Behavior\n\nWhat would you like to do?")
-        .title("rScoop - Minimized to Tray")
+        .message("Rscoop has been minimized to the system tray and will continue running in the background.\n\nYou can:\n• Click the tray icon to restore the window\n• Right-click the tray icon to access the context menu\n• Change this behavior in Settings > Window Behavior\n\nWhat would you like to do?")
+        .title("Rscoop - Minimized to Tray")
         .kind(MessageDialogKind::Info)
         .buttons(MessageDialogButtons::OkCancelCustom("Close and Disable Tray".to_string(), "Keep in Tray".to_string()))
         .blocking_show();

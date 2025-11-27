@@ -6,7 +6,6 @@ import { usePackageOperations } from "../hooks/usePackageOperations";
 import { ScoopPackage } from "../types/scoop";
 import BucketInfoModal from "../components/BucketInfoModal";
 import PackageInfoModal from "../components/PackageInfoModal";
-import FloatingOperationPanel from "../components/FloatingOperationPanel";
 import BucketSearch from "../components/page/buckets/BucketSearch";
 import BucketGrid from "../components/page/buckets/BucketGrid";
 import BucketSearchResults from "../components/page/buckets/BucketSearchResults";
@@ -324,27 +323,6 @@ function BucketPage() {
           onPackageClick={handlePackageClick}
           onBucketInstalled={handleBucketInstalled}
           onFetchManifests={(bucketName: string) => handleFetchManifests(bucketName)}
-        />
-      </Show>
-
-      <Show when={packageInfo.selectedPackage()}>
-        <PackageInfoModal
-          pkg={packageInfo.selectedPackage()!}
-          info={packageInfo.info()}
-          loading={packageInfo.loading()}
-          error={packageInfo.error()}
-          onClose={packageInfo.closeModal}
-          onInstall={(pkg: ScoopPackage) => packageOperations.handleInstall(pkg)}
-          onUninstall={(pkg: ScoopPackage) => packageOperations.handleUninstall(pkg)}
-          isPackageVersioned={() => false}
-        />
-      </Show>
-
-      <Show when={packageOperations.operationTitle()}>
-        <FloatingOperationPanel
-          title={packageOperations.operationTitle()!}
-          onClose={packageOperations.closeOperationModal}
-          nextStep={packageOperations.operationNextStep() || undefined}
         />
       </Show>
     </div>

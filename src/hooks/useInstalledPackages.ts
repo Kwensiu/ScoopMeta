@@ -254,8 +254,10 @@ export function useInstalledPackages() {
     
     // From usePackageOperations
     operationTitle: packageOperations.operationTitle,
+    setOperationTitle: packageOperations.setOperationTitle,
     operationNextStep: packageOperations.operationNextStep,
     handleUpdate: packageOperations.handleUpdate,
+    handleForceUpdate: packageOperations.handleForceUpdate,
     handleUpdateAll: packageOperations.handleUpdateAll,
     handleUninstall: packageOperations.handleUninstall,
     handleCloseOperationModal: packageOperations.closeOperationModal,

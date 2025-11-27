@@ -8,6 +8,7 @@ import { Download, Ellipsis, FileText, Trash2, ExternalLink, RefreshCw, X } from
 import { invoke } from "@tauri-apps/api/core";
 import ManifestModal from "./ManifestModal";
 import { openPath } from '@tauri-apps/plugin-opener';
+import settingsStore from "../stores/settings";
 
 hljs.registerLanguage('bash', bash);
 hljs.registerLanguage('json', json);
@@ -20,11 +21,15 @@ interface PackageInfoModalProps {
   onClose: () => void;
   onInstall?: (pkg: ScoopPackage) => void;
   onUninstall?: (pkg: ScoopPackage) => void;
+  onUpdate?: (pkg: ScoopPackage) => void;
+  onForceUpdate?: (pkg: ScoopPackage) => void;
   onSwitchVersion?: (pkg: ScoopPackage, version: string) => void;
   showBackButton?: boolean;
-  autoShowVersions?: boolean; // Auto-expand version switcher
-  isPackageVersioned?: (packageName: string) => boolean; // Function to check if package has multiple versions
-  onPackageStateChanged?: () => void; // Callback for when package state changes
+  autoShowVersions?: boolean;
+  isPackageVersioned?: (packageName: string) => boolean;
+  onPackageStateChanged?: () => void;
+  onChangeBucket?: (pkg: ScoopPackage) => void;
+  setOperationTitle?: (title: string) => void;
 }
 
 // Component to render detail values. If it's a JSON string of an object/array, it pretty-prints and highlights it.
@@ -117,6 +122,11 @@ function LicenseValue(props: { value: string }) {
 
 function PackageInfoModal(props: PackageInfoModalProps) {
   let codeRef: HTMLElement | undefined;
+  const { settings } = settingsStore;
+  // Theme-specific colors
+  const isDark = () => settings.theme === 'dark';
+  const codeBgColor = () => isDark() ? '#282c34' : '#f0f4f9';
+
   const [isVisible, setIsVisible] = createSignal(false);
   const [isClosing, setIsClosing] = createSignal(false);
   const [rendered, setRendered] = createSignal(false);
@@ -163,6 +173,10 @@ function PackageInfoModal(props: PackageInfoModalProps) {
   // State for uninstall confirmation
   const [uninstallConfirm, setUninstallConfirm] = createSignal(false);
   const [uninstallTimer, setUninstallTimer] = createSignal<number | null>(null);
+  
+  // State for update button
+  const [updateConfirm, setUpdateConfirm] = createSignal(false);
+  const [updateTimer, setUpdateTimer] = createSignal<number | null>(null);
 
   createEffect(() => {
     if (props.info?.notes && codeRef) {
@@ -194,7 +208,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
     }
   });
 
-  // Clear version info when switching to a different package
+  // Clear info when switching to a different package
   createEffect((prevPackageName) => {
     const currentPackageName = props.pkg?.name;
     if (prevPackageName !== undefined && prevPackageName !== currentPackageName) {
@@ -207,6 +221,12 @@ function PackageInfoModal(props: PackageInfoModalProps) {
       if (uninstallTimer()) {
         window.clearTimeout(uninstallTimer()!);
         setUninstallTimer(null);
+      }
+      // Reset update confirmation state when switching packages
+      setUpdateConfirm(false);
+      if (updateTimer()) {
+        window.clearTimeout(updateTimer()!);
+        setUpdateTimer(null);
       }
     }
     return currentPackageName;
@@ -320,7 +340,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
 
   return (
     <Show when={rendered()}>
-      <div class="fixed inset-0 flex items-center justify-center z-50 p-20">
+      <div class="fixed inset-0 flex items-center justify-center z-20 p-20">
         <div 
           class="absolute inset-0 transition-all duration-300 ease-in-out"
           classList={{
@@ -344,7 +364,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                 <label tabindex="0" class="btn btn-ghost btn-sm btn-circle">
                   <Ellipsis class="w-5 h-5" />
                 </label>
-                <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-400 rounded-box w-52 z-[100]">
+                <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-400 rounded-box w-52 z-[10]">
                   <li>
                     <a onClick={() => props.pkg && fetchManifest(props.pkg)}>
                       <FileText class="w-4 h-4 mr-2" />
@@ -452,9 +472,14 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                 <Show when={props.info?.notes}>
                   <div class="flex-1">
                     <h4 class="text-lg font-medium mb-3 border-b pb-2">Notes</h4>
-                    <pre class="text-sm rounded-xl whitespace-pre-wrap font-sans">
-                      <code ref={codeRef} class="language-bash">{props.info?.notes}</code>
-                    </pre>
+                    <div
+                      class="rounded-xl overflow-hidden border border-base-content/10 shadow-inner"
+                      style={{ "background-color": codeBgColor() }}
+                    >
+                      <pre class="p-4 m-0">
+                        <code ref={codeRef} class="nohighlight font-mono text-sm leading-relaxed !bg-transparent whitespace-pre-wrap">{props.info?.notes}</code>
+                      </pre>
+                    </div>
                   </div>
                 </Show>
               </div>
@@ -513,64 +538,155 @@ function PackageInfoModal(props: PackageInfoModalProps) {
               </Show>
             </Show>
           </div>
-          <div class="modal-action p-4 border-t border-base-300">
-            <form method="dialog">
-              <Show when={!props.pkg?.is_installed && props.onInstall}>
-                <button
-                  type="button"
-                  class="btn btn-primary mr-2"
-                  onClick={() => {
-                    if (props.pkg) {
-                      props.onInstall!(props.pkg);
-                      // Notify parent that package state may change
-                      props.onPackageStateChanged?.();
-                    }
-                  }}
-                >
-                  <Download class="w-4 h-4 mr-2" />
-                  Install
-                </button>
-              </Show>
+          <div class="modal-action p-4 border-t border-base-300 flex flex-wrap justify-between">
+            <div class="flex space-x-2 mb-2 sm:mb-0">
+              {/* Update (Force Update) Bottom in PackageInfoModal */}
               <Show when={props.pkg?.is_installed}>
                 <button
                   type="button"
-                  class="btn btn-error mr-2"
-                  classList={{ "btn-warning": uninstallConfirm() }}
+                  class="btn w-24"
+                  classList={{ 
+                    "btn-primary": !!props.pkg?.available_version && !updateConfirm(),
+                    "btn-soft text-base-content/50": !props.pkg?.available_version && !updateConfirm(),
+                    "btn-warning": updateConfirm()
+                  }}
                   onClick={() => {
-                    if (uninstallConfirm()) {
-                      // Execute uninstall
-                      if (uninstallTimer()) {
-                        window.clearTimeout(uninstallTimer()!);
-                        setUninstallTimer(null);
+                    if (updateConfirm()) {
+                      // Execute force update
+                      if (updateTimer()) {
+                        window.clearTimeout(updateTimer()!);
+                        setUpdateTimer(null);
                       }
-                      setUninstallConfirm(false);
-                    if (props.pkg) {
-                      props.onUninstall?.(props.pkg);
-                      // Notify parent that package state may change
-                      props.onPackageStateChanged?.();
+                      setUpdateConfirm(false);
+                      if (props.pkg) {
+                        // Implement force update functionality and show in OperationModal
+                        // Use the dedicated handleForceUpdate function if available
+                        if (props.onForceUpdate) {
+                          props.onForceUpdate(props.pkg);
+                        } else if (props.setOperationTitle) {
+                          // Fallback to direct invocation with proper UI feedback
+                          props.setOperationTitle(`Force Updating ${props.pkg.name}`);
+                          invoke("update_package", { 
+                            packageName: props.pkg.name,
+                            force: true
+                          }).catch(err => {
+                            console.error("Force update invocation failed:", err);
+                          });
+                        } else {
+                          console.warn("Neither onForceUpdate nor setOperationTitle is provided for force update operation");
+                        }
+                        props.onPackageStateChanged?.();
                       }
                     } else {
-                      // First click - show confirmation
-                      setUninstallConfirm(true);
-                      const timer = window.setTimeout(() => {
-                        setUninstallConfirm(false);
-                        setUninstallTimer(null);
-                      }, 3000);
-                      setUninstallTimer(timer);
+                      if (props.pkg?.available_version) {
+                        // Normal update - use package operations hook for consistency
+                        if (props.pkg && props.onUpdate) {
+                          props.onUpdate(props.pkg);
+                          // Notify parent that package state may change
+                          props.onPackageStateChanged?.();
+                        } else if (props.pkg) {
+                          // Fallback to direct invocation if onUpdate is not provided
+                          // We should not directly call setOperationTitle, but use the hook function
+                          // This ensures the operationTitle signal is properly updated
+                          if (props.setOperationTitle) {
+                            props.setOperationTitle(`Updating ${props.pkg.name}`);
+                          }
+                          invoke("update_package", { 
+                            packageName: props.pkg.name 
+                          }).catch(err => {
+                            console.error("Update invocation failed:", err);
+                          });
+                          props.onPackageStateChanged?.();
+                        }
+                      } else {
+                        // No update available, show force update confirmation
+                        setUpdateConfirm(true);
+                        const timer = window.setTimeout(() => {
+                          setUpdateConfirm(false);
+                          setUpdateTimer(null);
+                        }, 3000);
+                        setUpdateTimer(timer);
+                      }
                     }
                   }}
                 >
-                  <Trash2 class="w-4 h-4 mr-2" />
-                  {uninstallConfirm() ? "Sure?" : "Uninstall"}
+                  {updateConfirm() ? "Force?" : "Update"}
                 </button>
               </Show>
-              <button class="btn" onClick={(e) => {
-                e.preventDefault();
-                handleClose();
-              }}>
-                {props.showBackButton ? "Back to Bucket" : "Close"}
-              </button>
-            </form>
+              {/* Change Bucket Bottom in PackageInfoModal */}
+              <Show when={props.pkg?.is_installed && props.onChangeBucket}>
+                <button
+                  type="button"
+                  class="btn btn-outline btn-primary"
+                  onClick={() => {
+                    if (props.pkg) {
+                      props.onChangeBucket!(props.pkg);
+                    }
+                  }}
+                >
+                  Change Bucket
+                </button>
+              </Show>
+            </div>
+            <div class="flex">
+              <form method="dialog">
+                <Show when={!props.pkg?.is_installed && props.onInstall}>
+                  <button
+                    type="button"
+                    class="btn btn-primary mr-2"
+                    onClick={() => {
+                      if (props.pkg) {
+                        props.onInstall!(props.pkg);
+                        // Notify parent that package state may change
+                        props.onPackageStateChanged?.();
+                      }
+                    }}
+                  >
+                    <Download class="w-4 h-4 mr-2" />
+                    Install
+                  </button>
+                </Show>
+                <Show when={props.pkg?.is_installed}>
+                  <button
+                    type="button"
+                    class="btn btn-error mr-2 w-32"
+                    classList={{ "btn-warning": uninstallConfirm() }}
+                    onClick={() => {
+                      if (uninstallConfirm()) {
+                        // Execute uninstall
+                        if (uninstallTimer()) {
+                          window.clearTimeout(uninstallTimer()!);
+                          setUninstallTimer(null);
+                        }
+                        setUninstallConfirm(false);
+                      if (props.pkg) {
+                        props.onUninstall?.(props.pkg);
+                        // Notify parent that package state may change
+                        props.onPackageStateChanged?.();
+                        }
+                      } else {
+                        // First click - show confirmation
+                        setUninstallConfirm(true);
+                        const timer = window.setTimeout(() => {
+                          setUninstallConfirm(false);
+                          setUninstallTimer(null);
+                        }, 3000);
+                        setUninstallTimer(timer);
+                      }
+                    }}
+                  >
+                    <Trash2 class="w-4 h-4 mr-2" />
+                    {uninstallConfirm() ? "Sure?" : "Uninstall"}
+                  </button>
+                </Show>
+                <button class="btn" onClick={(e) => {
+                  e.preventDefault();
+                  handleClose();
+                }}>
+                  {props.showBackButton ? "Back to Bucket" : "Close"}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
         <div class="modal-backdrop" onClick={props.onClose}></div>

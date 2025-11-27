@@ -1,10 +1,11 @@
 import PackageInfoModal from "../components/PackageInfoModal";
-import FloatingOperationPanel from "../components/FloatingOperationPanel";
+// import OperationModal from "../components/OperationModal";
 
 import { useSearch } from "../hooks/useSearch";
 import SearchBar from "../components/page/search/SearchBar";
 import SearchResultsTabs from "../components/page/search/SearchResultsTabs";
 import SearchResultsList from "../components/page/search/SearchResultsList";
+
 import { createSignal, createEffect, onCleanup, onMount } from "solid-js";
 
 function SearchPage() {
@@ -19,17 +20,17 @@ function SearchPage() {
     info,
     infoLoading,
     infoError,
-    operationTitle,
-    operationNextStep,
-    isScanning,
+    // operationTitle,
+    // operationNextStep,
+    // isScanning,
     handleInstall,
     handleUninstall,
-    handleInstallConfirm,
+    // handleInstallConfirm,
     fetchPackageInfo,
     closeModal,
-    closeOperationModal,
+    // closeOperationModal,
+    cleanup,
     restoreSearchResults,
-    cleanup
   } = useSearch();
 
   const [currentPage, setCurrentPage] = createSignal(1);
@@ -49,7 +50,7 @@ function SearchPage() {
   });
 
   return (
-    <div class="p-4 sm:p-6 md:p-8">
+    <div class="p-4">
       <div class="max-w-3xl mx-auto">
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} loading={loading} />
 
@@ -89,13 +90,15 @@ function SearchPage() {
           // The actual refresh will happen in closeOperationModal when the operation completes
         }}
       />
-      <FloatingOperationPanel
+      {/*
+      <OperationModal
         title={operationTitle()}
         onClose={closeOperationModal}
         isScan={isScanning()}
         onInstallConfirm={handleInstallConfirm}
         nextStep={operationNextStep() ?? undefined}
       />
+      */}
     </div>
   );
 }

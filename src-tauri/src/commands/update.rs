@@ -10,9 +10,17 @@ pub async fn update_package(
     app: AppHandle,
     state: State<'_, AppState>,
     package_name: String,
+    force: Option<bool>,
 ) -> Result<(), String> {
     log::info!("Updating package '{}'", package_name);
-    scoop::execute_scoop(window, ScoopOp::Update, Some(&package_name), None).await?;
+    let op = if force.unwrap_or(false) {
+        log::info!("Force updating package '{}'", package_name);
+        ScoopOp::UpdateForce
+    } else {
+        ScoopOp::Update
+    };
+    
+    scoop::execute_scoop(window, op, Some(&package_name), None).await?;
 
     // Trigger auto cleanup after update
     trigger_auto_cleanup(app, state).await;

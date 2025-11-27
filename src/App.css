@@ -8,20 +8,28 @@
   color-scheme: "dark";
 
   /* Base surfaces */
-  --color-base-100: #222226; /* main background */
-  --color-base-200: #2e2e32; /* header/toolbar */
-  --color-base-300: #343437; /* elevated surfaces (Dark 3) */
-  --color-base-400: #3a3a3d; /* elevated surfaces (Hover) */
-  --color-base-content: #f6f5f4; /* light text (Light 2) */
+  --color-base-100: #222226;
+  /* main background */
+  --color-base-200: #2e2e32;
+  /* header/toolbar */
+  --color-base-300: #343437;
+  /* elevated surfaces (Dark 3) */
+  --color-base-400: #3a3a3d;
+  /* elevated surfaces (Hover) */
+  --color-base-content: #f6f5f4;
+  /* light text (Light 2) */
 
   /* Brand & accents */
-  --color-primary: #3584e4; /* Blue 3 */
+  --color-primary: #3584e4;
+  /* Blue 3 */
   --color-primary-content: #ffffff;
 
-  --color-secondary: #9141ac; /* Purple 3 */
+  --color-secondary: #9141ac;
+  /* Purple 3 */
   --color-secondary-content: #ffffff;
 
-  --color-accent: #62a0ea; /* Blue 2 */
+  --color-accent: #62a0ea;
+  /* Blue 2 */
   --color-accent-content: #ffffff;
 
   /* Neutral */
@@ -29,18 +37,88 @@
   --color-neutral-content: #f6f5f4;
 
   /* Status colors from HIG */
-  --color-info: #62a0ea; /* Blue 2 */
+  --color-info: #62a0ea;
+  /* Blue 2 */
   --color-info-content: #ffffff;
 
-  --color-success: #57e389; /* Green 2 */
+  --color-success: #57e389;
+  /* Green 2 */
   --color-success-content: #0d0d0d;
 
-  --color-warning: #ff7800; /* Yellow 3 */
+  --color-warning: #ff7800;
+  /* Yellow 3 */
   --color-warning-content: #0d0d0d;
 
-  --color-error: #e01b24; /* Red 3 */
+  --color-error: #e01b24;
+  /* Red 3 */
   --color-error-content: #ffffff;
 
+  /* GNOME's rounded + clean style */
+  --radius-selector: 0.375rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.5rem;
+
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "light";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+
+  /* Base surfaces - inverted: gray background, white cards */
+  --color-base-100: #f0f4f9;
+  /* main background - medium gray */
+  --color-base-200: #FAFAF9;
+  /* header/toolbar - slightly darker gray */
+  --color-base-300: #ffffff;
+  /* elevated surfaces (cards) - white */
+  --color-base-400: #fafafa;
+  /* elevated surfaces (Hover) - very light gray */
+  --color-base-content: #18181b;
+  /* dark text - very dark for good contrast */
+
+  /* Brand & accents */
+  --color-primary: #3584E4;
+  /* Blue 3 */
+  --color-primary-content: #ffffff;
+
+  --color-secondary: #9141AC;
+  /* Purple 3 */
+  --color-secondary-content: #ffffff;
+
+  --color-accent: #62a0ea;
+  /* Blue 2 */
+  --color-accent-content: #ffffff;
+
+  /* Neutral */
+  --color-neutral: #f4f4f5;
+  --color-neutral-content: #18181b;
+
+  /* Status colors from HIG */
+  --color-info: #3584e4;
+  /* Blue 3 - slightly darker for better contrast on light bg */
+  --color-info-content: #ffffff;
+
+  --color-success: #2EC27E;
+  /* Green 3 - darker for better light mode contrast */
+  --color-success-content: #ffffff;
+
+  --color-warning: #FF7800;
+  /* Yellow 4 - better contrast on light */
+  --color-warning-content: #ffffff;
+
+  --color-error: #E01B24;
+  /* Red 4 - darker for better light mode contrast */
+  --color-error-content: #ffffff;
+
+  /* GNOME's rounded + clean style */
   --radius-selector: 0.375rem;
   --radius-field: 0.5rem;
   --radius-box: 0.5rem;
@@ -107,4 +185,165 @@ html {
     transform: translateX(-10px);
     margin-left: 0;
   }
+}
+/* Custom close button outline style */
+.btn-close-outline {
+  @apply btn btn-outline border-base-content/30 text-base-content hover:border-base-content/50 hover:bg-transparent hover:text-base-content;
+}
+
+/* Custom manifest button style - secondary/info accent */
+.btn-manifest {
+  @apply btn btn-outline border-info/40 text-info hover:border-info/70 hover:bg-transparent hover:text-info;
+}
+
+/* Highlight.js Theme - Atom One Dark (for Dark Mode) */
+[data-theme="dark"] .hljs {
+  color: #abb2bf;
+  background: #282c34;
+}
+
+[data-theme="dark"] .hljs-comment,
+[data-theme="dark"] .hljs-quote {
+  color: #5c6370;
+  font-style: italic;
+}
+
+[data-theme="dark"] .hljs-doctag,
+[data-theme="dark"] .hljs-keyword,
+[data-theme="dark"] .hljs-formula {
+  color: #c678dd;
+}
+
+[data-theme="dark"] .hljs-section,
+[data-theme="dark"] .hljs-name,
+[data-theme="dark"] .hljs-selector-tag,
+[data-theme="dark"] .hljs-deletion,
+[data-theme="dark"] .hljs-subst {
+  color: #e06c75;
+}
+
+[data-theme="dark"] .hljs-literal {
+  color: #56b6c2;
+}
+
+[data-theme="dark"] .hljs-string,
+[data-theme="dark"] .hljs-regexp,
+[data-theme="dark"] .hljs-addition,
+[data-theme="dark"] .hljs-attribute,
+[data-theme="dark"] .hljs-meta .hljs-string {
+  color: #98c379;
+}
+
+[data-theme="dark"] .hljs-attr,
+[data-theme="dark"] .hljs-variable,
+[data-theme="dark"] .hljs-template-variable,
+[data-theme="dark"] .hljs-type,
+[data-theme="dark"] .hljs-selector-class,
+[data-theme="dark"] .hljs-selector-attr,
+[data-theme="dark"] .hljs-selector-pseudo,
+[data-theme="dark"] .hljs-number {
+  color: #d19a66;
+}
+
+[data-theme="dark"] .hljs-symbol,
+[data-theme="dark"] .hljs-bullet,
+[data-theme="dark"] .hljs-link,
+[data-theme="dark"] .hljs-meta,
+[data-theme="dark"] .hljs-selector-id,
+[data-theme="dark"] .hljs-title {
+  color: #61aeee;
+}
+
+[data-theme="dark"] .hljs-built_in,
+[data-theme="dark"] .hljs-title.class_,
+[data-theme="dark"] .hljs-class .hljs-title {
+  color: #e6c07b;
+}
+
+[data-theme="dark"] .hljs-emphasis {
+  font-style: italic;
+}
+
+[data-theme="dark"] .hljs-strong {
+  font-weight: bold;
+}
+
+[data-theme="dark"] .hljs-link {
+  text-decoration: underline;
+}
+
+/* Highlight.js Theme - Atom One Light (for Light Mode) */
+[data-theme="light"] .hljs {
+  color: #383a42;
+  background: #fafafa;
+}
+
+[data-theme="light"] .hljs-comment,
+[data-theme="light"] .hljs-quote {
+  color: #a0a1a7;
+  font-style: italic;
+}
+
+[data-theme="light"] .hljs-doctag,
+[data-theme="light"] .hljs-keyword,
+[data-theme="light"] .hljs-formula {
+  color: #a626a4;
+}
+
+[data-theme="light"] .hljs-section,
+[data-theme="light"] .hljs-name,
+[data-theme="light"] .hljs-selector-tag,
+[data-theme="light"] .hljs-deletion,
+[data-theme="light"] .hljs-subst {
+  color: #e45649;
+}
+
+[data-theme="light"] .hljs-literal {
+  color: #0184bb;
+}
+
+[data-theme="light"] .hljs-string,
+[data-theme="light"] .hljs-regexp,
+[data-theme="light"] .hljs-addition,
+[data-theme="light"] .hljs-attribute,
+[data-theme="light"] .hljs-meta .hljs-string {
+  color: #50a14f;
+}
+
+[data-theme="light"] .hljs-attr,
+[data-theme="light"] .hljs-variable,
+[data-theme="light"] .hljs-template-variable,
+[data-theme="light"] .hljs-type,
+[data-theme="light"] .hljs-selector-class,
+[data-theme="light"] .hljs-selector-attr,
+[data-theme="light"] .hljs-selector-pseudo,
+[data-theme="light"] .hljs-number {
+  color: #986801;
+}
+
+[data-theme="light"] .hljs-symbol,
+[data-theme="light"] .hljs-bullet,
+[data-theme="light"] .hljs-link,
+[data-theme="light"] .hljs-meta,
+[data-theme="light"] .hljs-selector-id,
+[data-theme="light"] .hljs-title {
+  color: #4078f2;
+}
+
+[data-theme="light"] .hljs-built_in,
+[data-theme="light"] .hljs-title.class_,
+[data-theme="light"] .hljs-class .hljs-title {
+  color: #c18401;
+}
+
+[data-theme="light"] .hljs-emphasis {
+  font-style: italic;
+}
+
+[data-theme="light"] .hljs-strong {
+  font-weight: bold;
+}
+
+[data-theme="light"] .hljs-link {
+  text-decoration: underline;
 }

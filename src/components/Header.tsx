@@ -29,7 +29,7 @@ const Header: Component<HeaderProps> = (props) => {
   return (
     <div class="navbar bg-base-200 overflow-x-hidden">
       <div class="flex-1">
-        <a class="btn btn-ghost text-xl">Rscoop</a>
+        <a class="btn btn-ghost text-xl font-bold">Rscoop</a>
       </div>
       <div class="flex-none">
         <ul class="menu menu-horizontal px-1">
@@ -37,6 +37,7 @@ const Header: Component<HeaderProps> = (props) => {
             {(item) => (
               <li>
                 <button
+                  class="btn btn-sm btn-ghost transition-colors duration-200"
                   class="btn nav-button"
                   classList={{
                     "btn-active": props.currentView === item.view,

@@ -8,7 +8,6 @@ import ShimManager from "../components/page/doctor/ShimManager";
 import ScoopInfo from "../components/page/doctor/ScoopInfo";
 import ScoopProxySettings from "../components/page/settings/ScoopProxySettings";
 import CommandInputField from "../components/page/doctor/CommandInputField";
-import FloatingOperationPanel from "../components/FloatingOperationPanel";
 import installedPackagesStore from "../stores/installedPackagesStore";
 
 const CACHE_DIR = "cache";
@@ -220,10 +219,6 @@ function DoctorPage() {
           </Show>
         </div>
       </div>
-      <FloatingOperationPanel 
-        title={operationTitle()}
-        onClose={handleCloseOperationModal}
-      />
     </>
   );
 }

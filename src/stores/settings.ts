@@ -1,5 +1,6 @@
 import { createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
+import { View } from "../types/scoop";
 
 const LOCAL_STORAGE_KEY = 'rscoop-settings';
 
@@ -12,6 +13,7 @@ interface Settings {
     closeToTray: boolean;
     firstTrayNotificationShown: boolean;
   };
+  theme: 'dark' | 'light';
   debug: {
     enabled: boolean;
   };
@@ -25,6 +27,7 @@ interface Settings {
     autoUpdateInterval: string; // "off" | "1h" | "6h" | "24h"
     autoUpdatePackagesEnabled: boolean;
   };
+  defaultLaunchPage: View;
 }
 
 const defaultSettings: Settings = {
@@ -36,6 +39,7 @@ const defaultSettings: Settings = {
     closeToTray: true,
     firstTrayNotificationShown: false,
   },
+  theme: 'dark',
   debug: {
     enabled: false,
   },
@@ -49,6 +53,7 @@ const defaultSettings: Settings = {
     autoUpdateInterval: "off",
     autoUpdatePackagesEnabled: false,
   },
+  defaultLaunchPage: "installed",
 };
 
 function createSettingsStore() {
@@ -67,6 +72,7 @@ function createSettingsStore() {
           ...defaultSettings.window,
           ...storedSettings.window,
         },
+        theme: storedSettings.theme || defaultSettings.theme,
         debug: {
           ...defaultSettings.debug,
           ...storedSettings.debug,
@@ -79,6 +85,7 @@ function createSettingsStore() {
           ...defaultSettings.buckets,
           ...storedSettings.buckets,
         },
+        defaultLaunchPage: storedSettings.defaultLaunchPage || defaultSettings.defaultLaunchPage,
       };
     }
     return defaultSettings;
@@ -112,6 +119,10 @@ function createSettingsStore() {
     });
   };
 
+  const setTheme = (theme: 'dark' | 'light') => {
+    saveSettings({ theme });
+  };
+
   const setDebugSettings = (newDebugSettings: Partial<Settings['debug']>) => {
     saveSettings({
       debug: {
@@ -139,7 +150,11 @@ function createSettingsStore() {
     });
   };
 
-  return { settings, setVirusTotalSettings, setWindowSettings, setDebugSettings, setCleanupSettings, setBucketSettings };
+  const setDefaultLaunchPage = (page: View) => {
+    saveSettings({ defaultLaunchPage: page });
+  };
+
+  return { settings, setVirusTotalSettings, setWindowSettings, setDebugSettings, setCleanupSettings, setBucketSettings, setTheme, setDefaultLaunchPage };
 }
 
-export default createRoot(createSettingsStore); 
+export default createRoot(createSettingsStore);

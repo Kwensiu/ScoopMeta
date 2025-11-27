@@ -10,6 +10,8 @@ import DebugSettings from "../components/page/settings/DebugSettings";
 import AutoCleanupSettings from "../components/page/settings/AutoCleanupSettings";
 import BucketAutoUpdateSettings from "../components/page/settings/BucketAutoUpdateSettings";
 import WindowBehaviorSettings from "../components/page/settings/WindowBehaviorSettings";
+import ThemeSettings from "../components/page/settings/ThemeSettings";
+import DefaultLaunchPageSettings from "../components/page/settings/DefaultLaunchPageSettings";
 import heldStore from "../stores/held";
 
 interface SettingsPageProps {
@@ -21,6 +23,7 @@ interface SettingsPageProps {
 function SettingsPage(props: SettingsPageProps) {
     const { refetch: refetchHeldPackages } = heldStore;
     const [operationTitle, setOperationTitle] = createSignal<string | null>(null);
+    const [isUnholding, setIsUnholding] = createSignal(false);
     let aboutSectionRef: AboutSectionRef | undefined;
 
     const TABS = [
@@ -38,9 +41,10 @@ function SettingsPage(props: SettingsPageProps) {
     });
 
     const handleUnhold = (packageName: string) => {
-        setOperationTitle(`Removing hold from ${packageName}...`);
+        setIsUnholding(true);
         invoke("unhold_package", { packageName }).finally(() => {
             refetchHeldPackages();
+            setIsUnholding(false);
         });
     };
 
@@ -54,7 +58,7 @@ function SettingsPage(props: SettingsPageProps) {
 
     return (
         <>
-            <div class="p-4 sm:p-6 md:p-8">
+            <div class="p-2">
                 <h1 class="text-3xl font-bold mb-4">Settings</h1>
                 {/* Tab Navigation */}
                 <div role="tablist" aria-label="Settings Sections" class="tabs tabs-border mb-6">
@@ -88,7 +92,7 @@ function SettingsPage(props: SettingsPageProps) {
                             <ScoopConfiguration />
                             <HeldPackagesManagement
                                 onUnhold={handleUnhold}
-                                operationInProgress={!!operationTitle()}
+                                operationInProgress={!!operationTitle() || isUnholding()}
                             />
                         </div>
                     </Show>
@@ -103,8 +107,10 @@ function SettingsPage(props: SettingsPageProps) {
                     {/* Window & UI Tab */}
                     <Show when={activeTab() === 'window'}>
                         <div class="space-y-8">
+                            <ThemeSettings />
                             <WindowBehaviorSettings />
                             <StartupSettings />
+                            <DefaultLaunchPageSettings />
                             <DebugSettings />
                         </div>
                     </Show>

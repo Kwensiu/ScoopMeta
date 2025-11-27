@@ -9,7 +9,6 @@ import PackageGridView from "../components/page/installed/PackageGridView";
 import { View } from "../types/scoop";
 import ConfirmationModal from "../components/ConfirmationModal";
 import { createStoredSignal } from "../hooks/createStoredSignal";
-import FloatingOperationPanel from "../components/FloatingOperationPanel";
 
 interface InstalledPageProps {
   onNavigate?: (view: View) => void;
@@ -27,8 +26,7 @@ function InstalledPage(props: InstalledPageProps) {
     sortKey, sortDirection,
     selectedBucket, setSelectedBucket,
     selectedPackage, info, infoLoading, infoError,
-    operationTitle,
-    operationNextStep,
+    setOperationTitle,
     operatingOn,
     scoopStatus,
     statusLoading,
@@ -37,6 +35,7 @@ function InstalledPage(props: InstalledPageProps) {
     checkScoopStatus,
     handleSort,
     handleUpdate,
+    handleForceUpdate,
     handleUpdateAll,
     handleHold,
     handleUnhold,
@@ -47,7 +46,6 @@ function InstalledPage(props: InstalledPageProps) {
     handleFetchPackageInfoForVersions,
     handleCloseInfoModalWithVersions,
     autoShowVersions,
-    handleCloseOperationModal,
     fetchInstalledPackages,
     checkForUpdates,
     // Change bucket states
@@ -184,7 +182,7 @@ function InstalledPage(props: InstalledPageProps) {
       </Show>
 
       <Show when={changeBucketModalOpen()}>
-        <div class="fixed inset-0 flex items-center justify-center z-50 p-2">
+        <div class="fixed inset-0 flex items-center justify-center z-21 p-2">
           <div 
             class="absolute inset-0 transition-all duration-300 ease-out"
             classList={{
@@ -250,14 +248,15 @@ function InstalledPage(props: InstalledPageProps) {
         </div>
       </Show>
 
-      <PackageInfoModal 
+      <PackageInfoModal
         pkg={selectedPackage()}
         info={info()}
         loading={infoLoading()}
         error={infoError()}
         onClose={handleCloseInfoModalWithVersions}
         onUninstall={handleUninstall}
-
+        onUpdate={handleUpdate}
+        onForceUpdate={handleForceUpdate}
         onSwitchVersion={(pkg, version) => {
           console.log(`Switched ${pkg.name} to version ${version}`);
           // The PackageInfoModal already calls onPackageStateChanged which triggers a refresh
@@ -265,11 +264,8 @@ function InstalledPage(props: InstalledPageProps) {
         autoShowVersions={autoShowVersions()}
         isPackageVersioned={isPackageVersioned}
         onPackageStateChanged={fetchInstalledPackages}
-      />
-      <OperationModal
-        title={operationTitle()}
-        onClose={handleCloseOperationModal}
-        nextStep={operationNextStep() ?? undefined}
+        onChangeBucket={handleOpenChangeBucket}
+        setOperationTitle={setOperationTitle}
       />
       <ScoopStatusModal
         isOpen={showStatusModal()}

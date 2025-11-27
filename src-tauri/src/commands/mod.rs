@@ -13,7 +13,6 @@ pub mod installed;
 pub mod linker;
 pub mod manifest;
 pub mod powershell;
-pub mod regex_utils;
 pub mod scoop;
 pub mod search;
 pub mod settings;

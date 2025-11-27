@@ -1,6 +1,7 @@
 import { createSignal, onMount } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { FolderCog, Save, CheckCircle } from "lucide-solid";
+import Card from "../../common/Card";
 
 export default function ScoopConfiguration() {
     const [scoopPath, setScoopPath] = createSignal("");
@@ -98,18 +99,11 @@ export default function ScoopConfiguration() {
         setIsValidating(true);
         setPathError(null);
         try {
-            // We'll implement this as a new Tauri command
             const isValid = await invoke<boolean>("validate_scoop_directory", { path: scoopPath() });
             if (isValid) {
-                setValidationResult({
-                    isValid: true,
-                    message: "Scoop directory structure is valid"
-                });
+                setPathSuccessMessage("Scoop directory structure is valid");
             } else {
-                setValidationResult({
-                    isValid: false,
-                    message: "Directory exists but Scoop structure is invalid. Missing 'apps' or 'buckets' directories."
-                });
+                setPathSuccessMessage("Directory exists but Scoop structure is invalid. Missing 'apps' or 'buckets' directories.");
             }
         } catch (err) {
             const errorMsg = err instanceof Error ? err.message : String(err);
@@ -128,16 +122,12 @@ export default function ScoopConfiguration() {
     });
 
     return (
-        <div class="card bg-base-200 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title text-xl">
-                    <FolderCog class="w-6 h-6 mr-2 text-primary" />
-                    Scoop Configuration
-                </h2>
-                <p class="text-base-content/80 mb-4">
-                    Set the installation path for your Scoop directory. Changes will take effect immediately.
-                </p>
-
+        <Card
+            title="Scoop Configuration"
+            icon={FolderCog}
+            description="Set the installation path for your Scoop directory. Changes will take effect immediately."
+        >
+            <div class="form-control w-full max-w-lg">
                 <label class="label">
                     <span class="label-text font-semibold flex items-center">
                         Scoop Installation Path
@@ -148,7 +138,7 @@ export default function ScoopConfiguration() {
                     <input 
                         type="text"
                         placeholder={pathIsLoading() ? "Loading..." : "Enter Scoop path (e.g. C:\\scoop)"}
-                        class={`input input-bordered join-item max-w-62 ${!isValidPath() ? 'input-error' : ''}`} 
+                        class={`input input-bordered join-item w-full ${!isValidPath() ? 'input-error' : ''}`} 
                         value={scoopPath()}
                         onInput={(e) => handlePathChange(e.currentTarget.value)}
                         disabled={pathIsLoading() || isDetecting() || isSaving() || isValidating()}
@@ -189,10 +179,17 @@ export default function ScoopConfiguration() {
                         onClick={validateScoopDirectory} 
                         disabled={pathIsLoading() || isDetecting() || isSaving() || isValidating() || !scoopPath()}
                     >
-                        Test
-                    
+                        {isValidating() ? (
+                            <>
+                                <span class="loading loading-spinner loading-xs"></span>
+                                Testing...
+                            </>
+                        ) : (
+                            "Test"
+                        )}
                     </button>
                 </div>
+                
                 <div class="text-sm text-base-content/70 mt-2">
                     Automatically detects Scoop installation directory from the SCOOP environment variable.
                 </div>
@@ -207,6 +204,6 @@ export default function ScoopConfiguration() {
                 {pathError() && <div class="alert alert-error mt-4 text-sm">{pathError()}</div>}
                 {pathSuccessMessage() && <div class="alert alert-success mt-4 text-sm">{pathSuccessMessage()}</div>}
             </div>
-        </div>
+        </Card>
     );
 }
