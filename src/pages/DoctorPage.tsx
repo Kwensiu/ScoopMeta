@@ -8,6 +8,7 @@ import ShimManager from "../components/page/doctor/ShimManager";
 import ScoopInfo from "../components/page/doctor/ScoopInfo";
 import ScoopProxySettings from "../components/page/settings/ScoopProxySettings";
 import CommandInputField from "../components/page/doctor/CommandInputField";
+import FloatingOperationModal from "../components/FloatingOperationModal";
 import installedPackagesStore from "../stores/installedPackagesStore";
 
 const CACHE_DIR = "cache";
@@ -191,7 +192,7 @@ function DoctorPage() {
 
   return (
     <>
-      <div class="p-4 sm:p-6 md:p-8">
+      <div class="p-6">
         <h1 class="text-3xl font-bold mb-6">Scoop Doctor</h1>
         
         <div class="space-y-8">
@@ -219,6 +220,10 @@ function DoctorPage() {
           </Show>
         </div>
       </div>
+      <FloatingOperationModal
+        title={operationTitle()}
+        onClose={handleCloseOperationModal}
+      />
     </>
   );
 }

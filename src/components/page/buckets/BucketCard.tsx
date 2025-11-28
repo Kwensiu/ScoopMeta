@@ -19,13 +19,20 @@ function BucketCard(props: BucketCardProps) {
   };
 
   return (
-    <div class="card bg-base-200 shadow-sm hover:shadow-md transition-all duration-200 border border-base-300">
-      <div class="card-body p-4">
-        <div class="flex items-start justify-between mb-3">
-          <h3 class="card-title text-lg font-semibold">{props.bucket.name}</h3>
+    <div class="relative">
+      <Show when={props.bucket.git_branch}>
+        <div class="badge badge-outline badge-sm absolute top-[21px] right-[16px] z-10">
+          {props.bucket.git_branch}
         </div>
-        
-        <div class="flex items-center justify-between mb-2">
+      </Show>
+      
+      <Card
+        title={
+          <h3 class="whitespace-nowrap overflow-hidden text-ellipsis max-w-full" title={props.bucket.name}>
+            {props.bucket.name}
+          </h3>
+        }
+        description={
           <div class="text-sm text-base-content/70">
             <div class="flex items-center gap-1 mb-1">
               <span class="font-bold text-primary text-xl">
@@ -39,16 +46,11 @@ function BucketCard(props: BucketCardProps) {
               </div>
             </Show>
           </div>
-          
-          <Show when={props.bucket.git_branch}>
-            <div class="badge badge-outline badge-sm">
-              {props.bucket.git_branch}
-            </div>
-          </Show>
-        </div>
-        
+        }
+        class="bg-base-200 shadow-sm hover:shadow-md transition-all duration-200 border border-base-300"
+      >
         <Show when={props.bucket.git_url}>
-        <div 
+          <div 
             class="text-xs text-base-content/40 mt-2 truncate font-mono bg-base-100 px-2 py-1 rounded cursor-pointer hover:underline"
             onClick={() => openPath(props.bucket.git_url!)}
             title={props.bucket.git_url}
@@ -92,7 +94,7 @@ function BucketCard(props: BucketCardProps) {
             </button>
           </Show>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

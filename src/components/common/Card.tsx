@@ -18,12 +18,12 @@ export default function Card(props: CardProps) {
 
     return (
         <section
-            class={`card bg-base-300 shadow-xl ${props.class ?? ""}`}
+            class={`card bg-base-300 shadow-xl relative ${props.class ?? ""}`}
             aria-describedby={descriptionId}
         >
             <div class="card-body p-4">
                 <div class="flex items-center justify-between">
-                    <h2 class="card-title text-xl flex items-center">
+                    <h2 class="card-title text-xl flex items-center max-w-[calc(100%-80px)]">
                         {props.icon && (
                             <Dynamic component={props.icon} class="w-6 h-6 mr-2 text-primary" />
                         )}

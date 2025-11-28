@@ -75,7 +75,7 @@ function InstalledPage(props: InstalledPageProps) {
   });
 
   return (
-    <div class="p-8 sm:p-8 md:p-8">
+    <div class="p-6">
       <InstalledPageHeader
         updatableCount={updatableCount}
         onUpdateAll={handleUpdateAll}
@@ -209,7 +209,7 @@ function InstalledPage(props: InstalledPageProps) {
               </button>
             </div>
             
-            <div class="p-4">
+            <div class="p-6">
               <select
                 value={newBucketName()}
                 onInput={(e) => setNewBucketName(e.currentTarget.value)}

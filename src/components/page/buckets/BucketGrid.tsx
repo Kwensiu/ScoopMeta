@@ -1,5 +1,5 @@
 import { Show, For } from "solid-js";
-import { RefreshCw } from "lucide-solid";
+import { RefreshCw, X } from "lucide-solid";
 import { BucketInfo } from "../../../hooks/useBuckets";
 import BucketCard from "./BucketCard";
 
@@ -9,19 +9,34 @@ interface BucketGridProps {
   onRefresh?: () => void;
   onUpdateBucket?: (bucketName: string) => void;
   onUpdateAll?: () => void;
+  onCancelUpdateAll?: () => void;
   updatingBuckets?: Set<string>;
   updateResults?: {[key: string]: string};
   loading?: boolean;
+  isUpdatingAll?: boolean;
+  isCancelling?: boolean;
 }
 
 function BucketGrid(props: BucketGridProps) {
   return (
-    <div class="card bg-base-100">
-      <div class="card-body">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="card-title">Installed Buckets</h2>
-          <Show when={props.onUpdateAll && props.buckets.some(b => b.is_git_repo)}>
-            <div class="flex gap-2">
+    <>
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="card-title">Installed Buckets</h2>
+        <Show when={props.onUpdateAll && props.buckets.some(b => b.is_git_repo)}>
+          <div class="flex gap-2">
+            <Show 
+              when={!props.isUpdatingAll}
+              fallback={
+                <button 
+                  class="btn btn-warning btn-sm gap-2"
+                  onClick={props.onCancelUpdateAll}
+                  disabled={props.isCancelling}
+                >
+                  <X class="w-4 h-4" />
+                  {props.isCancelling ? "Cancelling..." : "Cancel"}
+                </button>
+              }
+            >
               <button 
                 class="btn btn-secondary btn-sm gap-2"
                 onClick={props.onUpdateAll}
@@ -30,59 +45,59 @@ function BucketGrid(props: BucketGridProps) {
                 <RefreshCw class="w-4 h-4" />
                 Update All Git Buckets
               </button>
-              <Show when={props.onRefresh}>
-                <button 
-                  class="btn btn-outline btn-sm gap-2"
-                  onClick={props.onRefresh}
-                >
-                  <RefreshCw class="w-4 h-4" />
-                  Reload Local Buckets
-                </button>
-              </Show>
-            </div>
-          </Show>
-        </div>
-        
-        <Show when={props.loading}>
-          <div class="flex justify-center items-center py-8">
-            <span class="loading loading-spinner loading-md"></span>
-            <span class="ml-2">Loading buckets...</span>
+            </Show>
+            <Show when={props.onRefresh}>
+              <button 
+                class="btn btn-outline btn-sm gap-2"
+                onClick={props.onRefresh}
+              >
+                <RefreshCw class="w-4 h-4" />
+                Reload Local Buckets
+              </button>
+            </Show>
           </div>
         </Show>
-        
-        <Show when={!props.loading}>
-          <Show when={props.buckets.length > 0} fallback={
-            <div class="text-center py-8">
-              <p class="text-base-content/70">No buckets found</p>
-              <p class="text-sm text-base-content/50 mt-2">
-                Buckets are typically located in your Scoop installation's buckets directory
-              </p>
-              <Show when={props.onRefresh}>
-                <div class="mt-4">
-                  <button class="btn btn-primary" onClick={props.onRefresh}>
-                    Refresh
-                  </button>
-                </div>
-              </Show>
-            </div>
-          }>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <For each={props.buckets}>
-                {(bucket) => (
-                  <BucketCard 
-                    bucket={bucket} 
-                    onViewBucket={props.onViewBucket}
-                    onUpdateBucket={props.onUpdateBucket}
-                    isUpdating={props.updatingBuckets?.has(bucket.name) || false}
-                    updateResult={props.updateResults?.[bucket.name]}
-                  />
-                )}
-              </For>
-            </div>
-          </Show>
-        </Show>
       </div>
-    </div>
+      
+      <Show when={props.loading}>
+        <div class="flex justify-center items-center py-8">
+          <span class="loading loading-spinner loading-md"></span>
+          <span class="ml-2">Loading buckets...</span>
+        </div>
+      </Show>
+      
+      <Show when={!props.loading}>
+        <Show when={props.buckets.length > 0} fallback={
+          <div class="text-center py-8">
+            <p class="text-base-content/70">No buckets found</p>
+            <p class="text-sm text-base-content/50 mt-2">
+              Buckets are typically located in your Scoop installation's buckets directory
+            </p>
+            <Show when={props.onRefresh}>
+              <div class="mt-4">
+                <button class="btn btn-primary" onClick={props.onRefresh}>
+                  Refresh
+                </button>
+              </div>
+            </Show>
+          </div>
+        }>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <For each={props.buckets}>
+              {(bucket) => (
+                <BucketCard 
+                  bucket={bucket} 
+                  onViewBucket={props.onViewBucket}
+                  onUpdateBucket={props.onUpdateBucket}
+                  isUpdating={props.updatingBuckets?.has(bucket.name) || false}
+                  updateResult={props.updateResults?.[bucket.name]}
+                />
+              )}
+            </For>
+          </div>
+        </Show>
+      </Show>
+    </>
   );
 }
 
