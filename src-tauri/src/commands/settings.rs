@@ -191,6 +191,17 @@ pub fn get_scoop_config() -> Result<Option<serde_json::Value>, String> {
     Ok(Some(config))
 }
 
+/// Updates the Scoop configuration with a new JSON object
+#[tauri::command]
+pub fn update_scoop_config(config: serde_json::Value) -> Result<(), String> {
+    // Convert to Map for writing
+    if let serde_json::Value::Object(map) = config {
+        write_scoop_config(&map)
+    } else {
+        Err("Config must be a JSON object".to_string())
+    }
+}
+
 /// Gets the VirusTotal API key from Scoop's `config.json`.
 #[tauri::command]
 pub fn get_virustotal_api_key() -> Result<Option<String>, String> {

@@ -11,6 +11,9 @@ interface ModalProps {
     headerAction?: JSX.Element;
     class?: string;
     preventBackdropClose?: boolean;
+
+    editButton?: boolean; // Add: Edit botton
+    initialContent?: string; // Test
 }
 
 export default function Modal(props: ModalProps) {

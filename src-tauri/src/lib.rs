@@ -124,6 +124,7 @@ pub fn run() {
             commands::settings::run_scoop_command,
             commands::settings::run_powershell_command,
             commands::settings::get_scoop_config,
+            commands::settings::update_scoop_config,
             commands::virustotal::scan_package,
             commands::auto_cleanup::run_auto_cleanup,
             commands::doctor::checkup::run_scoop_checkup,
