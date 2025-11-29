@@ -2,7 +2,7 @@ import { For, Show } from "solid-js";
 import { SearchableBucket } from "../../../hooks/useBucketSearch";
 import { BucketInfo } from "../../../hooks/useBuckets";
 import { useBucketInstall } from "../../../hooks/useBucketInstall";
-import { ExternalLink, Star, Package, GitFork, Shield, Clock, CircleCheckBig, Download, Trash2, LoaderCircle } from "lucide-solid";
+import { ExternalLink, Star, Package, GitFork, Shield, Clock, Download, Trash2, LoaderCircle } from "lucide-solid";
 import { openUrl } from '@tauri-apps/plugin-opener';
 import Card from "../../common/Card";
 

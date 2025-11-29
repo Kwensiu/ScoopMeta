@@ -23,6 +23,7 @@ interface UseSearchReturn {
   infoError: () => string | null;
   fetchPackageInfo: (pkg: ScoopPackage) => Promise<void>;
   closeModal: () => void;
+  updateSelectedPackage: (pkg: ScoopPackage) => void;
   
   // From usePackageOperations (with enhanced closeOperationModal)
   operationTitle: () => string | null;
@@ -219,6 +220,7 @@ export function useSearch(): UseSearchReturn {
         infoError: packageInfo.error,
         fetchPackageInfo: packageInfo.fetchPackageInfo,
         closeModal: packageInfo.closeModal,
+        updateSelectedPackage: packageInfo.updateSelectedPackage,
 
         // From usePackageOperations (with enhanced closeOperationModal)
         operationTitle: packageOperations.operationTitle,

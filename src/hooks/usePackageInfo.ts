@@ -9,6 +9,7 @@ interface UsePackageInfoReturn {
   error: () => string | null;
   fetchPackageInfo: (pkg: ScoopPackage) => Promise<void>;
   closeModal: () => void;
+  updateSelectedPackage: (pkg: ScoopPackage) => void;
 }
 
 export function usePackageInfo(): UsePackageInfoReturn {
@@ -54,5 +55,6 @@ export function usePackageInfo(): UsePackageInfoReturn {
         error,
         fetchPackageInfo,
         closeModal,
+        updateSelectedPackage: setSelectedPackage,
     };
 }

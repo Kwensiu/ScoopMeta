@@ -23,13 +23,11 @@ interface UseBucketsReturn {
 
 let cachedBuckets: BucketInfo[] | null = null;
 let isFetching = false;
-let isForceRefreshing = false;
 const listeners: ((buckets: BucketInfo[]) => void)[] = [];
 
 // Add a function to update the cache from outside the hook
 export function updateBucketsCache(buckets: BucketInfo[] | null) {
   cachedBuckets = buckets;
-  isForceRefreshing = false;
   
   // Notify all listeners of the cache update
   listeners.forEach(listener => listener(buckets || []));
@@ -70,11 +68,6 @@ export function useBuckets(): UseBucketsReturn {
       return;
     }
 
-    // Set force refresh flag
-    if (forceRefresh) {
-      isForceRefreshing = true;
-    }
-
     if (!quiet) {
       setLoading(true);
     }
@@ -92,7 +85,6 @@ export function useBuckets(): UseBucketsReturn {
       setError(err as string);
     } finally {
       isFetching = false;
-      isForceRefreshing = false;
       if (!quiet) {
         setLoading(false);
       }

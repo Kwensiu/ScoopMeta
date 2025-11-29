@@ -1,13 +1,11 @@
 import { For, Show, createSignal, createMemo } from "solid-js";
 import PackageInfoModal from "../components/PackageInfoModal";
-import OperationModal from "../components/OperationModal";
 import ScoopStatusModal from "../components/ScoopStatusModal";
 import { useInstalledPackages } from "../hooks/useInstalledPackages";
 import InstalledPageHeader from "../components/page/installed/InstalledPageHeader";
 import PackageListView from "../components/page/installed/PackageListView";
 import PackageGridView from "../components/page/installed/PackageGridView";
 import { View } from "../types/scoop";
-import ConfirmationModal from "../components/ConfirmationModal";
 import { createStoredSignal } from "../hooks/createStoredSignal";
 
 interface InstalledPageProps {
