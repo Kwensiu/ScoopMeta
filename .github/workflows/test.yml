@@ -51,7 +51,7 @@ jobs:
         id: meta
         shell: pwsh
         run: |
-          $cfg = Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json
+          $cfg = Get-Content src-tauri/tauri.conf.test.json | ConvertFrom-Json
           "version=$($cfg.version)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           "product=$($cfg.productName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 

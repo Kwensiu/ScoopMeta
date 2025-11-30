@@ -25,15 +25,6 @@
     }
   },
   "plugins": {
-    "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXkgREUzNDBBOUZCRkZGMzg5Qg0KUldTYk9QKy9ud28wM21SRUdEd25sNXdtNXZyZVFZcWNFUDN3MDVUdEhGSHRKVXowVmVQbHVCUVcNCg==",
-      "endpoints": [
-        "https://github.com/Kwensiu/Rscoop/releases/latest/download/update.json"
-      ],
-      "windows": {
-        "installMode": "passive"
-      }
-    },
     "store": null,
     "dialog": null
   },
