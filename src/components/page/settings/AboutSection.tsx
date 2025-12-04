@@ -1,11 +1,13 @@
-import { Download, RefreshCw, Github, BookOpen } from "lucide-solid";
-import { createSignal, Show } from "solid-js";
+import { Download, RefreshCw, Github, BookOpen, AlertCircle, CheckCircle } from "lucide-solid";
+import { createSignal, Show, For } from "solid-js";
 import { check, type Update } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { ask, message } from '@tauri-apps/plugin-dialog';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import pkgJson from "../../../../package.json";
 import { t } from "../../../i18n";
+import settingsStore from "../../../stores/settings";
+import { invoke } from "@tauri-apps/api/core";
 
 export interface AboutSectionRef {
   checkForUpdates: (manual: boolean) => Promise<void>;
@@ -18,10 +20,57 @@ export interface AboutSectionProps {
 
 
 export default function AboutSection(props: AboutSectionProps) {
+  const { settings, setUpdateSettings } = settingsStore;
   const [updateStatus, setUpdateStatus] = createSignal<'idle' | 'checking' | 'available' | 'downloading' | 'installing' | 'error'>('idle');
   const [updateInfo, setUpdateInfo] = createSignal<Update | null>(null);
   const [updateError, setUpdateError] = createSignal<string | null>(null);
   const [downloadProgress, setDownloadProgress] = createSignal<{ downloaded: number; total: number | null }>({ downloaded: 0, total: null });
+
+  const handleChannelChange = async (channel: 'stable' | 'test') => {
+    setUpdateSettings({ channel });
+
+    // Call backend to reload update configuration
+    try {
+      await invoke("reload_update_config");
+    } catch (error) {
+      console.error("Failed to reload update configuration:", error);
+      // Notify user about configuration reload failure
+      await message(t("settings.about.config_reload_failed"), {
+        title: t("settings.about.config_error"),
+        kind: "error"
+      });
+    }
+
+    // Show a message that restart is required for changes to take effect
+    await message(
+      channel === 'test'
+        ? t("update_channel.test_restart_required")
+        : t("update_channel.stable_restart_required"),
+      {
+        title: channel === 'test'
+          ? t("settings.update_channel.test_channel")
+          : t("settings.update_channel.stable_channel"),
+        kind: "info"
+      }
+    );
+  };
+
+  const channels = [
+    {
+      value: 'stable' as const,
+      label: t("update_channel.stable"),
+      description: t("update_channel.stable_description"),
+      icon: <CheckCircle class="h-4 w-4" />,
+      isSelected: () => settings.update.channel === 'stable',
+    },
+    {
+      value: 'test' as const,
+      label: t("update_channel.test"),
+      description: t("update_channel.test_description"),
+      icon: <AlertCircle class="h-4 w-4" />,
+      isSelected: () => settings.update.channel === 'test',
+    }
+  ];
 
   const checkForUpdates = async (manual: boolean) => {
     try {
@@ -39,16 +88,27 @@ export default function AboutSection(props: AboutSectionProps) {
       setUpdateStatus('checking');
       setUpdateError(null);
 
+      // Check if we're using test channel and show appropriate message
+      if (settings.update.channel === 'test' && manual) {
+        await message(t("settings.about.test_update_channel_notice"), {
+          title: t("settings.update_channel.test_channel"),
+          kind: "info"
+        });
+      }
+
+      console.log('Starting update check process...');
       const update = await check();
+      console.log('Update check completed', { updateAvailable: !!update?.available });
 
       if (update?.available) {
         setUpdateStatus('available');
         setUpdateInfo(update);
+        console.log('Update found', { version: update.version, body: update.body });
 
         // Only show dialog if user manually clicked "Check for updates"
         if (manual) {
           const shouldInstall = await ask(
-            t("settings.about.update_available_dialog", { version: update.version, body: update.body || 'No release notes provided' }),
+            t("settings.about.update_available_dialog", { version: update.version, body: update.body || t("settings.about.no_release_notes") }),
             {
               title: t("settings.about.update_available"),
               kind: "info",
@@ -69,11 +129,32 @@ export default function AboutSection(props: AboutSectionProps) {
             kind: "info"
           });
         }
+        console.log('No updates available');
       }
     } catch (error) {
       console.error('Failed to check for updates:', error);
       setUpdateStatus('error');
-      setUpdateError(error instanceof Error ? error.message : String(error));
+      
+      let errorMessage = t("settings.about.unknown_error");
+      
+      // Handle specific error types with more detailed messages
+      if (error instanceof Error) {
+        if (error.message.includes('network')) {
+          errorMessage = t("settings.about.network_error");
+        } else if (error.message.includes('timeout')) {
+          errorMessage = t("settings.about.timeout_error");
+        } else if (error.message.includes('certificate') || error.message.includes('TLS') || error.message.includes('SSL')) {
+          errorMessage = t("settings.about.certificate_error");
+        } else {
+          // Sanitize error message to prevent exposing sensitive information
+          errorMessage = error.message;
+        }
+      } else {
+        errorMessage = String(error);
+      }
+      
+      setUpdateError(errorMessage);
+      console.error('Update check error details:', errorMessage);
     }
   };
 
@@ -86,39 +167,87 @@ export default function AboutSection(props: AboutSectionProps) {
 
       setUpdateStatus('downloading');
       setDownloadProgress({ downloaded: 0, total: null });
+      console.log('Starting update download...', { version: currentUpdateInfo.version });
 
       // Download and install the update with progress reporting
       await currentUpdateInfo.downloadAndInstall((progress) => {
+        console.log('Update progress event:', progress.event, progress);
+        
         if (progress.event === 'Started') {
+          console.log('Download started', { contentLength: progress.data.contentLength });
           setDownloadProgress({
             downloaded: 0,
             total: progress.data.contentLength || null
           });
         } else if (progress.event === 'Progress') {
+          const newDownloaded = progress.data.chunkLength || 0;
+          
           setDownloadProgress(prev => ({
-            downloaded: prev.downloaded + (progress.data.chunkLength || 0),
+            downloaded: prev.downloaded + newDownloaded,
             total: prev.total
           }));
+          
+          // Calculate percentage using the total from Started event
+          const currentProgress = downloadProgress();
+          const percent = currentProgress.total 
+            ? Math.round((currentProgress.downloaded + newDownloaded) / currentProgress.total * 100)
+            : undefined;
+            
+          if (percent !== undefined) {
+            console.log(`Download progress: ${percent}% (${currentProgress.downloaded + newDownloaded} bytes)`);
+          }
         } else if (progress.event === 'Finished') {
+          console.log('Download finished, starting installation...');
           setUpdateStatus('installing');
         }
       });
 
+      console.log('Update installation completed successfully');
+      
       // Restart the app after successful installation
-      await ask(
+      const confirmed = await ask(
         t("settings.about.update_complete"),
         {
           title: t("buttons.confirm"),
           kind: "info",
-          okLabel: t("settings.about.restart_now")
+          okLabel: t("settings.about.restart_now"),
+          cancelLabel: t("buttons.later")
         }
       );
 
-      await relaunch();
+      if (confirmed) {
+        console.log('User confirmed restart, relaunching application...');
+        await relaunch();
+      } else {
+        console.log('User postponed restart');
+        setUpdateStatus('idle');
+      }
     } catch (error) {
       console.error('Failed to install update:', error);
       setUpdateStatus('error');
-      setUpdateError(error instanceof Error ? error.message : String(error));
+      
+      let errorMessage = t("settings.about.installation_failed");
+      
+      // Handle specific error types with more detailed messages
+      if (error instanceof Error) {
+        if (error.message.includes('network') || error.message.includes('download')) {
+          errorMessage = t("settings.about.download_failed");
+        } else if (error.message.includes('permission') || error.message.includes('access')) {
+          errorMessage = t("settings.about.permission_error");
+        } else if (error.message.includes('disk') || error.message.includes('space')) {
+          errorMessage = t("settings.about.insufficient_space");
+        } else if (error.message.includes('integrity') || error.message.includes('verification')) {
+          errorMessage = t("settings.about.integrity_check_failed");
+        } else {
+          // Sanitize error message to prevent exposing sensitive information
+          errorMessage = error.message;
+        }
+      } else {
+        errorMessage = String(error);
+      }
+      
+      setUpdateError(errorMessage);
+      console.error('Update installation error details:', errorMessage);
     }
   };
 
@@ -148,14 +277,30 @@ export default function AboutSection(props: AboutSectionProps) {
 
         {/* Update Section */}
         <div class="bg-base-100 rounded-xl p-5 border border-base-content/5 shadow-sm">
-          <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center justify-between mb-4 min-h-[36px]">
             <div class="font-semibold flex items-center gap-2">
               <RefreshCw class="w-4 h-4 text-base-content/70" />
               {t("settings.about.update_status")}
             </div>
-            {props.isScoopInstalled && (
-              <span class="badge badge-sm badge-info badge-outline">{t("settings.about.managed_by_scoop")}</span>
-            )}
+            <div class="flex items-center">
+              {props.isScoopInstalled && (
+                <span class="badge badge-sm badge-info badge-outline mr-2">{t("settings.about.managed_by_scoop")}</span>
+              )}
+              {updateStatus() === 'idle' && !props.isScoopInstalled && (
+                <button
+                  class="btn btn-sm btn-primary"
+                  onClick={() => checkForUpdates(true)}
+                >
+                  {t("settings.about.check_now")}
+                </button>
+              )}
+              {updateStatus() === 'checking' && (
+                <div class="flex items-center justify-center py-1 text-base-content/70 min-h-[36px]">
+                  <span class="loading loading-spinner loading-sm mr-2"></span>
+                  {t("settings.about.checking_for_updates")}
+                </div>
+              )}
+            </div>
           </div>
 
           {props.isScoopInstalled ? (
@@ -164,25 +309,6 @@ export default function AboutSection(props: AboutSectionProps) {
             </div>
           ) : (
             <div class="space-y-4">
-              {updateStatus() === 'idle' && (
-                <div class="flex items-center justify-between">
-                  <span class="text-sm text-base-content/70">{t("settings.about.check_now")}</span>
-                  <button
-                    class="btn btn-sm btn-primary"
-                    onClick={() => checkForUpdates(true)}
-                  >
-                    {t("settings.about.check_now")}
-                  </button>
-                </div>
-              )}
-
-              {updateStatus() === 'checking' && (
-                <div class="flex items-center justify-center py-2 text-base-content/70">
-                  <span class="loading loading-spinner loading-sm mr-3"></span>
-                  {t("settings.about.checking_for_updates")}
-                </div>
-              )}
-
               {updateStatus() === 'available' && (
                 <div class="space-y-3 animate-in fade-in slide-in-from-top-2">
                   <div class="alert alert-success shadow-sm">
@@ -236,6 +362,46 @@ export default function AboutSection(props: AboutSectionProps) {
               )}
             </div>
           )}
+          {/* Update Channel Selection */}
+          <div class="border-t mt-6">
+            <div class="font-semibold flex items-center gap-2 mb-4 mt-4">
+              {t("update_channel.title")}
+            </div>
+            <div class="space-y-3">
+              <For each={channels}>
+                {(channel) => (
+                  <div
+                    class={`p-3 rounded-lg border cursor-pointer transition-colors ${channel.isSelected()
+                      ? 'bg-primary/10 border-primary/50'
+                      : 'bg-base-200 border-base-300 hover:bg-base-300'
+                      }`}
+                    onClick={() => handleChannelChange(channel.value)}
+                  >
+                    <div class="flex items-start space-x-3">
+                      <div class={channel.isSelected() ? 'text-primary' : 'text-base-content/60'}>
+                        {channel.icon}
+                      </div>
+                      <div class="flex-1">
+                        <div class="font-medium">{channel.label}</div>
+                        <div class="text-sm text-base-content/60 mt-1">{channel.description}</div>
+                      </div>
+                      <div class="flex items-center">
+                        {channel.isSelected() && (
+                          <div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-primary-foreground" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+
+                    </div>
+                  </div>
+                )}
+              </For>
+              <span class="text-sm text-base-content/70">{t("settings.about.check_now_note")}</span>
+            </div>
+          </div>
         </div>
 
         {/* Links */}

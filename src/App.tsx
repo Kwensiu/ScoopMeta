@@ -119,7 +119,15 @@ function App() {
 
     // Debug: track state changes
     createEffect(() => {
-        console.log("MSI State - hasCwdMismatch:", hasCwdMismatch(), "bypassCwdMismatch:", bypassCwdMismatch());
+        console.log("App State Debug:", {
+            "readyFlag": readyFlag(),
+            "isReady": isReady(),
+            "hasCwdMismatch": hasCwdMismatch(),
+            "bypassCwdMismatch": bypassCwdMismatch(),
+            "error": error(),
+            "isScoopInstalled": isScoopInstalled(),
+            "initTimedOut": initTimedOut()
+        });
     });
 
     const handleInstallUpdate = async () => {
@@ -283,10 +291,13 @@ function App() {
         // Handle cold start event payload
         const handleColdStartEvent = (payload: boolean) => {
             info(`Handling cold start event with payload: ${payload}`);
+            console.log(`Handling cold start event with payload: ${payload}`);
+            console.log(`Current state before event: ready=${isReady()}, error=${error()}`);
             // Only update if not already ready
             if (!isReady() && !error()) {
                 if (payload) {
                     info("Cold start ready event - triggering installed packages refetch");
+                    console.log("Setting ready flag to true");
                     setReadyFlag("true");
 
                     // Trigger refetch of installed packages to ensure we get the freshly prefetched data
@@ -329,16 +340,24 @@ function App() {
             if (!isReady() && !error()) {
                 const timeoutMsg = "Initialization is taking longer than expected. This might be due to a slow system or Scoop configuration issue.";
                 info(`Forcing ready state after timeout. ${timeoutMsg}`);
+                console.log(`Forcing ready state after timeout. ${timeoutMsg}`);
                 setInitTimedOut(true);
                 setReadyFlag("true");
                 // Ensure update check still runs even if events were missed
                 triggerUpdateCheck();
             }
-        }, 10000);
+        }, 3000); // Further reduce timeout to 3 seconds for immediate display
+
+        // Also set up an immediate fallback for white screen issues
+        const immediateFallback = setTimeout(() => {
+            console.log("Immediate fallback: Setting ready flag to true after 1 second");
+            setReadyFlag("true");
+        }, 1000);
 
         // Clean up on unmount
         return () => {
             clearTimeout(timeoutId);
+            clearTimeout(immediateFallback);
             cleanup();
         };
     });

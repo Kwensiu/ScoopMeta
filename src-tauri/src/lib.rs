@@ -167,7 +167,8 @@ pub fn run() {
             commands::startup::is_auto_start_enabled,
             commands::startup::set_auto_start_enabled,
             cold_start::is_cold_start_ready,
-            tray::refresh_tray_apps_menu
+            tray::refresh_tray_apps_menu,
+            commands::update_config::reload_update_config
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

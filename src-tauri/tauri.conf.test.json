@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "rscoop",
-  "version": "1.4.652",
+  "version": "1.4.8-beta.1",
   "identifier": "com.rscoop.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -25,6 +25,15 @@
     }
   },
   "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXkgREUzNDBBOUZCRkZGMzg5Qg0KUldTYk9QKy9ud28wM21SRUdEd25sNXdtNXZyZVFZcWNFUDN3MDVUdEhGSHRKVXowVmVQbHVCUVcNCg==",
+      "endpoints": [
+        "https://raw.githubusercontent.com/Kwensiu/Rscoop/main/docs/test-update.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    },
     "store": null,
     "dialog": null
   },

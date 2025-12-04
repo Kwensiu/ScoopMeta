@@ -1,0 +1,138 @@
+name: Test Update
+
+on:
+  push:
+    branches:
+      - test
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual trigger'
+        required: false
+        default: 'Manual test update build'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-upload:
+    runs-on: windows-latest
+    env:
+      NODE_VERSION: '20'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      # Cache Rust dependencies and build artifacts
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            src-tauri -> target
+
+      - name: Install system dependencies (UPX)
+        run: choco install upx -y
+
+      - name: Install project dependencies
+        run: npm ci
+
+      # Build the application
+      - name: Build & bundle application (Tauri)
+        run: npm run tauri -- build
+
+      - name: Extract metadata (product name & version)
+        id: meta
+        shell: pwsh
+        run: |
+          $cfg = Get-Content src-tauri/tauri.conf.test.json | ConvertFrom-Json
+          "version=$($cfg.version)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "product=$($cfg.productName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Compress executable with UPX
+        run: upx --best --lzma src-tauri/target/release/${{ steps.meta.outputs.product }}.exe
+
+      - name: Generate update artifacts for test channel
+        id: updater
+        shell: pwsh
+        run: |
+          $msiPath = "./src-tauri/target/release/bundle/msi/${{ steps.meta.outputs.product }}_${{ steps.meta.outputs.version }}_x64_en-US.msi"
+          $exePath = "./src-tauri/target/release/${{ steps.meta.outputs.product }}.exe"
+          
+          # Create signature files (unsigned for test builds)
+          $signature = "test-signature-${{ steps.meta.outputs.version }}"
+          $date = Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"
+          
+          # Generate update.json for test channel
+          $json = @{
+            version = "${{ steps.meta.outputs.version }}"
+            pub_date = $date
+            platforms = @{
+              "windows-x86_64" = @{
+                signature = $signature
+                url = "https://github.com/${{ github.repository }}/releases/download/test-${{ steps.meta.outputs.version }}/${{ steps.meta.outputs.product }}_${{ steps.meta.outputs.version }}_x64_en-US.msi"
+              }
+            }
+            notes = "Test update from test branch. Build #${{ github.run_number }}"
+          } | ConvertTo-Json -Depth 4
+          
+          Set-Content -Path "./update-test.json" -Value $json
+          
+          # Output paths for later steps
+          "msiPath=$msiPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "exePath=$exePath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Create Test Release with artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: test-${{ steps.meta.outputs.version }}
+          name: Test Build v${{ steps.meta.outputs.version }}
+          body: |
+            ## Test Build
+            
+            This is a test build from the `test` branch.
+            
+            **Build Information:**
+            - Version: ${{ steps.meta.outputs.version }}
+            - Branch: test
+            - Commit: ${{ github.sha }}
+            - Build #${{ github.run_number }}
+            
+            **Note:** This is a test release and may contain unstable features.
+            
+            ${{ github.event.inputs.reason && format('- **Manual Trigger Reason:** {0}', github.event.inputs.reason) }}
+          draft: false
+          prerelease: true
+          artifacts: >-
+            ${{ steps.updater.outputs.msiPath }},
+            ${{ steps.updater.outputs.exePath }},
+            ./update-test.json
+          artifactErrorsFailBuild: true
+
+      - name: Update test update endpoint
+        shell: pwsh
+        run: |
+          # Update the test update endpoint with the new version info
+          $updateContent = Get-Content -Raw "./update-test.json"
+          
+          # Create or update a file in the repo to serve as the test update endpoint
+          $updateEndpointPath = "./docs/test-update.json"
+          Set-Content -Path $updateEndpointPath -Value $updateContent
+          
+          # Commit and push the update endpoint file
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add $updateEndpointPath
+          git diff --staged --quiet || git commit -m "Update test endpoint to version ${{ steps.meta.outputs.version }}"
+          git push

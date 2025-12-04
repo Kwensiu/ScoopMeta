@@ -45,12 +45,12 @@
       "clear_search": "Clear search",
       "close_search": "Close search",
       "community_buckets": "Community Buckets",
+      "description": "This will download and search through the complete Scoop bucket directory maintained by the community. This includes thousands of buckets with various quality levels.",
       "disable_chinese_buckets": "Disable Chinese Buckets",
       "disable_community": "Disable Community Buckets",
       "disable_community_title": "Clear expanded search cache and return to verified buckets only",
       "discover_description": "Explore community package repositories",
       "discover_new": "Discover New Buckets",
-      "description": "This will download and search through the complete Scoop bucket directory maintained by the community. This includes thousands of buckets with various quality levels.",
       "enable_expanded_search": "Enable Expanded Search",
       "estimated_download_size": "Estimated download size:",
       "expand_note": "This will download ~14MB initially, but only ~0.3-4MB (depending on filters) will be stored as optimized cache. The search will include community buckets of varying quality and maintenance levels. After the initial download, all searches will be instant and offline-capable.",
@@ -280,13 +280,6 @@
     "uninstall_success": "Package uninstalled successfully!",
     "update_success": "Package updated successfully!"
   },
-  "no_packages_found": {
-    "title": "No packages found",
-    "no_match_criteria": "No installed packages match your current filter criteria.",
-    "no_installed_yet": "You don't have any packages installed yet.",
-    "clear_filters": "Clear Filters",
-    "browse_packages": "Browse Packages"
-  },
   "msi_notice": {
     "close_app": "Close App Now",
     "description": "Everything is okay — this isn't an error. Windows launched app in a limited mode right after installation.",
@@ -302,17 +295,26 @@
     "title": "MSI Launch Notice",
     "workaround": "Have a workaround?"
   },
+  "no_packages_found": {
+    "browse_packages": "Browse Packages",
+    "clear_filters": "Clear Filters",
+    "no_installed_yet": "You don't have any packages installed yet.",
+    "no_match_criteria": "No installed packages match your current filter criteria.",
+    "title": "No packages found"
+  },
   "package_info": {
     "available_versions": "Available Versions",
     "back_to_bucket": "Back to Bucket",
     "bucket": "Bucket",
     "change_bucket": "Change Bucket",
+    "change_bucket_for": "Change bucket for {{name}}",
     "close": "Close",
     "current": "Current",
     "debug_failed": "Debug failed",
     "debug_structure": "Debug Structure",
     "description": "Description",
     "details": "Details",
+    "ensure_software_present": "Ensure the software package is present in the target repository",
     "error_loading_manifest": "Failed to load manifest for {{name}}: {{error}}",
     "error_loading_versions": "Failed to load versions for {{name}}: {{error}}",
     "error_switching_version": "Failed to switch to version {{version}}: {{error}}",
@@ -336,22 +338,20 @@
     "version": "Version",
     "version_manager": "Version Manager",
     "view_manifest": "View Manifest",
-    "warning": "Warning",
-    "ensure_software_present": "Ensure the software package is present in the target repository",
-    "change_bucket_for": "Change bucket for {{name}}"
+    "warning": "Warning"
   },
   "scan": {
     "install_anyway": "Install Anyway",
     "virus_total_warning": "VirusTotal Scan Warning"
   },
   "search": {
-    "filter":{
-      "all_buckets":"All Buckets"
-    },
     "bar": {
       "clear_search": "Clear search",
       "exact_match_tooltip": "Wrap with \"quotes\" for exact match",
       "placeholder": "Search for apps from local Buckets"
+    },
+    "filter": {
+      "all_buckets": "All Buckets"
     },
     "results": {
       "from_bucket": "from bucket: {{bucket}}",
@@ -368,7 +368,7 @@
   "settings": {
     "about": {
       "check_now": "Check Now",
-      "checking_for_updates": "Checking for updates...",
+      "check_now_note": "You may need to restart after switching channels to apply the changes.",
       "customized_version": "You are Using a customized version of Rscoop, maintained by Kwensiu.",
       "description": "A modern, powerful, and fast GUI for Scoop package manager on Windows.",
       "docs": "Docs",
@@ -377,13 +377,14 @@
       "installing_update": "Installing update...",
       "latest_version": "You're already using the latest version!",
       "managed_by_scoop": "Managed by Scoop",
-      "my_fork": "My Fork (Kwensiu)",
+      "my_fork": "Fork/Kwensiu",
       "no_updates_available": "No Updates Available",
       "please_report_issues": "Please report any issues to my fork repository.",
       "release_notes": "Release Notes:",
       "restart_now": "Restart Now",
       "retry": "Retry",
       "scoop_update_instruction": "Use {code} in your terminal to update.",
+      "test_update_channel_notice": "You are currently on the test update channel. You will receive test builds with the latest features.",
       "update_available": "Update Available!",
       "update_available_dialog": "Update to {version} is available!\n\nRelease notes: {body}",
       "update_complete": "Update has been installed successfully. The application needs to restart to apply the changes.",
@@ -392,7 +393,7 @@
       "update_status": "Update Status",
       "update_via_scoop": "This app was installed via Scoop. Please use Scoop to update this application instead.",
       "updates_via_scoop": "Updates via Scoop",
-      "upstream": "Upstream"
+      "upstream": "AmarBego"
     },
     "auto_cleanup": {
       "clean_old_versions": "Clean Old Versions",
@@ -438,6 +439,7 @@
       "automation": "Automation",
       "management": "Managment",
       "security": "Security",
+      "update": "Update",
       "window_ui": "Window & UI"
     },
     "debug": {
@@ -523,6 +525,25 @@
     "all_tooltip": "Update All Packages",
     "loading": "Updating...",
     "success": "Complete!"
+  },
+  "update_channel": {
+    "current_status": "Current Status",
+    "description": "Choose which update channel to receive updates from.",
+    "receiving_stable_updates": "Receiving updates from the stable channel",
+    "receiving_test_updates": "Receiving updates from the test channel",
+    "restart_description": "Changes to the update channel will take effect after restarting the application.",
+    "restart_required": "Restart Required",
+    "stable": "Stable",
+    "stable_channel": "Stable Channel",
+    "stable_description": "Receive stable releases that are thoroughly tested and reliable.",
+    "stable_restart_required": "You have switched to the stable update channel. Please restart the application to apply changes.",
+    "test": "Test",
+    "test_channel": "Test Channel",
+    "test_description": "Receive test builds with the latest features and fixes before they're released to stable.",
+    "test_restart_required": "You have switched to the test update channel. Please restart the application to apply changes.",
+    "test_warning_description": "Test builds may contain bugs or unfinished features. Use with caution.",
+    "test_warning_title": "Test Channel Warning",
+    "title": "Update Channel"
   },
   "welcome": "Welcome to Rscoop!"
 }

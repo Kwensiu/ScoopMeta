@@ -27,6 +27,9 @@ interface Settings {
     autoUpdateInterval: string; // "off" | "1h" | "6h" | "24h"
     autoUpdatePackagesEnabled: boolean;
   };
+  update: {
+    channel: 'stable' | 'test';
+  };
   defaultLaunchPage: View;
 }
 
@@ -52,6 +55,9 @@ const defaultSettings: Settings = {
   buckets: {
     autoUpdateInterval: "off",
     autoUpdatePackagesEnabled: false,
+  },
+  update: {
+    channel: "stable",
   },
   defaultLaunchPage: "installed",
 };
@@ -84,6 +90,10 @@ function createSettingsStore() {
         buckets: {
           ...defaultSettings.buckets,
           ...storedSettings.buckets,
+        },
+        update: {
+          ...defaultSettings.update,
+          ...storedSettings.update,
         },
         defaultLaunchPage: storedSettings.defaultLaunchPage || defaultSettings.defaultLaunchPage,
       };
@@ -150,11 +160,20 @@ function createSettingsStore() {
     });
   };
 
+  const setUpdateSettings = (newUpdateSettings: Partial<Settings['update']>) => {
+    saveSettings({
+      update: {
+        ...settings.update,
+        ...newUpdateSettings,
+      },
+    });
+  };
+
   const setDefaultLaunchPage = (page: View) => {
     saveSettings({ defaultLaunchPage: page });
   };
 
-  return { settings, setVirusTotalSettings, setWindowSettings, setDebugSettings, setCleanupSettings, setBucketSettings, setTheme, setDefaultLaunchPage };
+  return { settings, setVirusTotalSettings, setWindowSettings, setDebugSettings, setCleanupSettings, setBucketSettings, setUpdateSettings, setTheme, setDefaultLaunchPage };
 }
 
 export default createRoot(createSettingsStore);
