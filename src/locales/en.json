@@ -384,7 +384,6 @@
       "restart_now": "Restart Now",
       "retry": "Retry",
       "scoop_update_instruction": "Use {code} in your terminal to update.",
-      "test_update_channel_notice": "You are currently on the test update channel. You will receive test builds with the latest features.",
       "update_available": "Update Available!",
       "update_available_dialog": "Update to {version} is available!\n\nRelease notes: {body}",
       "update_complete": "Update has been installed successfully. The application needs to restart to apply the changes.",
@@ -439,7 +438,6 @@
       "automation": "Automation",
       "management": "Managment",
       "security": "Security",
-      "update": "Update",
       "window_ui": "Window & UI"
     },
     "debug": {
@@ -509,6 +507,7 @@
       "title": "Tray Support"
     }
   },
+  "settings.about.checking_for_updates": "Checking for updates...",
   "status": {
     "error": "Error",
     "in_progress": "In Progress",
@@ -527,21 +526,11 @@
     "success": "Complete!"
   },
   "update_channel": {
-    "current_status": "Current Status",
     "description": "Choose which update channel to receive updates from.",
-    "receiving_stable_updates": "Receiving updates from the stable channel",
-    "receiving_test_updates": "Receiving updates from the test channel",
-    "restart_description": "Changes to the update channel will take effect after restarting the application.",
-    "restart_required": "Restart Required",
     "stable": "Stable",
-    "stable_channel": "Stable Channel",
     "stable_description": "Receive stable releases that are thoroughly tested and reliable.",
-    "stable_restart_required": "You have switched to the stable update channel. Please restart the application to apply changes.",
     "test": "Test",
-    "test_channel": "Test Channel",
     "test_description": "Receive test builds with the latest features and fixes before they're released to stable.",
-    "test_restart_required": "You have switched to the test update channel. Please restart the application to apply changes.",
-    "test_warning_description": "Test builds may contain bugs or unfinished features. Use with caution.",
     "test_warning_title": "Test Channel Warning",
     "title": "Update Channel"
   },
