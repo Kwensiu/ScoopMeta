@@ -35,8 +35,8 @@ export default function AboutSection(props: AboutSectionProps) {
     } catch (error) {
       console.error("Failed to reload update configuration:", error);
       // Notify user about configuration reload failure
-      await message(t("settings.about.config_reload_failed"), {
-        title: t("settings.about.config_error"),
+      await message(t("settings.about.config_reload_failed") || "Failed to reload update configuration", {
+        title: t("settings.about.config_error") || "Configuration Error",
         kind: "error"
       });
     }
@@ -44,12 +44,12 @@ export default function AboutSection(props: AboutSectionProps) {
     // Show a message that restart is required for changes to take effect
     await message(
       channel === 'test'
-        ? t("update_channel.test_restart_required")
-        : t("update_channel.stable_restart_required"),
+        ? (t("update_channel.test_restart_required") || "You have switched to the test update channel. Please restart the application to apply changes.")
+        : (t("update_channel.stable_restart_required") || "You have switched to the stable update channel. Please restart the application to apply changes."),
       {
         title: channel === 'test'
-          ? t("settings.update_channel.test_channel")
-          : t("settings.update_channel.stable_channel"),
+          ? (t("settings.update_channel.test_channel") || "Test Channel")
+          : (t("settings.update_channel.stable_channel") || "Stable Channel"),
         kind: "info"
       }
     );
@@ -60,26 +60,27 @@ export default function AboutSection(props: AboutSectionProps) {
     if (error instanceof Error) {
       // Specific error handling with translated messages
       if (error.message.includes('network')) {
-        return t("settings.about.network_error");
+        return t("settings.about.network_error") || "Network error occurred during update check";
       } else if (error.message.includes('timeout')) {
-        return t("settings.about.timeout_error");
+        return t("settings.about.timeout_error") || "Update check timed out";
       } else if (error.message.includes('certificate') || error.message.includes('TLS') || error.message.includes('SSL')) {
-        return t("settings.about.certificate_error");
+        return t("settings.about.certificate_error") || "Certificate error occurred during update check";
       } else if (error.message.includes('network') || error.message.includes('download')) {
-        return t("settings.about.download_failed");
+        return t("settings.about.download_failed") || "Failed to download update";
       } else if (error.message.includes('permission') || error.message.includes('access')) {
-        return t("settings.about.permission_error");
+        return t("settings.about.permission_error") || "Permission denied during update process";
       } else if (error.message.includes('disk') || error.message.includes('space')) {
-        return t("settings.about.insufficient_space");
+        return t("settings.about.insufficient_space") || "Insufficient disk space for update";
       } else if (error.message.includes('integrity') || error.message.includes('verification')) {
-        return t("settings.about.integrity_check_failed");
+        return t("settings.about.integrity_check_failed") || "Update integrity check failed";
       }
       
       // Return the actual error message, but limit its length for security
       return error.message.substring(0, 200);
     }
     
-    return String(error).substring(0, 200);
+    const errorString = String(error);
+    return errorString.substring(0, 200);
   };
 
   const channels = createMemo(() => [
@@ -115,14 +116,6 @@ export default function AboutSection(props: AboutSectionProps) {
       setUpdateStatus('checking');
       setUpdateError(null);
 
-      // Check if we're using test channel and show appropriate message
-      if (settings.update.channel === 'test' && manual) {
-        await message(t("settings.about.test_update_channel_notice"), {
-          title: t("settings.update_channel.test_channel"),
-          kind: "info"
-        });
-      }
-
       console.log('Starting update check process...');
       const update = await check();
       console.log('Update check completed', { updateAvailable: !!update?.available });
@@ -130,17 +123,28 @@ export default function AboutSection(props: AboutSectionProps) {
       if (update?.available) {
         setUpdateStatus('available');
         setUpdateInfo(update);
-        console.log('Update found', { version: update.version, body: update.body });
+        console.log('Update found', { 
+          version: update.version, 
+          body: update.body 
+        });
 
         // Only show dialog if user manually clicked "Check for updates"
         if (manual) {
+          const versionText = update.version || 'unknown';
+          const bodyText = update.body || t("settings.about.no_release_notes") || "No release notes provided";
+          
+          const messageContent = t("settings.about.update_available_dialog", { 
+            version: versionText, 
+            body: bodyText
+          }) || `Update to ${versionText} is available!\n\nRelease notes: ${bodyText}`;
+
           const shouldInstall = await ask(
-            t("settings.about.update_available_dialog", { version: update.version, body: update.body || t("settings.about.no_release_notes") }),
+            messageContent,
             {
-              title: t("settings.about.update_available"),
+              title: t("settings.about.update_available") || "Update Available",
               kind: "info",
-              okLabel: t("buttons.install"),
-              cancelLabel: t("buttons.cancel")
+              okLabel: t("buttons.install") || "Install Now",
+              cancelLabel: t("buttons.cancel") || "Later"
             }
           );
 
@@ -151,8 +155,9 @@ export default function AboutSection(props: AboutSectionProps) {
       } else {
         setUpdateStatus('idle');
         if (manual) {
-          await message(t("settings.about.latest_version"), {
-            title: t("settings.about.no_updates_available"),
+          const messageText = t("settings.about.latest_version") || "You're already using the latest version!";
+          await message(messageText, {
+            title: t("settings.about.no_updates_available") || "No Updates Available",
             kind: "info"
           });
         }
@@ -219,12 +224,12 @@ export default function AboutSection(props: AboutSectionProps) {
       
       // Restart the app after successful installation
       const confirmed = await ask(
-        t("settings.about.update_complete"),
+        t("settings.about.update_complete") || "Update installed successfully. Do you want to restart the application now?",
         {
-          title: t("buttons.confirm"),
+          title: t("buttons.confirm") || "Confirm",
           kind: "info",
-          okLabel: t("settings.about.restart_now"),
-          cancelLabel: t("buttons.later")
+          okLabel: t("settings.about.restart_now") || "Restart Now",
+          cancelLabel: t("buttons.later") || "Later"
         }
       );
 
@@ -274,7 +279,7 @@ export default function AboutSection(props: AboutSectionProps) {
           <div class="flex items-center justify-between mb-4 min-h-[36px]">
             <div class="font-semibold flex items-center gap-2">
               <RefreshCw class="w-4 h-4 text-base-content/70" />
-              {t("settings.about.update_status")}
+              {t("settings.about.update_status") || "Update Status"}
             </div>
             <div class="flex items-center">
               {props.isScoopInstalled && (
@@ -285,13 +290,13 @@ export default function AboutSection(props: AboutSectionProps) {
                   class="btn btn-sm btn-primary"
                   onClick={() => checkForUpdates(true)}
                 >
-                  {t("settings.about.check_now")}
+                  {t("settings.about.check_now") || "Check Now"}
                 </button>
               )}
               {updateStatus() === 'checking' && (
                 <div class="flex items-center justify-center py-1 text-base-content/70 min-h-[36px]">
                   <span class="loading loading-spinner loading-sm mr-2"></span>
-                  {t("settings.about.checking_for_updates")}
+                  {t("settings.about.checking_for_updates") || "Checking for updates..."}
                 </div>
               )}
             </div>
@@ -299,7 +304,7 @@ export default function AboutSection(props: AboutSectionProps) {
 
           {props.isScoopInstalled ? (
             <div class="alert alert-info text-sm shadow-sm">
-              <span>{t("settings.about.scoop_update_instruction", { code: "scoop update rscoop" })}</span>
+              <span>{t("settings.about.scoop_update_instruction", { code: "scoop update rscoop" }) || "This app was installed via Scoop. Please use Scoop to update this application with the command: scoop update rscoop"}</span>
             </div>
           ) : (
             <div class="space-y-4">
@@ -308,15 +313,15 @@ export default function AboutSection(props: AboutSectionProps) {
                   <div class="alert alert-success shadow-sm">
                     <Download class="w-5 h-5" />
                     <div>
-                      <h3 class="font-bold">{t("settings.about.update_available")}</h3>
-                      <div class="text-xs">{t("settings.about.update_ready", { version: updateInfo()?.version })}</div>
+                      <h3 class="font-bold">{t("settings.about.update_available") || "Update Available"}</h3>
+                      <div class="text-xs">{t("settings.about.update_ready", { version: updateInfo()?.version || 'unknown' }) || `Version ${updateInfo()?.version || 'unknown'} is ready to install`}</div>
                     </div>
-                    <button class="btn btn-sm" onClick={installAvailableUpdate}>{t("buttons.install")}</button>
+                    <button class="btn btn-sm" onClick={installAvailableUpdate}>{t("buttons.install") || "Install"}</button>
                   </div>
                   <Show when={updateInfo()?.body}>
                     <div class="bg-base-200 rounded-lg p-3 text-xs max-h-32 overflow-y-auto border border-base-content/5">
-                      <div class="font-bold mb-1 opacity-70">{t("settings.about.release_notes")}</div>
-                      <div class="whitespace-pre-wrap opacity-80">{updateInfo()?.body}</div>
+                      <div class="font-bold mb-1 opacity-70">{t("settings.about.release_notes") || "Release Notes"}</div>
+                      <div class="whitespace-pre-wrap opacity-80">{updateInfo()?.body || ''}</div>
                     </div>
                   </Show>
                 </div>
@@ -325,10 +330,10 @@ export default function AboutSection(props: AboutSectionProps) {
               {updateStatus() === 'downloading' && (
                 <div class="space-y-2">
                   <div class="flex justify-between text-xs font-medium">
-                    <span>{t("settings.about.downloading_update")}</span>
+                    <span>{t("settings.about.downloading_update") || "Downloading update..."}</span>
                     <span>{downloadProgress().total
                       ? `${Math.round((downloadProgress().downloaded / (downloadProgress().total || 1)) * 100)}%`
-                      : t("settings.about.downloading_no_size")}</span>
+                      : (t("settings.about.downloading_no_size") || "Downloading...")}</span>
                   </div>
                   <progress
                     class="progress progress-primary w-full"
@@ -341,17 +346,17 @@ export default function AboutSection(props: AboutSectionProps) {
               {updateStatus() === 'installing' && (
                 <div class="flex items-center justify-center py-2 text-success font-medium">
                   <span class="loading loading-spinner loading-sm mr-3"></span>
-                  {t("settings.about.installing_update")}
+                  {t("settings.about.installing_update") || "Installing update..."}
                 </div>
               )}
 
               {updateStatus() === 'error' && (
                 <div class="alert alert-error shadow-sm">
                   <div class="flex-1">
-                    <div class="font-bold text-xs">{t("settings.about.update_failed")}</div>
-                    <div class="text-xs opacity-80">{updateError()}</div>
+                    <div class="font-bold text-xs">{t("settings.about.update_failed") || "Update Failed"}</div>
+                    <div class="text-xs opacity-80">{updateError() || "An unknown error occurred"}</div>
                   </div>
-                  <button class="btn btn-xs btn-outline" onClick={() => checkForUpdates(true)}>{t("settings.about.retry")}</button>
+                  <button class="btn btn-xs btn-outline" onClick={() => checkForUpdates(true)}>{t("settings.about.retry") || "Retry"}</button>
                 </div>
               )}
             </div>
@@ -359,7 +364,7 @@ export default function AboutSection(props: AboutSectionProps) {
           {/* Update Channel Selection */}
           <div class="border-t mt-6">
             <div class="font-semibold flex items-center gap-2 mb-4 mt-4">
-              {t("update_channel.title")}
+              {t("update_channel.title") || "Update Channel"}
             </div>
             <div class="space-y-3">
               <For each={channels()}>
@@ -401,7 +406,7 @@ export default function AboutSection(props: AboutSectionProps) {
                     await relaunch();
                   }}
                 >
-                  {t("settings.about.restart_app")}
+                  {t("settings.about.restart_app") || "Restart App"}
                 </button>
               </div>
             </div>
@@ -415,14 +420,14 @@ export default function AboutSection(props: AboutSectionProps) {
             onClick={() => openUrl('https://github.com/Kwensiu/Rscoop/').catch(console.error)}
           >
             <Github class="w-5 h-5" />
-            {t("settings.about.my_fork")}
+            {t("settings.about.my_fork") || "My Fork"}
           </button>
           <button
             class="btn btn-outline hover:bg-base-content hover:text-base-100 transition-all"
             onClick={() => openUrl('https://github.com/AmarBego/Rscoop').catch(console.error)}
           >
             <Github class="w-5 h-5" />
-            {t("settings.about.upstream")}
+            {t("settings.about.upstream") || "Upstream"}
           </button>
 
           <button
@@ -430,7 +435,7 @@ export default function AboutSection(props: AboutSectionProps) {
             onClick={() => openUrl('https://amarbego.github.io/Rscoop/').catch(console.error)}
           >
             <BookOpen class="w-5 h-5" />
-            {t("settings.about.docs")}
+            {t("settings.about.docs") || "Documentation"}
           </button>
 
         </div>
