@@ -1,6 +1,6 @@
-import { createSignal, Show } from "solid-js";
+import { createSignal, Show, createMemo } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
-import { info } from "@tauri-apps/plugin-log";
+import { info, warn, error } from "@tauri-apps/plugin-log";
 import settingsStore from "../stores/settings";
 import Modal from "./common/Modal";
 
@@ -23,6 +23,10 @@ const DebugModal = () => {
     const [activeTab, setActiveTab] = createSignal<"info" | "logs">("info");
     const [isLoading, setIsLoading] = createSignal(false);
 
+    // Memoized tab checks for performance
+    const isInfoTab = createMemo(() => activeTab() === "info");
+    const isLogsTab = createMemo(() => activeTab() === "logs");
+
     const refreshDebugInfo = async () => {
         setIsLoading(true);
         try {
@@ -35,7 +39,7 @@ const DebugModal = () => {
             const logFile = await invoke<string>("read_app_log_file");
             setLogFileContent(logFile);
         } catch (e) {
-            info(`Failed to fetch debug info: ${e}`);
+            error(`Failed to fetch debug info: ${e}`);
         } finally {
             setIsLoading(false);
         }
@@ -46,11 +50,16 @@ const DebugModal = () => {
             await navigator.clipboard.writeText(text);
             info("Debug information copied to clipboard");
         } catch (e) {
-            info(`Failed to copy to clipboard: ${e}`);
+            warn(`Failed to copy to clipboard: ${e}`);
         }
     };
 
     const exportDebugData = async () => {
+        if (!debugInfo()) {
+            warn("Attempted to export debug data before it was loaded.");
+            return;
+        }
+
         const data = {
             timestamp: new Date().toISOString(),
             debugInfo: debugInfo(),
@@ -114,7 +123,7 @@ const DebugModal = () => {
                         >
                             Copy All Data
                         </button>
-                        <Show when={activeTab() === "logs" && logFileContent()}>
+                        <Show when={isLogsTab() && logFileContent()}>
                             <button
                                 class="btn btn-sm btn-info"
                                 onClick={() => copyToClipboard(logFileContent())}
@@ -135,14 +144,14 @@ const DebugModal = () => {
                 <div class="tabs tabs-boxed mb-4">
                     <button
                         class="tab"
-                        classList={{ "tab-active": activeTab() === "info" }}
+                        classList={{ "tab-active": isInfoTab() }}
                         onClick={() => setActiveTab("info")}
                     >
                         System Info
                     </button>
                     <button
                         class="tab"
-                        classList={{ "tab-active": activeTab() === "logs" }}
+                        classList={{ "tab-active": isLogsTab() }}
                         onClick={() => setActiveTab("logs")}
                     >
                         Logs
@@ -152,7 +161,7 @@ const DebugModal = () => {
                 {/* Tab Content */}
                 <div class="flex-1 overflow-y-auto mb-4 bg-base-100 p-4 rounded border">
                     {/* Info Tab */}
-                    <Show when={activeTab() === "info"}>
+                    <Show when={isInfoTab()}>
                         <Show when={debugInfo()}>
                             {(info) => (
                                 <div class="space-y-3 font-mono text-sm">
@@ -203,7 +212,7 @@ const DebugModal = () => {
                     </Show>
 
                     {/* Logs Tab */}
-                    <Show when={activeTab() === "logs"}>
+                    <Show when={isLogsTab()}>
                         <pre class="text-xs overflow-auto max-h-full whitespace-pre-wrap break-words">
                             {logFileContent() || (appLogs() ? "Loading log file..." : "No logs available")}
                         </pre>
