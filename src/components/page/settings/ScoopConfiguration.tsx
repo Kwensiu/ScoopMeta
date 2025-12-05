@@ -1,6 +1,6 @@
 import { createSignal, onMount, Show } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
-import { FolderCog, Save, CheckCircle, Folder, RefreshCw } from "lucide-solid";
+import { FolderCog, Save, CircleCheckBig, Folder, RefreshCw } from "lucide-solid";
 import Card from "../../common/Card";
 import { t } from "../../../i18n";
 
@@ -199,7 +199,7 @@ export default function ScoopConfiguration(props: ScoopConfigurationProps) {
 
                 {validationResult() && (
                     <div class={`alert mt-4 text-sm ${validationResult()?.isValid ? 'alert-success' : 'alert-warning'}`}>
-                        <CheckCircle class={`w-4 h-4 ${validationResult()?.isValid ? 'text-success' : 'text-warning'}`} />
+                        <CircleCheckBig class={`w-4 h-4 ${validationResult()?.isValid ? 'text-success' : 'text-warning'}`} />
                         <span>{validationResult()?.message}</span>
                     </div>
                 )}

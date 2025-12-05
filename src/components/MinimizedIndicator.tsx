@@ -1,5 +1,5 @@
 import { Show, Component, createEffect, createSignal } from "solid-js";
-import { CheckCircle, XCircle } from "lucide-solid";
+import { CircleCheckBig, XCircle } from "lucide-solid";
 import { listen } from "@tauri-apps/api/event";
 
 interface MinimizedIndicatorProps {
@@ -53,7 +53,7 @@ const MinimizedIndicator: Component<MinimizedIndicatorProps> = (props) => {
             <span class="loading loading-spinner loading-xs mr-1"></span>
           </Show>
           <Show when={result() === 'success'}>
-            <CheckCircle class="w-4 h-4 text-success mr-1" />
+            <CircleCheckBig class="w-4 h-4 text-success mr-1" />
           </Show>
           <Show when={result() === 'error'}>
             <XCircle class="w-4 h-4 text-error mr-1" />

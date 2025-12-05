@@ -1,4 +1,4 @@
-import { Download, RefreshCw, Github, BookOpen, AlertCircle, CheckCircle, Check } from "lucide-solid";
+import { Download, RefreshCw, Github, BookOpen, AlertCircle, CircleCheckBig, Check } from "lucide-solid";
 import { createSignal, Show, For, createMemo } from "solid-js";
 import { check, type Update } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
@@ -88,7 +88,7 @@ export default function AboutSection(props: AboutSectionProps) {
       value: 'stable' as const,
       label: t("update_channel.stable"),
       description: t("update_channel.stable_description"),
-      icon: <CheckCircle class="h-4 w-4" />,
+      icon: <CircleCheckBig class="h-4 w-4" />,
       isSelected: () => settings.update.channel === 'stable',
     },
     {
