@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all tags and branches
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -64,6 +66,49 @@ jobs:
           
       - name: Compress executable with UPX
         run: upx --best --lzma src-tauri/target/release/${{ steps.meta.outputs.product }}.exe
+
+      - name: Get previous tag
+        id: previous_tag
+        shell: pwsh
+        run: |
+          # Get the latest tag
+          $latestTag = git describe --tags --abbrev=0 2>$null
+          if ($latestTag) {
+            "tag=$latestTag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          } else {
+            "tag=" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          }
+
+      - name: Generate commit list
+        id: commit_list
+        shell: pwsh
+        run: |
+          $previousTag = "${{ steps.previous_tag.outputs.tag }}"
+          $commitMessages = ""
+          
+          if ($previousTag) {
+            # Get commits between previous tag and HEAD
+            $commits = git log --pretty=format:"- %s" "$previousTag"..HEAD
+            if ($commits) {
+              $commitMessages = $commits -join "`n"
+            } else {
+              $commitMessages = "No new commits since $previousTag"
+            }
+          } else {
+            # If no previous tag, get recent commits
+            $commits = git log --oneline -5
+            if ($commits) {
+              # Format each commit with a dash prefix
+              $formattedCommits = ($commits -split "`n") | ForEach-Object { "- $_" }
+              $commitMessages = $formattedCommits -join "`n"
+            } else {
+              $commitMessages = "No recent commits found"
+            }
+          }
+          
+          # Escape special characters for YAML
+          $commitMessages = $commitMessages -replace '\\', '\\' -replace '"', '\"' -replace "`n", "\\n"
+          "messages=$commitMessages" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Generate update artifacts for test channel
         id: updater
@@ -109,13 +154,16 @@ jobs:
             ## Test Build
             
             This is a test build from the `test` branch.
+
+            ### Changes since last test version:
+            
+            ${{ steps.commit_list.outputs.messages }}
             
             **Build Information:**
             - Version: ${{ steps.meta.outputs.version }}
             - Branch: test
             - Commit: ${{ github.sha }}
 
-            
             **Note:** This is a test release and may contain unstable features.
             
             ${{ github.event.inputs.reason && format('- **Manual Trigger Reason:** {0}', github.event.inputs.reason) }}
