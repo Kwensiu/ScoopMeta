@@ -15,31 +15,6 @@
     "later": "稍后"
   },
   "bottons.go_to_buckets": "前往仓库",
-
-  "scoop_status": {
-    "title": "Scoop 状态",
-    "everything_ok": "一切正常！",
-    "some_issues_found": "发现一些问题",
-    "error_checking_status": "检查状态时出错",
-    "scoop_out_of_date": "Scoop 已过期。运行 'scoop update' 获取最新更改。",
-    "buckets_out_of_date": "Scoop 仓库已过期。点击'前往仓库'获取最新更改。",
-    "network_failure": "检查更新时发生网络故障。",
-    "all_good_message": "Scoop 已更新，所有软件包状态良好！",
-    "apps_with_issues": "有问题的应用：",
-    
-    "table": {
-      "name": "名称",
-      "installed": "已安装",
-      "latest": "最新",
-      "status": "状态"
-    },
-    
-    "badges": {
-      "held_package": "保留包",
-      "update_available": "可更新"
-    }
-  },
-
   "bucket": {
     "card": {
       "branch": "分支",
@@ -370,6 +345,27 @@
     "install_anyway": "仍要安装",
     "virus_total_warning": "VirusTotal 扫描警告"
   },
+  "scoop_status": {
+    "all_good_message": "Scoop 已更新，所有软件包状态良好！",
+    "apps_with_issues": "有问题的应用：",
+    "badges": {
+      "held_package": "保留包",
+      "update_available": "可更新"
+    },
+    "buckets_out_of_date": "Scoop 仓库已过期。点击'前往仓库'获取最新更改。",
+    "error_checking_status": "检查状态时出错",
+    "everything_ok": "一切正常！",
+    "network_failure": "检查更新时发生网络故障。",
+    "scoop_out_of_date": "Scoop 已过期。运行 'scoop update' 获取最新更改。",
+    "some_issues_found": "发现一些问题",
+    "table": {
+      "installed": "已安装",
+      "latest": "最新",
+      "name": "名称",
+      "status": "状态"
+    },
+    "title": "Scoop 状态"
+  },
   "search": {
     "bar": {
       "clear_search": "清除搜索",
@@ -403,9 +399,9 @@
       "docs": "文档",
       "downloading_no_size": "正在下载...",
       "downloading_update": "正在下载更新...",
-      "invalid_json_error": "无法获取更新信息。这可能是由于网络问题、GitHub API 速率限制或配置错误造成的。",
       "install": "安装",
       "installing_update": "正在安装更新...",
+      "invalid_json_error": "无法获取更新信息。这可能是由于网络问题、GitHub API 速率限制或配置错误造成的。",
       "latest_version": "您已经在使用最新版本！",
       "managed_by_scoop": "由 Scoop 管理",
       "my_fork": "Fork/Kwensiu",
@@ -428,6 +424,27 @@
       "update_via_scoop": "此应用程序是通过 Scoop 安装的。请使用 Scoop 更新此应用程序。",
       "updates_via_scoop": "通过 Scoop 更新",
       "upstream": "原版/AmarBego"
+    },
+    "app_data": {
+      "14_days": "14 天",
+      "1_day": "1 天",
+      "30_days": "30 天",
+      "3_days": "3 天",
+      "7_days": "7 天",
+      "clear_button": "清理",
+      "clear_confirm": "确认清理",
+      "clear_data": "清理数据",
+      "clear_data_description": "这会清理Rscoop的所有配置数据并重启软件",
+      "clear_error": "清理错误",
+      "clear_success": "清理成功",
+      "clearing": "正在清理",
+      "data_directory": "数据目录",
+      "description": "管理Rscoop产生的数据文件",
+      "log_directory": "Log 目录",
+      "log_retention": "Log 保留",
+      "log_retention_description": "更改Rscoop日志文件的保留时间",
+      "open_directory": "打开目录",
+      "title": "Rscoop 数据"
     },
     "auto_cleanup": {
       "clean_old_versions": "清理旧版本",

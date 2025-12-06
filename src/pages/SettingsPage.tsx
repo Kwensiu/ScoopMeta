@@ -12,6 +12,7 @@ import BucketAutoUpdateSettings from "../components/page/settings/BucketAutoUpda
 import WindowBehaviorSettings from "../components/page/settings/WindowBehaviorSettings";
 import ThemeSettings from "../components/page/settings/ThemeSettings";
 import DefaultLaunchPageSettings from "../components/page/settings/DefaultLaunchPageSettings";
+import AppDataManagement from "../components/page/settings/AppDataManagement";
 import heldStore from "../stores/held";
 import { t } from "../i18n";
 
@@ -87,6 +88,7 @@ function SettingsPage(props: SettingsPageProps) {
                     <Show when={activeTab() === 'management'}>
                         <div class="space-y-8">
                             <ScoopConfiguration />
+                            <AppDataManagement />
                             <HeldPackagesManagement
                                 onUnhold={handleUnhold}
                                 operationInProgress={!!operationTitle() || isUnholding()}

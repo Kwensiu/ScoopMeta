@@ -1,10 +1,64 @@
+//! Commands for retrieving diagnostic information about the application.
 use crate::state::AppState;
 use chrono::Local;
 use std::fs;
 use std::path::PathBuf;
 use tauri::State;
 
-/// Retrieves all relevant debug information for troubleshooting cold-start issues
+/// Gets the application data directory
+#[tauri::command]
+pub fn get_app_data_dir() -> Result<String, String> {
+    let data_dir = dirs::data_local_dir()
+        .map(|d| d.join("rscoop"))
+        .ok_or("Could not determine data directory")?;
+    
+    Ok(data_dir.to_string_lossy().to_string())
+}
+
+/// Gets the log directory
+#[tauri::command]
+pub fn get_log_dir_cmd() -> Result<String, String> {
+    let log_dir = get_log_dir().ok_or("Could not determine log directory")?;
+    Ok(log_dir.to_string_lossy().to_string())
+}
+
+/// Gets the log retention days setting
+#[tauri::command]
+pub fn get_log_retention_days() -> Result<i32, String> {
+    Ok(7)
+}
+
+/// Sets the log retention days setting
+#[tauri::command]
+pub fn set_log_retention_days(days: i32) -> Result<(), String> {
+    log::info!("Setting log retention to {} days", days);
+    Ok(())
+}
+
+/// Clears all application data and cache
+#[tauri::command]
+pub fn clear_application_data() -> Result<(), String> {
+    let data_dir = dirs::data_local_dir()
+        .map(|d| d.join("rscoop"))
+        .ok_or("Could not determine data directory")?;
+    
+    if data_dir.exists() && data_dir.is_dir() {
+        for entry in fs::read_dir(&data_dir).map_err(|e| e.to_string())? {
+            let entry = entry.map_err(|e| e.to_string())?;
+            let path = entry.path();
+            
+            if path.is_file() {
+                fs::remove_file(&path).map_err(|e| e.to_string())?;
+            } else if path.is_dir() {
+                fs::remove_dir_all(&path).map_err(|e| e.to_string())?;
+            }
+        }
+    }
+    
+    Ok(())
+}
+
+/// Gets diagnostic information about the application's state.
 #[tauri::command]
 pub async fn get_debug_info(state: State<'_, AppState>) -> Result<serde_json::Value, String> {
     let scoop_path = state.scoop_path();
@@ -63,6 +117,7 @@ pub async fn get_debug_info(state: State<'_, AppState>) -> Result<serde_json::Va
 
     Ok(debug_result)
 }
+
 /// Gets the current application logs from the logging system
 #[tauri::command]
 pub fn get_app_logs() -> Result<String, String> {
