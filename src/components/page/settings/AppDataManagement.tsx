@@ -2,7 +2,7 @@ import { createSignal, Show, onMount } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { openPath } from "@tauri-apps/plugin-opener";
 import { relaunch } from "@tauri-apps/plugin-process";
-import { HardDrive, Folder, FileText, RotateCcw, Trash2 } from "lucide-solid";
+import { HardDrive, Folder, FileText, Trash2 } from "lucide-solid";
 import Card from "../../common/Card";
 import { t } from "../../../i18n";
 import { createStoredSignal } from "../../../hooks/createStoredSignal";
@@ -25,7 +25,7 @@ export default function AppDataManagement() {
             const logDir = await invoke<string>("get_log_dir_cmd");
             setAppDataDirPath(dataDir);
             setLogDir(logDir);
-            
+
             // 获取日志保留天数设置
             const retentionDays = await invoke<number>("get_log_retention_days");
             setLogRetentionDays(retentionDays);
@@ -64,7 +64,7 @@ export default function AppDataManagement() {
         if (isClearing()) {
             return;
         }
-        
+
         if (clearConfirm()) {
             // 第二次点击 - 执行清理
             if (clearTimer()) {
@@ -72,7 +72,7 @@ export default function AppDataManagement() {
                 setClearTimer(null);
             }
             setClearConfirm(false);
-            
+
             // 重置状态
             setClearSuccess(false);
             setClearError(null);
@@ -82,10 +82,10 @@ export default function AppDataManagement() {
                 // Clear both regular application data and Tauri store data
                 await invoke("clear_application_data");
                 await invoke("clear_store_data");
-                
+
                 // 只有在清理操作真正完成后才显示成功消息
                 setClearSuccess(true);
-                
+
                 // 3秒后重启应用
                 setTimeout(async () => {
                     await relaunch();
@@ -124,113 +124,108 @@ export default function AppDataManagement() {
             description={t("settings.app_data.description")}
         >
             <Show when={!isLoading()}>
-                <div class="space-y-6">
-                    <Show when={loadError()}>
-                        <div class="alert alert-error">
-                            <span>{loadError()}</span>
-                        </div>
-                    </Show>
-                    
-                    {/* Data Directory */}
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-base-200 rounded-lg">
-                        <div class="flex items-start gap-3">
-                            <Folder class="mt-1 text-primary" size={20} />
-                            <div>
-                                <h3 class="font-medium">{t("settings.app_data.data_directory")}</h3>
-                                <p class="text-sm text-base-content/70 mt-1 break-all">{appDataDirPath()}</p>
+
+                <Show when={loadError()}>
+                    <div class="alert alert-error">
+                        <span>{loadError()}</span>
+                    </div>
+                </Show>
+                <div class="card-body p-2">
+                    <div class="bg-base-100 rounded-xl p-5 border border-base-content/5 shadow-sm">
+                        <div class="space-y-4">
+                            {/* Data Directory */}
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-base-200 rounded-lg">
+                                <div class="flex items-start gap-3">
+                                    <Folder class="text-primary" size={20} />
+                                    <div>
+                                        <h3 class="font-medium">{t("settings.app_data.data_directory")}</h3>
+                                        <p class="text-sm text-base-content/70 break-all">{appDataDirPath()}</p>
+                                    </div>
+                                </div>
+                                <button
+                                    class="btn btn-sm btn-primary whitespace-nowrap"
+                                    onClick={openAppDataDir}
+                                >
+                                    {t("settings.app_data.open_directory")}
+                                </button>
+                            </div>
+
+                            {/* Log Directory */}
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-base-200 rounded-lg">
+                                <div class="flex items-start gap-3">
+                                    <FileText class="text-primary" size={20} />
+                                    <div>
+                                        <h3 class="font-medium">{t("settings.app_data.log_directory")}</h3>
+                                        <p class="text-sm text-base-content/70 break-all">{logDir()}</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-2">
+                                    <div class="flex gap-2">
+                                        <select
+                                            class="select select-bordered select-sm"
+                                            value={logRetentionDays()}
+                                            onChange={(e) => handleLogRetentionChange(Number(e.target.value))}
+                                        >
+                                            <option value="1">{t("settings.app_data.1_day")}</option>
+                                            <option value="3">{t("settings.app_data.3_days")}</option>
+                                            <option value="7">{t("settings.app_data.7_days")}</option>
+                                            <option value="14">{t("settings.app_data.14_days")}</option>
+                                            <option value="30">{t("settings.app_data.30_days")}</option>
+                                        </select>
+                                    </div>
+                                    <button
+                                        class="btn btn-sm btn-primary whitespace-nowrap w-full max-w-[calc(100%-60px)]"
+                                        onClick={openLogDir}
+                                    >
+                                        {t("settings.app_data.open_directory")}
+                                    </button>
+                                </div>
+
+                            </div>
+                            {/* Clean App data */}
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-warning/10 rounded-lg border border-warning/20">
+                                <div class="flex items-start gap-3">
+                                    <Trash2 class="text-warning" size={20} />
+                                    <div>
+                                        <h3 class="font-medium text-warning">{t("settings.app_data.clear_data")}</h3>
+                                        <p class="text-sm text-base-content/70">
+                                            {t("settings.app_data.clear_data_description")}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    class="btn btn-sm btn-warning whitespace-nowrap"
+                                    classList={{ "btn-error": clearConfirm() }}
+                                    onClick={clearApplicationData}
+                                    disabled={isClearing()}
+                                >
+                                    <Show when={isClearing()} fallback={
+                                        <Show when={clearConfirm()} fallback={t("settings.app_data.clear_button")}>
+                                            {t("settings.app_data.sure")}
+                                        </Show>
+                                    }>
+                                        <span class="loading loading-spinner loading-xs"></span>
+                                        {t("settings.app_data.clearing")}
+                                    </Show>
+                                </button>
                             </div>
                         </div>
-                        <button 
-                            class="btn btn-sm btn-primary whitespace-nowrap"
-                            onClick={openAppDataDir}
-                        >
-                            {t("settings.app_data.open_directory")}
-                        </button>
-                    </div>
-
-                    {/* Log Directory */}
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-base-200 rounded-lg">
-                        <div class="flex items-start gap-3">
-                            <FileText class="mt-1 text-primary" size={20} />
-                            <div>
-                                <h3 class="font-medium">{t("settings.app_data.log_directory")}</h3>
-                                <p class="text-sm text-base-content/70 mt-1 break-all">{logDir()}</p>
-                            </div>
-                        </div>
-                        <button 
-                            class="btn btn-sm btn-primary whitespace-nowrap"
-                            onClick={openLogDir}
-                        >
-                            {t("settings.app_data.open_directory")}
-                        </button>
-                    </div>
-
-                    {/* Log Retention */}
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-base-200 rounded-lg">
-                        <div class="flex items-start gap-3">
-                            <RotateCcw class="mt-1 text-primary" size={20} />
-                            <div>
-                                <h3 class="font-medium">{t("settings.app_data.log_retention")}</h3>
-                                <p class="text-sm text-base-content/70 mt-1">
-                                    {t("settings.app_data.log_retention_description")}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <select 
-                                class="select select-bordered select-sm"
-                                value={logRetentionDays()}
-                                onChange={(e) => handleLogRetentionChange(Number(e.target.value))}
-                            >
-                                <option value="1">{t("settings.app_data.1_day")}</option>
-                                <option value="3">{t("settings.app_data.3_days")}</option>
-                                <option value="7">{t("settings.app_data.7_days")}</option>
-                                <option value="14">{t("settings.app_data.14_days")}</option>
-                                <option value="30">{t("settings.app_data.30_days")}</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    {/* Clean App data */}
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-warning/10 rounded-lg border border-warning/20">
-                        <div class="flex items-start gap-3">
-                            <Trash2 class="mt-1 text-warning" size={20} />
-                            <div>
-                                <h3 class="font-medium text-warning">{t("settings.app_data.clear_data")}</h3>
-                                <p class="text-sm text-base-content/70 mt-1">
-                                    {t("settings.app_data.clear_data_description")}
-                                </p>
-                            </div>
-                        </div>
-                        <button 
-                            class="btn btn-sm btn-warning whitespace-nowrap"
-                            classList={{ "btn-error": clearConfirm() }}
-                            onClick={clearApplicationData}
-                            disabled={isClearing()}
-                        >
-                            <Show when={isClearing()} fallback={
-                                <Show when={clearConfirm()} fallback={t("settings.app_data.clear_button")}>
-                                    {t("settings.app_data.sure")}
-                                </Show>
-                            }>
-                                <span class="loading loading-spinner loading-xs"></span>
-                                {t("settings.app_data.clearing")}
-                            </Show>
-                        </button>
-                    </div>
-
+                        {/* Maybe no necessary
                     <Show when={clearSuccess()}>
                         <div class="alert alert-success">
                             <span>{t("settings.app_data.clear_success")}</span>
                         </div>
                     </Show>
-
-                    <Show when={clearError()}>
-                        <div class="alert alert-error">
-                            <span>{clearError()}</span>
-                        </div>
-                    </Show>
+                    */}
+                    </div>
                 </div>
+                <Show when={clearError()}>
+                    <div class="alert alert-error">
+                        <span>{clearError()}</span>
+                    </div>
+                </Show>
+
             </Show>
 
             <Show when={isLoading()}>

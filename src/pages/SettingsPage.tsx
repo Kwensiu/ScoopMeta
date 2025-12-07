@@ -89,7 +89,7 @@ function SettingsPage(props: SettingsPageProps) {
                     <Show when={activeTab() === 'management'}>
                         <div class="space-y-8">
                             <ScoopConfiguration />
-                            <AppDataManagement />
+
                             <HeldPackagesManagement
                                 onUnhold={handleUnhold}
                                 operationInProgress={!!operationTitle() || isUnholding()}
@@ -121,6 +121,7 @@ function SettingsPage(props: SettingsPageProps) {
                             ref={(r) => (aboutSectionRef = r)}
                             isScoopInstalled={props.isScoopInstalled}
                         />
+                                                    <AppDataManagement />
                     </Show>
                 </div>
             </div>
