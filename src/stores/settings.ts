@@ -134,6 +134,10 @@ function createSettingsStore() {
               ...stored.update,
             },
             defaultLaunchPage: stored.defaultLaunchPage || defaultSettings.defaultLaunchPage,
+            ui: {
+              ...defaultSettings.ui,
+              ...stored.ui,
+            },
           };
         }
       } catch (error) {
