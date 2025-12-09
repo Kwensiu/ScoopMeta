@@ -1,6 +1,7 @@
 import { createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Store } from "@tauri-apps/plugin-store";
+import { invoke } from "@tauri-apps/api/core";
 import { View } from "../types/scoop";
 
 const STORE_NAME = 'settings.dat';
@@ -167,7 +168,6 @@ function createSettingsStore() {
   const checkFactoryReset = async (): Promise<boolean> => {
     try {
       // Check if factory reset marker exists using a Tauri command
-      const { invoke } = await import('@tauri-apps/api/core');
       const markerExists = await invoke<boolean>('check_factory_reset_marker');
       return markerExists;
     } catch (error) {

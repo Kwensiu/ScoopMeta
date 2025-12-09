@@ -112,8 +112,8 @@ function SettingsPage(props: SettingsPageProps) {
                             <WindowBehaviorSettings />
                             <StartupSettings />
                             <DefaultLaunchPageSettings />
+                            <UISettings />
                             <DebugSettings />
-                                                    <UISettings />
                         </div>
                     </Show>
 
@@ -123,7 +123,7 @@ function SettingsPage(props: SettingsPageProps) {
                             ref={(r) => (aboutSectionRef = r)}
                             isScoopInstalled={props.isScoopInstalled}
                         />
-                                                    <AppDataManagement />
+                        <AppDataManagement />
                     </Show>
                 </div>
             </div>

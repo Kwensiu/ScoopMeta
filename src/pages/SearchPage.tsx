@@ -48,7 +48,7 @@ function SearchPage() {
     resultsToShow();
     activeTab();
     setCurrentPage(1);
-    
+
     // Get the bucket's name
     const buckets = [...new Set([...packageResults(), ...binaryResults()].map(p => p.source))];
     setUniqueBuckets(buckets);
@@ -74,7 +74,7 @@ function SearchPage() {
             />
           </div>
           <div class="ml-4 w-48">
-            <select 
+            <select
               class="select select-bordered w-full max-w-xs"
               value={bucketFilter()}
               onChange={(e) => setBucketFilter(e.currentTarget.value)}

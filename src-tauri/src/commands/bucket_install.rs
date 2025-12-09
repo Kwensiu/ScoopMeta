@@ -30,7 +30,6 @@ fn get_buckets_dir() -> Result<PathBuf, String> {
     Ok(scoop_dir.join("buckets"))
 }
 
-
 // Check if bucket already exists
 fn bucket_exists(bucket_name: &str) -> Result<bool, String> {
     let buckets_dir = get_buckets_dir()?;
@@ -43,7 +42,6 @@ fn get_bucket_path(bucket_name: &str) -> Result<PathBuf, String> {
     let buckets_dir = get_buckets_dir()?;
     Ok(buckets_dir.join(bucket_name))
 }
-
 
 // Clone repository with progress callback
 fn clone_repository(url: &str, target_path: &Path) -> Result<Repository, String> {
@@ -322,7 +320,10 @@ pub async fn update_bucket(bucket_name: String) -> Result<BucketInstallResult, S
         .map_err(|e| e.to_string())?
 }
 
-fn update_bucket_sync(bucket_name: &str, bucket_path: &Path) -> Result<BucketInstallResult, String> {
+fn update_bucket_sync(
+    bucket_name: &str,
+    bucket_path: &Path,
+) -> Result<BucketInstallResult, String> {
     // Try to update the repository using git2
     match Repository::open(bucket_path) {
         Ok(repo) => {

@@ -13,7 +13,7 @@ export default function AppDataManagement() {
     const [logRetentionDays, setLogRetentionDays] = createStoredSignal<number>("logRetentionDays", 7);
     const [isLoading, setIsLoading] = createSignal<boolean>(true);
     const [isClearing, setIsClearing] = createSignal<boolean>(false);
-    const [clearSuccess, setClearSuccess] = createSignal<boolean>(false);
+    // const [clearSuccess, setClearSuccess] = createSignal<boolean>(false);
     const [clearError, setClearError] = createSignal<string | null>(null);
     const [loadError, setLoadError] = createSignal<string | null>(null);
     const [clearConfirm, setClearConfirm] = createSignal<boolean>(false);
@@ -26,7 +26,6 @@ export default function AppDataManagement() {
             setAppDataDirPath(dataDir);
             setLogDir(logDir);
 
-            // 获取日志保留天数设置
             const retentionDays = await invoke<number>("get_log_retention_days");
             setLogRetentionDays(retentionDays);
             setLoadError(null);
@@ -60,42 +59,35 @@ export default function AppDataManagement() {
     };
 
     const clearApplicationData = async () => {
-        // 防止并发操作
         if (isClearing()) {
             return;
         }
 
         if (clearConfirm()) {
-            // 第二次点击 - 执行清理
             if (clearTimer()) {
                 window.clearTimeout(clearTimer()!);
                 setClearTimer(null);
             }
             setClearConfirm(false);
-
-            // 重置状态
-            setClearSuccess(false);
+            // setClearSuccess(false);
             setClearError(null);
             setIsClearing(true);
 
             try {
-                // 使用新的统一清理命令
                 await invoke("factory_reset");
-                
-                // 显示成功消息
-                setClearSuccess(true);
-                
-                // 1秒后重启应用
+
+                // setClearSuccess(true);
+
                 setTimeout(async () => {
                     await relaunch();
                 }, 1000);
             } catch (error) {
                 // 错误处理
-                setClearError(t("settings.app_data.clear_error") + ": " + error.message);
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                setClearError(t("settings.app_data.clear_error") + ": " + errorMessage);
                 setIsClearing(false);
             }
         } else {
-            // 第一次点击 - 显示确认
             setClearConfirm(true);
             const timer = window.setTimeout(() => {
                 setClearConfirm(false);

@@ -1,4 +1,4 @@
-import { createSignal, Show, onMount, createMemo, createEffect, onCleanup, Suspense } from "solid-js";
+import { createSignal, Show, onMount, createMemo, createEffect, onCleanup } from "solid-js";
 import "./App.css";
 import "./i18n";
 import Header from "./components/Header.tsx";
@@ -520,10 +520,10 @@ function App() {
                 </div>
                 {/* Update ALL floating button in the bottom-right corner */}
                 <Show when={settings.ui.showGlobalUpdateButton}>
-                  <AnimatedButton
-                      onClick={handleUpdateAll}
-                      initialState="circle"
-                  />
+                    <AnimatedButton
+                        onClick={handleUpdateAll}
+                        initialState="circle"
+                    />
                 </Show>
                 <DebugModal />
                 <OperationModal
