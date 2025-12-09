@@ -26,8 +26,12 @@ struct InstallManifest {
 fn find_package_bucket(scoop_path: &Path, package_name: &str) -> Option<String> {
     let buckets_path = scoop_path.join("buckets");
 
-    log::info!("Searching for package bucket. Scoop path: {}, Package name: {}", scoop_path.display(), package_name);
-    
+    log::info!(
+        "Searching for package bucket. Scoop path: {}, Package name: {}",
+        scoop_path.display(),
+        package_name
+    );
+
     if let Ok(buckets) = fs::read_dir(&buckets_path) {
         for bucket_entry in buckets.flatten() {
             if bucket_entry.path().is_dir() {
@@ -38,7 +42,11 @@ fn find_package_bucket(scoop_path: &Path, package_name: &str) -> Option<String> 
                     .join("bucket")
                     .join(format!("{}.json", package_name));
 
-                log::debug!("Checking bucket: {}, manifest path: {}", bucket_name, manifest_path.display());
+                log::debug!(
+                    "Checking bucket: {}, manifest path: {}",
+                    bucket_name,
+                    manifest_path.display()
+                );
                 if manifest_path.exists() {
                     log::info!("Found package {} in bucket {}", package_name, bucket_name);
                     return Some(bucket_name);
@@ -57,7 +65,10 @@ fn find_package_bucket(scoop_path: &Path, package_name: &str) -> Option<String> 
 fn find_latest_version_dir(package_path: &Path) -> Option<PathBuf> {
     let mut candidates: Vec<(u128, PathBuf)> = Vec::new();
 
-    log::info!("Finding latest version directory for package: {}", package_path.display());
+    log::info!(
+        "Finding latest version directory for package: {}",
+        package_path.display()
+    );
 
     if let Ok(entries) = fs::read_dir(package_path) {
         for entry in entries.flatten() {
@@ -98,13 +109,20 @@ fn find_latest_version_dir(package_path: &Path) -> Option<PathBuf> {
 
     candidates.sort_by(|a, b| b.0.cmp(&a.0));
     let result = candidates.into_iter().map(|(_, path)| path).next();
-    log::info!("Latest version directory found: {:?}", result.as_ref().map(|p| p.display().to_string()));
+    log::info!(
+        "Latest version directory found: {:?}",
+        result.as_ref().map(|p| p.display().to_string())
+    );
     result
 }
 
 fn locate_install_dir(package_path: &Path) -> Option<PathBuf> {
     let current_path = package_path.join("current");
-    log::info!("Locating install directory for package: {}, checking current path: {}", package_path.display(), current_path.display());
+    log::info!(
+        "Locating install directory for package: {}, checking current path: {}",
+        package_path.display(),
+        current_path.display()
+    );
 
     if current_path.is_dir() {
         log::info!("Found current directory: {}", current_path.display());
@@ -116,7 +134,10 @@ fn locate_install_dir(package_path: &Path) -> Option<PathBuf> {
 }
 
 fn compute_apps_fingerprint(app_dirs: &[PathBuf]) -> String {
-    log::info!("Computing apps fingerprint for {} app directories", app_dirs.len());
+    log::info!(
+        "Computing apps fingerprint for {} app directories",
+        app_dirs.len()
+    );
     let mut entries = Vec::with_capacity(app_dirs.len());
 
     for path in app_dirs {
@@ -190,7 +211,11 @@ fn load_package_details(package_path: &Path, scoop_path: &Path) -> Result<ScoopP
 
     // Read and parse manifest.json
     let manifest_path = install_root.join("manifest.json");
-    log::info!("Reading manifest.json for package: {}, path: {}", package_name, manifest_path.display());
+    log::info!(
+        "Reading manifest.json for package: {}, path: {}",
+        package_name,
+        manifest_path.display()
+    );
     let manifest_content = fs::read_to_string(&manifest_path)
         .map_err(|e| format!("Failed to read manifest.json for {}: {}", package_name, e))?;
     let manifest: Manifest = serde_json::from_str(&manifest_content)
@@ -198,7 +223,11 @@ fn load_package_details(package_path: &Path, scoop_path: &Path) -> Result<ScoopP
 
     // Read and parse install.json
     let install_manifest_path = install_root.join("install.json");
-    log::info!("Reading install.json for package: {}, path: {}", package_name, install_manifest_path.display());
+    log::info!(
+        "Reading install.json for package: {}, path: {}",
+        package_name,
+        install_manifest_path.display()
+    );
     let install_manifest_content = fs::read_to_string(&install_manifest_path)
         .map_err(|e| format!("Failed to read install.json for {}: {}", package_name, e))?;
     let install_manifest: InstallManifest = serde_json::from_str(&install_manifest_content)
@@ -219,14 +248,18 @@ fn load_package_details(package_path: &Path, scoop_path: &Path) -> Result<ScoopP
     // Check if this is a versioned install - versioned installs don't have a bucket field in install.json
     // AND cannot be found in any bucket directory (indicating custom/generated manifest)
     let is_versioned_install = install_manifest.bucket.is_none();
-    log::info!("Is versioned install for {}: {}", package_name, is_versioned_install);
+    log::info!(
+        "Is versioned install for {}: {}",
+        package_name,
+        is_versioned_install
+    );
 
-    // Get the last modified time of the installation
-    let updated_time = fs::metadata(&install_manifest_path)
+    // Get the last modified time of the installation folder as install date
+    let updated_time = fs::metadata(&install_root)
         .and_then(|m| m.modified())
         .map(|t| DateTime::<Utc>::from(t).to_rfc3339())
         .unwrap_or_default();
-    
+
     log::info!("Package {} last updated: {}", package_name, updated_time);
 
     Ok(ScoopPackage {
@@ -248,7 +281,11 @@ async fn refresh_scoop_path_if_needed<R: Runtime>(
     reason: &str,
 ) -> Option<PathBuf> {
     let current_path = state.scoop_path();
-    log::info!("Refreshing scoop path if needed. Current path: {}, reason: {}", current_path.display(), reason);
+    log::info!(
+        "Refreshing scoop path if needed. Current path: {}, reason: {}",
+        current_path.display(),
+        reason
+    );
 
     match crate::utils::resolve_scoop_root(app) {
         Ok(new_path) => {
@@ -381,7 +418,7 @@ async fn scan_installed_packages_internal<R: Runtime>(
                 Ok(package) => {
                     log::info!("Successfully loaded package: {}", package.name);
                     Some(package)
-                },
+                }
                 Err(e) => {
                     log::warn!(
                         "{} Skipping package at '{}': {}",
@@ -433,7 +470,10 @@ pub async fn get_installed_packages_full<R: Runtime>(
 
     // Perform the scan (cache is checked inside)
     let result = scan_installed_packages_internal(app, &state, false).await;
-    log::info!("=== INSTALLED SCAN === get_installed_packages_full completed, result: {:?}", result.as_ref().map(|pkgs| pkgs.len()));
+    log::info!(
+        "=== INSTALLED SCAN === get_installed_packages_full completed, result: {:?}",
+        result.as_ref().map(|pkgs| pkgs.len())
+    );
     result
 }
 

@@ -16,22 +16,23 @@ hljs.registerLanguage('bash', bash);
 hljs.registerLanguage('json', json);
 
 interface PackageInfoModalProps {
-  pkg: ScoopPackage | null;
-  info: ScoopInfo | null;
-  loading: boolean;
-  error: string | null;
+  pkg?: ScoopPackage | null;
+  info?: ScoopInfo | null;
+  loading?: boolean;
+  error?: string | null;
+  autoShowVersions?: boolean;
+  isPackageVersioned?: (packageName: string) => boolean;
   onClose: () => void;
   onInstall?: (pkg: ScoopPackage) => void;
   onUninstall?: (pkg: ScoopPackage) => void;
   onUpdate?: (pkg: ScoopPackage) => void;
   onForceUpdate?: (pkg: ScoopPackage) => void;
   onSwitchVersion?: (pkg: ScoopPackage, version: string) => void;
-  showBackButton?: boolean;
-  autoShowVersions?: boolean;
-  isPackageVersioned?: (packageName: string) => boolean;
-  onPackageStateChanged?: () => void;
   onChangeBucket?: (pkg: ScoopPackage) => void;
+  onPackageStateChanged?: () => void;
   setOperationTitle?: (title: string) => void;
+  showBackButton?: boolean;
+  context?: 'installed' | 'search'; // 新增 context 属性以区分页面来源
 }
 
 // Component to render detail values. If it's a JSON string of an object/array, it pretty-prints and highlights it.
@@ -133,6 +134,28 @@ function PackageInfoModal(props: PackageInfoModalProps) {
   const [isClosing, setIsClosing] = createSignal(false);
   const [rendered, setRendered] = createSignal(false);
 
+  // 格式化日期显示
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    
+    try {
+      const date = new Date(dateString);
+      // 检查日期是否有效
+      if (isNaN(date.getTime())) return dateString;
+      
+      // 使用更简洁的日期格式
+      return date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (e) {
+      return dateString;
+    }
+  };
+
   const orderedDetails = createMemo(() => {
     if (!props.info?.details) return [];
 
@@ -143,6 +166,13 @@ function PackageInfoModal(props: PackageInfoModalProps) {
       { key: 'Installed Version', label: t('package_info.installed_version') },
       { key: 'Latest Version', label: t('package_info.latest_version') },
       { key: 'Version', label: t('package_info.version') },
+      // 根据 context 决定是否添加日期信息
+      ...(props.pkg && props.context === 'installed'
+        ? [{ key: 'Install Date', label: t('package_info.install_date') }]
+        : []),
+      ...(props.pkg && props.context === 'search'
+        ? [{ key: 'Update Date', label: t('package_info.update_date') }]
+        : []),
       { key: 'Includes', label: t('package_info.includes') },
       { key: 'Installed', label: t('package_info.installed') },
       { key: 'Homepage', label: t('package_info.homepage') },
@@ -155,6 +185,12 @@ function PackageInfoModal(props: PackageInfoModalProps) {
     for (const { key, label } of desiredOrder) {
       if (detailsMap.has(key)) {
         result.push([label, detailsMap.get(key)!, key]);
+      } else if (key === 'Install Date' && props.pkg) {
+        // 添加安装日期信息并格式化
+        result.push([label, formatDate(props.pkg.updated), 'Install Date']);
+      } else if (key === 'Update Date' && props.pkg) {
+        // 添加更新日期信息并格式化
+        result.push([label, formatDate(props.pkg.updated), 'Update Date']);
       }
     }
 

@@ -220,6 +220,7 @@ function InstalledPage(props: InstalledPageProps) {
       <PackageInfoModal
         pkg={selectedPackage()}
         info={info()}
+        context="installed"
         loading={infoLoading()}
         error={infoError()}
         onClose={handleCloseInfoModalWithVersions}
