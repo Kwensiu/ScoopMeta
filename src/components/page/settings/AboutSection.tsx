@@ -76,11 +76,11 @@ export default function AboutSection(props: AboutSectionProps) {
       } else if (error.message.includes('integrity') || error.message.includes('verification')) {
         return t("settings.about.integrity_check_failed");
       }
-      
+
       // Return the actual error message, but limit its length for security
       return error.message.substring(0, 200);
     }
-    
+
     const errorString = String(error);
     return errorString.substring(0, 200);
   };
@@ -125,18 +125,18 @@ export default function AboutSection(props: AboutSectionProps) {
       if (update?.available) {
         setUpdateStatus('available');
         setUpdateInfo(update);
-        console.log('Update found', { 
-          version: update.version, 
-          body: update.body 
+        console.log('Update found', {
+          version: update.version,
+          body: update.body
         });
 
         // Only show dialog if user manually clicked "Check for updates"
         if (manual) {
           const versionText = update.version;
           const bodyText = update.body || t("settings.about.no_release_notes");
-          
-          const messageContent = t("settings.about.update_available_dialog", { 
-            version: versionText, 
+
+          const messageContent = t("settings.about.update_available_dialog", {
+            version: versionText,
             body: bodyText
           });
 
@@ -168,11 +168,11 @@ export default function AboutSection(props: AboutSectionProps) {
     } catch (error) {
       console.error('Failed to check for updates:', error);
       setUpdateStatus('error');
-      
+
       const errorMessage = sanitizeErrorMessage(error);
       setUpdateError(errorMessage);
       console.error('Update check error details:', errorMessage);
-      
+
       // Show error to user if manually checking
       if (manual) {
         await message(errorMessage, {
@@ -197,7 +197,7 @@ export default function AboutSection(props: AboutSectionProps) {
       // Download and install the update with progress reporting
       await currentUpdateInfo.downloadAndInstall((progress) => {
         console.log('Update progress event:', progress.event, progress);
-        
+
         if (progress.event === 'Started') {
           console.log('Download started', { contentLength: progress.data.contentLength });
           setDownloadProgress({
@@ -206,7 +206,7 @@ export default function AboutSection(props: AboutSectionProps) {
           });
         } else if (progress.event === 'Progress') {
           const newDownloaded = progress.data.chunkLength || 0;
-          
+
           setDownloadProgress(prev => {
             const updatedDownloaded = prev.downloaded + newDownloaded;
             return {
@@ -214,13 +214,13 @@ export default function AboutSection(props: AboutSectionProps) {
               total: prev.total
             };
           });
-          
+
           // Calculate percentage using the total from Started event
           const currentProgress = downloadProgress();
-          const percent = currentProgress.total 
+          const percent = currentProgress.total
             ? Math.round((currentProgress.downloaded + newDownloaded) / currentProgress.total * 100)
             : undefined;
-            
+
           if (percent !== undefined) {
             console.log(`Download progress: ${percent}% (${currentProgress.downloaded + newDownloaded} bytes)`);
           }
@@ -231,7 +231,7 @@ export default function AboutSection(props: AboutSectionProps) {
       });
 
       console.log('Update installation completed successfully');
-      
+
       // Restart the app after successful installation
       const confirmed = await ask(
         t("settings.about.update_complete"),
@@ -253,7 +253,7 @@ export default function AboutSection(props: AboutSectionProps) {
     } catch (error) {
       console.error('Failed to install update:', error);
       setUpdateStatus('error');
-      
+
       const errorMessage = sanitizeErrorMessage(error);
       setUpdateError(errorMessage);
       console.error('Update installation error details:', errorMessage);
@@ -324,7 +324,11 @@ export default function AboutSection(props: AboutSectionProps) {
                     <Download class="w-5 h-5" />
                     <div>
                       <h3 class="font-bold">{t("settings.about.update_available")}</h3>
-                      <div class="text-xs">{t("settings.about.update_ready", { version: updateInfo()?.version})}</div>
+                      <div class="text-xs">
+                        {t("settings.about.update_ready", {
+                          version: updateInfo()?.version || "unknown"
+                        })}
+                      </div>
                     </div>
                     <button class="btn btn-sm" onClick={installAvailableUpdate}>{t("buttons.install")}</button>
                   </div>
@@ -397,7 +401,7 @@ export default function AboutSection(props: AboutSectionProps) {
                       <div class="flex items-center">
                         {channel.isSelected() && (
                           <div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                            <Check class="w-3 h-3 " strokeWidth={3}/>
+                            <Check class="w-3 h-3 " strokeWidth={3} />
                           </div>
                         )}
                       </div>
@@ -408,7 +412,7 @@ export default function AboutSection(props: AboutSectionProps) {
               </For>
               <div class="flex items-center justify-between">
                 <span class="text-sm text-base-content/70">{t("settings.about.check_now_note")}</span>
-                <button 
+                <button
                   class="btn btn-xs btn-outline"
                   onClick={async () => {
                     await relaunch();
