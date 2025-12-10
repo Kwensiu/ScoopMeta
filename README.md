@@ -42,7 +42,7 @@ Rscoop 是一个开源、轻量、全面的 Scoop GUI管理器项目，上游作
 
 ##
 
-### 📲 便携终端（测试中）
+### 📲 便携终端（实验）
 <details>
 <summary>点击展开</summary>
 <br>

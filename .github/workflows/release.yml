@@ -89,12 +89,16 @@ jobs:
           
           Set-Content -Path "./update.json" -Value $json
 
+          "installerPath=$installerPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "sigPath=$sigPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "exePath=./src-tauri/target/release/$productName.exe" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
       - name: Create GitHub Release with artifacts
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
+          tag: v${{ github.ref_name }}
+          name: v${{ github.ref_name }}
           bodyFile: RELEASE_NOTES.md
           draft: false
           prerelease: false
