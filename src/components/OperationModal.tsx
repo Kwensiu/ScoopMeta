@@ -175,10 +175,9 @@ function OperationModal(props: OperationModalProps) {
       setRendered(true);
       setIsMinimizing(true);
 
+      // Use a single requestAnimationFrame to reduce redraws
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setIsMinimizing(false);
-        });
+        setIsMinimizing(false);
       });
 
       setupListeners();
