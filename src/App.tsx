@@ -117,18 +117,20 @@ function App() {
         });
     };
 
-    // Debug: track state changes
-    createEffect(() => {
-        console.log("App State Debug:", {
-            "readyFlag": readyFlag(),
-            "isReady": isReady(),
-            "hasCwdMismatch": hasCwdMismatch(),
-            "bypassCwdMismatch": bypassCwdMismatch(),
-            "error": error(),
-            "isScoopInstalled": isScoopInstalled(),
-            "initTimedOut": initTimedOut()
+    // Debug: track state changes (only in development)
+    if (process.env.NODE_ENV === 'development') {
+        createEffect(() => {
+            console.log("App State Debug:", {
+                "readyFlag": readyFlag(),
+                "isReady": isReady(),
+                "hasCwdMismatch": hasCwdMismatch(),
+                "bypassCwdMismatch": bypassCwdMismatch(),
+                "error": error(),
+                "isScoopInstalled": isScoopInstalled(),
+                "initTimedOut": initTimedOut()
+            });
         });
-    });
+    }
 
     const handleInstallUpdate = async () => {
         if (!update()) return;
