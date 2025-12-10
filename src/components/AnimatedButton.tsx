@@ -15,7 +15,6 @@ const AnimatedButton = (props: AnimatedButtonProps) => {
   const [isHovered, setIsHovered] = createSignal(false);
   const [isLoading, setIsLoading] = createSignal(false);
   const [isSuccess, setIsSuccess] = createSignal(false);
-  const [buttonWidth, setButtonWidth] = createSignal(props.initialState === "expanded" ? 128 : 48);
   const [shouldHideText, setShouldHideText] = createSignal(false);
 
   // Use createMemo to memoize the localized strings
@@ -24,15 +23,15 @@ const AnimatedButton = (props: AnimatedButtonProps) => {
   const successText = createMemo(() => props.successText || t('update.success'));
   const tooltip = createMemo(() => props.tooltip || t('update.all_tooltip'));
 
-  // Calculate button width based on text content
-  const calculateWidth = () => {
+  // Calculate button width based on text content using memoization
+  const buttonWidth = createMemo(() => {
     if (isLoading()) return getTextWidth(loadingText());
     if (isSuccess()) return getTextWidth(successText());
     if (isHovered() && !isLoading() && !isSuccess() && !shouldHideText()) return getTextWidth(defaultText());
 
     // Circle width
     return props.initialState === "expanded" ? getTextWidth(defaultText()) : 48;
-  };
+  });
 
   const getTextWidth = (text: string) => {
     // Different character width calculations for different languages
@@ -51,8 +50,7 @@ const AnimatedButton = (props: AnimatedButtonProps) => {
 
   // Update button width when state changes
   createEffect(() => {
-    const newWidth = calculateWidth();
-    setButtonWidth(newWidth);
+    const newWidth = buttonWidth();
     if (props.onWidthChange) {
       props.onWidthChange(newWidth);
     }
