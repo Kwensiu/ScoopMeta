@@ -45,7 +45,7 @@ Currently only supports switching between Chinese and English, and some texts ma
 
 ##
 
-### 📲 Portable Terminal (实验)
+### 📲 Portable Terminal (Beta)
 
 <details>
 <summary>Click to expand</summary>
