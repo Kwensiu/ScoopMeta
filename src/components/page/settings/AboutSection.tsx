@@ -478,7 +478,6 @@ export default function AboutSection(props: AboutSectionProps) {
         <p class="text-sm text-base-content/60">
           {t("settings.about.please_report_issues")}
         </p>
-
       </div>
 
       <div class="card-body p-6 space-y-8">
@@ -636,6 +635,85 @@ export default function AboutSection(props: AboutSectionProps) {
               </div>
             </div>
           </div>
+
+          {props.isScoopInstalled ? (
+            <div class="alert alert-info text-sm shadow-sm">
+              <span>Use <code>scoop update rscoop</code> in your terminal to update.</span>
+            </div>
+          ) : (
+            <div class="space-y-4">
+              {updateStatus() === 'idle' && (
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-base-content/70">Check for the latest version</span>
+                  <button
+                    class="btn btn-sm btn-primary"
+                    onClick={() => checkForUpdates(true)}
+                  >
+                    Check Now
+                  </button>
+                </div>
+              )}
+
+              {updateStatus() === 'checking' && (
+                <div class="flex items-center justify-center py-2 text-base-content/70">
+                  <span class="loading loading-spinner loading-sm mr-3"></span>
+                  Checking for updates...
+                </div>
+              )}
+
+              {updateStatus() === 'available' && (
+                <div class="space-y-3 animate-in fade-in slide-in-from-top-2">
+                  <div class="alert alert-success shadow-sm">
+                    <Download class="w-5 h-5" />
+                    <div>
+                      <h3 class="font-bold">Update Available!</h3>
+                      <div class="text-xs">Version {updateInfo()?.version} is ready to install.</div>
+                    </div>
+                    <button class="btn btn-sm" onClick={installAvailableUpdate}>Install</button>
+                  </div>
+                  <Show when={updateInfo()?.body}>
+                    <div class="bg-base-200 rounded-lg p-3 text-xs max-h-32 overflow-y-auto border border-base-content/5">
+                      <div class="font-bold mb-1 opacity-70">Release Notes:</div>
+                      <div class="whitespace-pre-wrap opacity-80">{updateInfo()?.body}</div>
+                    </div>
+                  </Show>
+                </div>
+              )}
+
+              {updateStatus() === 'downloading' && (
+                <div class="space-y-2">
+                  <div class="flex justify-between text-xs font-medium">
+                    <span>Downloading update...</span>
+                    <span>{downloadProgress().total
+                      ? `${Math.round((downloadProgress().downloaded / (downloadProgress().total || 1)) * 100)}%`
+                      : '...'}</span>
+                  </div>
+                  <progress
+                    class="progress progress-primary w-full"
+                    value={downloadProgress().downloaded}
+                    max={downloadProgress().total || 100}
+                  />
+                </div>
+              )}
+
+              {updateStatus() === 'installing' && (
+                <div class="flex items-center justify-center py-2 text-success font-medium">
+                  <span class="loading loading-spinner loading-sm mr-3"></span>
+                  Installing update...
+                </div>
+              )}
+
+              {updateStatus() === 'error' && (
+                <div class="alert alert-error shadow-sm">
+                  <div class="flex-1">
+                    <div class="font-bold text-xs">Update Failed</div>
+                    <div class="text-xs opacity-80">{updateError()}</div>
+                  </div>
+                  <button class="btn btn-xs btn-outline" onClick={() => checkForUpdates(true)}>Retry</button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Links */}

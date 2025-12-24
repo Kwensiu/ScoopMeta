@@ -118,6 +118,7 @@ export default function BucketAutoUpdateSettings() {
 
             <Show when={settings.buckets.autoUpdateInterval !== 'off'}>
                 <div class="divider my-4"></div>
+
                 <div class="flex items-center justify-between">
                     <div class="flex flex-col">
                         <span class="text-sm font-medium">{t("settings.bucket_auto_update.silent_update")}</span>
@@ -135,6 +136,7 @@ export default function BucketAutoUpdateSettings() {
                         />
                     </label>
                 </div>
+
                 <div class="flex items-center justify-between mt-4">
                     <div class="flex flex-col">
                         <span class="text-sm font-medium">{t("settings.bucket_auto_update.auto_update_packages")}</span>
@@ -148,6 +150,24 @@ export default function BucketAutoUpdateSettings() {
                             onChange={async (e) => {
                                 await setBucketSettings({ autoUpdatePackagesEnabled: e.currentTarget.checked });
                                 await invoke("set_config_value", { key: "buckets.autoUpdatePackagesEnabled", value: e.currentTarget.checked });
+                            }}
+                        />
+                    </label>
+                </div>
+                
+                <div class="flex items-center justify-between mt-4">
+                    <div class="flex flex-col">
+                        <span class="text-sm font-medium">{t("settings.bucket_auto_update.update_history_enabled")}</span>
+                        <span class="text-[11px] text-base-content/60">{t("settings.bucket_auto_update.update_history_enabled_description")}</span>
+                    </div>
+                    <label class="label cursor-pointer">
+                        <input
+                            type="checkbox"
+                            class="toggle toggle-primary"
+                            checked={settings.buckets.updateHistoryEnabled}
+                            onChange={async (e) => {
+                                await setBucketSettings({ updateHistoryEnabled: e.currentTarget.checked });
+                                await invoke("set_config_value", { key: "buckets.updateHistoryEnabled", value: e.currentTarget.checked });
                             }}
                         />
                     </label>

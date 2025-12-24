@@ -2,6 +2,7 @@ import { createSignal, onMount, Show, onCleanup } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { useBuckets, type BucketInfo } from "../hooks/useBuckets";
 import { usePackageInfo } from "../hooks/usePackageInfo";
+
 import { createStoredSignal } from "../hooks/createStoredSignal";
 import { ScoopPackage } from "../types/scoop";
 import BucketInfoModal from "../components/BucketInfoModal";

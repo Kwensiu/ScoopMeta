@@ -177,7 +177,7 @@ function CacheManager(props: CacheManagerProps) {
                                 disabled={selectedItems().size === 0 || isLoading()}
                             >
                                 <Trash2 class="w-4 h-4" />
-                                {t('doctor.cache_manager.selected')} ({selectedItems().size})
+                                {t('buttons.removeSelected')} ({selectedItems().size})
                             </button>
                             <button
                                 class="btn btn-error btn-sm"
@@ -185,7 +185,7 @@ function CacheManager(props: CacheManagerProps) {
                                 disabled={isLoading()}
                             >
                                 <Archive class="w-4 h-4" />
-                                {t('doctor.cache_manager.remove_all')}
+                                {t('buttons.removeAll')}
                             </button>
                             <div class="divider divider-horizontal m-1" />
                         </Show>

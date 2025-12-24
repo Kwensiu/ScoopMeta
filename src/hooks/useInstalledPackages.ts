@@ -46,7 +46,7 @@ export function useInstalledPackages() {
   
   // State for auto-showing versions in modal
   const [autoShowVersions, setAutoShowVersions] = createSignal(false);
-  
+
   const [viewMode, setViewMode] = createStoredSignal<'grid' | 'list'>('installedViewMode', 'grid');
   const [sortKey, setSortKey] = createStoredSignal<SortKey>('installedSortKey', 'name');
   const [sortDirection, setSortDirection] = createStoredSignal<'asc' | 'desc'>('installedSortDirection', 'asc');
@@ -193,6 +193,29 @@ export function useInstalledPackages() {
     setChangeBucketModalOpen(false);
   };
 
+  const handleCloseOperationModal = async (wasSuccess: boolean) => {
+    packageOperations.closeOperationModal(wasSuccess);
+    if (wasSuccess) {
+      await refetch();
+
+      // Update selectedPackage if it exists
+      const currentSelected = packageInfo.selectedPackage();
+      if (currentSelected) {
+        // Find the package in the updated list
+        const updatedPackage = packages().find(p => p.name === currentSelected.name);
+
+        if (updatedPackage) {
+          packageInfo.updateSelectedPackage(updatedPackage);
+        } else {
+          // If not found in installed packages, it might have been uninstalled.
+          // We update the modal to reflect that it is no longer installed.
+          const uninstalledPackage = { ...currentSelected, is_installed: false };
+          packageInfo.updateSelectedPackage(uninstalledPackage);
+        }
+      }
+    }
+  };
+
   const processedPackages = createMemo(() => {
     let pkgs = [...packages()];
     if (selectedBucket() !== 'all') {
@@ -226,22 +249,22 @@ export function useInstalledPackages() {
     isCheckingForUpdates,
     processedPackages,
     updatableCount,
-    viewMode, 
+    viewMode,
     setViewMode,
-    sortKey, 
+    sortKey,
     sortDirection,
-    selectedBucket, 
+    selectedBucket,
     setSelectedBucket,
     operatingOn,
     isPackageVersioned,
     autoShowVersions,
-    
+
     // Status functionality
     scoopStatus,
     statusLoading,
     statusError,
     checkScoopStatus,
-    
+
     // From usePackageInfo
     selectedPackage: packageInfo.selectedPackage,
     info: packageInfo.info,
@@ -251,7 +274,7 @@ export function useInstalledPackages() {
     handleFetchPackageInfoForVersions,
     handleCloseInfoModal: packageInfo.closeModal,
     handleCloseInfoModalWithVersions,
-    
+
     // From usePackageOperations
     operationTitle: packageOperations.operationTitle,
     setOperationTitle: packageOperations.setOperationTitle,
@@ -260,8 +283,8 @@ export function useInstalledPackages() {
     handleForceUpdate: packageOperations.handleForceUpdate,
     handleUpdateAll: packageOperations.handleUpdateAll,
     handleUninstall: packageOperations.handleUninstall,
-    handleCloseOperationModal: packageOperations.closeOperationModal,
-    
+    handleCloseOperationModal,
+
     // Local methods
     handleSort,
     handleHold,
