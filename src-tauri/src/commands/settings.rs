@@ -35,11 +35,11 @@ where
 
 /// Returns the path to the Scoop configuration file.
 ///
-/// Typically: `C:\Users\USER\.config\scoop\config.json`
+/// Scoop uses: `~/.config/scoop/config.json` where ~ is %USERPROFILE%
 fn get_scoop_config_path() -> Result<PathBuf, String> {
-    dirs::config_dir()
-        .ok_or_else(|| "Could not determine config directory".to_string())
-        .map(|p| p.join("scoop").join("config.json"))
+    std::env::var("USERPROFILE")
+        .map_err(|_| "Could not get USERPROFILE environment variable".to_string())
+        .map(|profile| PathBuf::from(profile).join(".config").join("scoop").join("config.json"))
 }
 
 /// Reads the Scoop configuration file and returns its contents as a JSON map.
@@ -172,7 +172,7 @@ pub fn set_config_value<R: Runtime>(
 
 /// Gets the Scoop configuration as a JSON object
 #[tauri::command]
-pub fn get_scoop_config() -> Result<Option<serde_json::Value>, String> {
+pub fn get_scoop_config() -> Result<Option<serde_json::Map<String, serde_json::Value>>, String> {
     let path = get_scoop_config_path()?;
     if !path.exists() {
         return Ok(None);
@@ -181,7 +181,12 @@ pub fn get_scoop_config() -> Result<Option<serde_json::Value>, String> {
         .map_err(|e| format!("Failed to read Scoop config at {:?}: {}", path, e))?;
     let config: serde_json::Value = serde_json::from_str(&content)
         .map_err(|e| format!("Failed to parse Scoop config at {:?}: {}", path, e))?;
-    Ok(Some(config))
+
+    // Ensure it's an object and convert to Map
+    match config {
+        serde_json::Value::Object(map) => Ok(Some(map)),
+        _ => Err(format!("Scoop config at {:?} is not a valid JSON object", path)),
+    }
 }
 
 /// Updates the Scoop configuration with a new JSON object

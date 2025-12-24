@@ -9,6 +9,9 @@ interface ScoopConfig {
     [key: string]: any;
 }
 
+// Type for the actual data returned by Tauri
+type ScoopConfigMap = Record<string, any>;
+
 export interface ScoopInfoProps {
     onOpenDirectory?: () => void;
 }
@@ -33,7 +36,7 @@ function ScoopInfo(props: ScoopInfoProps) {
             setScoopPath(path);
 
             // Get Scoop configuration
-            const config = await invoke<ScoopConfig | null>("get_scoop_config");
+            const config = await invoke<ScoopConfigMap | null>("get_scoop_config");
             setScoopConfig(config);
 
         } catch (err) {
