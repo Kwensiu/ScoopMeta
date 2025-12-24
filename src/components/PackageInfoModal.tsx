@@ -2,17 +2,16 @@ import { For, Show, createEffect, createSignal, createMemo, Switch, Match } from
 import { ScoopPackage, ScoopInfo, VersionedPackageInfo } from "../types/scoop";
 import { Portal } from "solid-js/web";
 import hljs from 'highlight.js/lib/core';
-import 'highlight.js/styles/github-dark.css';
-import bash from 'highlight.js/lib/languages/bash';
+
 import json from 'highlight.js/lib/languages/json';
 import { Download, Ellipsis, FileText, Trash2, ExternalLink, RefreshCw, X } from "lucide-solid";
 import { invoke } from "@tauri-apps/api/core";
 import ManifestModal from "./ManifestModal";
+import Modal from "./common/Modal";
 import { openPath } from '@tauri-apps/plugin-opener';
 import settingsStore from "../stores/settings";
 import { t } from "../i18n";
 
-hljs.registerLanguage('bash', bash);
 hljs.registerLanguage('json', json);
 
 interface PackageInfoModalProps {
@@ -78,7 +77,7 @@ function DetailValue(props: { value: string }) {
 function IncludesValue(props: { value: string }) {
   const items = createMemo(() => props.value.split(/,\s*/).filter((s) => s.length > 0));
   return (
-    <div class="max-h-60 overflow-y-auto">
+    <div class="max-h-[4.5rem] overflow-y-auto">
       <ul class="list-disc list-inside text-xs space-y-0.5">
         <For each={items()}>{(item) => <li class="break-all">{item}</li>}</For>
       </ul>

@@ -39,7 +39,7 @@ const Header: Component<HeaderProps> = (props) => {
             {(item) => (
               <li>
                 <button
-                  class="btn btn-sm btn-ghost transition-colors duration-200 nav-button"
+                  class="btn btn-sm btn-ghost transition-colors duration-200"
                   classList={{
                     "bg-base-300 text-info font-semibold": props.currentView === item.view,
                     "hover:bg-base-300/50": props.currentView !== item.view,

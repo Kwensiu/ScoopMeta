@@ -161,7 +161,7 @@ const DebugModal = () => {
                 {/* Tab Content */}
                 <div class="flex-1 overflow-y-auto mb-4 bg-base-100 p-4 rounded border">
                     {/* Info Tab */}
-                    <Show when={isInfoTab()}>
+                    <Show when={activeTab() === "info"}>
                         <Show when={debugInfo()}>
                             {(info) => (
                                 <div class="space-y-3 font-mono text-sm">
@@ -212,7 +212,7 @@ const DebugModal = () => {
                     </Show>
 
                     {/* Logs Tab */}
-                    <Show when={isLogsTab()}>
+                    <Show when={activeTab() === "logs"}>
                         <pre class="text-xs overflow-auto max-h-full whitespace-pre-wrap break-words">
                             {logFileContent() || (appLogs() ? "Loading log file..." : "No logs available")}
                         </pre>

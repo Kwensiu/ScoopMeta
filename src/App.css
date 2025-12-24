@@ -18,16 +18,32 @@
   /* elevated surfaces (Hover) */
   --color-base-content: #f6f5f4;
   /* light text (Light 2) */
+  --color-base-100: #222226;
+  /* main background */
+  --color-base-200: #2e2e32;
+  /* header/toolbar */
+  --color-base-300: #343437;
+  /* elevated surfaces (Dark 3) */
+  --color-base-400: #3a3a3d;
+  /* elevated surfaces (Hover) */
+  --color-base-content: #f6f5f4;
+  /* light text (Light 2) */
 
   /* Brand & accents */
+  --color-primary: #3584e4;
+  /* Blue 3 */
   --color-primary: #3584e4;
   /* Blue 3 */
   --color-primary-content: #ffffff;
 
   --color-secondary: #9141ac;
   /* Purple 3 */
+  --color-secondary: #9141ac;
+  /* Purple 3 */
   --color-secondary-content: #ffffff;
 
+  --color-accent: #62a0ea;
+  /* Blue 2 */
   --color-accent: #62a0ea;
   /* Blue 2 */
   --color-accent-content: #ffffff;
@@ -39,12 +55,18 @@
   /* Status colors from HIG */
   --color-info: #62a0ea;
   /* Blue 2 */
+  --color-info: #62a0ea;
+  /* Blue 2 */
   --color-info-content: #ffffff;
 
   --color-success: #57e389;
   /* Green 2 */
+  --color-success: #57e389;
+  /* Green 2 */
   --color-success-content: #0d0d0d;
 
+  --color-warning: #ff7800;
+  /* Yellow 3 */
   --color-warning: #ff7800;
   /* Yellow 3 */
   --color-warning-content: #0d0d0d;
@@ -116,8 +138,76 @@
 
   --color-error: #E01B24;
   /* Red 4 - darker for better light mode contrast */
+  --color-error: #e01b24;
+  /* Red 3 */
   --color-error-content: #ffffff;
 
+  /* GNOME's rounded + clean style */
+  --radius-selector: 0.375rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.5rem;
+
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "light";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+
+  /* Base surfaces - inverted: gray background, white cards */
+  --color-base-100: #f0f4f9;
+  /* main background - medium gray */
+  --color-base-200: #FAFAF9;
+  /* header/toolbar - slightly darker gray */
+  --color-base-300: #ffffff;
+  /* elevated surfaces (cards) - white */
+  --color-base-400: #fafafa;
+  /* elevated surfaces (Hover) - very light gray */
+  --color-base-content: #18181b;
+  /* dark text - very dark for good contrast */
+
+  /* Brand & accents */
+  --color-primary: #3584E4;
+  /* Blue 3 */
+  --color-primary-content: #ffffff;
+
+  --color-secondary: #9141AC;
+  /* Purple 3 */
+  --color-secondary-content: #ffffff;
+
+  --color-accent: #62a0ea;
+  /* Blue 2 */
+  --color-accent-content: #ffffff;
+
+  /* Neutral */
+  --color-neutral: #f4f4f5;
+  --color-neutral-content: #18181b;
+
+  /* Status colors from HIG */
+  --color-info: #3584e4;
+  /* Blue 3 - slightly darker for better contrast on light bg */
+  --color-info-content: #ffffff;
+
+  --color-success: #2EC27E;
+  /* Green 3 - darker for better light mode contrast */
+  --color-success-content: #ffffff;
+
+  --color-warning: #FF7800;
+  /* Yellow 4 - better contrast on light */
+  --color-warning-content: #ffffff;
+
+  --color-error: #E01B24;
+  /* Red 4 - darker for better light mode contrast */
+  --color-error-content: #ffffff;
+
+  /* GNOME's rounded + clean style */
   /* GNOME's rounded + clean style */
   --radius-selector: 0.375rem;
   --radius-field: 0.5rem;

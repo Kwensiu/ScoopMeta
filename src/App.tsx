@@ -440,7 +440,7 @@ function App() {
                 </div>
             </Show>
 
-            <Show when={!isReady() && !error() && (!hasCwdMismatch() || bypassCwdMismatch())}>
+            <Show when={!isReady() && !error()}>
                 <div class="flex flex-col items-center justify-center h-screen bg-base-100">
                     <h1 class="text-2xl font-bold mb-4">{t('app.title')}</h1>
                     <p>{t('messages.loading')}</p>
@@ -454,7 +454,7 @@ function App() {
                 </div>
             </Show>
 
-            <Show when={error() && (!hasCwdMismatch() || bypassCwdMismatch())}>
+            <Show when={error()}>
                 <div class="flex flex-col items-center justify-center h-screen bg-base-100">
                     <h1 class="text-2xl font-bold text-error mb-4">{t('status.error')}</h1>
                     <p>{error()}</p>
