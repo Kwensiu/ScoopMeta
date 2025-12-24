@@ -2,6 +2,7 @@
 mod cold_start;
 mod commands;
 mod models;
+mod scheduler;
 mod state;
 mod tray;
 pub mod utils;
@@ -27,11 +28,14 @@ mod app_constants {
     pub const MAX_SLEEP_CHUNK_SECS: u64 = 60; // Check every minute at most
 }
 
+#[cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Set up panic handler for better crash reporting
     std::panic::set_hook(Box::new(|panic_info| {
-        let location = panic_info.location().unwrap_or_else(|| panic_info.location().unwrap());
+        let location = panic_info
+            .location()
+            .unwrap_or_else(|| panic_info.location().unwrap());
         let message = if let Some(s) = panic_info.payload().downcast_ref::<&str>() {
             s.to_string()
         } else if let Some(s) = panic_info.payload().downcast_ref::<String>() {
@@ -39,23 +43,26 @@ pub fn run() {
         } else {
             "Unknown panic message".to_string()
         };
-        
-        eprintln!("PANIC: {} at {}:{}:{}", 
-            message, 
-            location.file(), 
-            location.line(), 
+
+        eprintln!(
+            "PANIC: {} at {}:{}:{}",
+            message,
+            location.file(),
+            location.line(),
             location.column()
         );
-        
+
         // Try to write to log file if possible
         if let Some(log_dir) = dirs::data_dir().map(|dir| dir.join("com.rscoop.app").join("logs")) {
             if let Ok(mut log_file) = std::fs::OpenOptions::new()
                 .create(true)
                 .append(true)
-                .open(log_dir.join("panic.log")) 
+                .open(log_dir.join("panic.log"))
             {
                 use std::io::Write;
-                let _ = writeln!(log_file, "[{}] PANIC: {} at {}:{}:{}", 
+                let _ = writeln!(
+                    log_file,
+                    "[{}] PANIC: {} at {}:{}:{}",
                     chrono::Utc::now().format("%Y-%m-%d %H:%M:%S"),
                     message,
                     location.file(),
@@ -89,7 +96,6 @@ pub fn run() {
         .unwrap_or_else(|| PathBuf::from("./logs"));
 
     cleanup_old_logs(&log_dir);
-
 
     // Create log directory if it does not exist
     if let Err(e) = std::fs::create_dir_all(&log_dir) {
@@ -248,6 +254,8 @@ pub fn run() {
             commands::update_config::reload_update_config,
             commands::update_log::get_update_logs,
             commands::update_log::get_all_update_logs,
+            commands::update_log::clear_all_update_logs,
+            commands::update_log::remove_update_log_entry,
             commands::update_log::add_update_log_entry,
             commands::update_log::get_logs_by_type,
             commands::update_config::get_update_channel,
@@ -287,7 +295,11 @@ fn cleanup_old_logs(log_dir: &PathBuf) {
         }
 
         if removed_count > 0 || failed_count > 0 {
-            log::info!("Log cleanup completed: {} removed, {} failed", removed_count, failed_count);
+            log::info!(
+                "Log cleanup completed: {} removed, {} failed",
+                removed_count,
+                failed_count
+            );
         }
     } else {
         log::debug!("Could not read log directory: {:?}", log_dir);
@@ -320,20 +332,24 @@ fn resolve_scoop_path(app_handle: tauri::AppHandle) -> Result<PathBuf, Box<dyn s
         Ok(path) => Ok(path),
         Err(e) => {
             log::warn!("Could not resolve scoop root path: {}", e);
-            detect_scoop_path()
-                .map(PathBuf::from)
-                .or_else(|_| {
-                    #[cfg(windows)]
-                    {
-                        log::info!("Using default Windows Scoop path: {}", app_constants::DEFAULT_SCOOP_PATH_WINDOWS);
-                        Ok(PathBuf::from(app_constants::DEFAULT_SCOOP_PATH_WINDOWS))
-                    }
-                    #[cfg(not(windows))]
-                    {
-                        log::info!("Using default Unix Scoop path: {}", app_constants::DEFAULT_SCOOP_PATH_UNIX);
-                        Ok(PathBuf::from(app_constants::DEFAULT_SCOOP_PATH_UNIX))
-                    }
-                })
+            detect_scoop_path().map(PathBuf::from).or_else(|_| {
+                #[cfg(windows)]
+                {
+                    log::info!(
+                        "Using default Windows Scoop path: {}",
+                        app_constants::DEFAULT_SCOOP_PATH_WINDOWS
+                    );
+                    Ok(PathBuf::from(app_constants::DEFAULT_SCOOP_PATH_WINDOWS))
+                }
+                #[cfg(not(windows))]
+                {
+                    log::info!(
+                        "Using default Unix Scoop path: {}",
+                        app_constants::DEFAULT_SCOOP_PATH_UNIX
+                    );
+                    Ok(PathBuf::from(app_constants::DEFAULT_SCOOP_PATH_UNIX))
+                }
+            })
         }
     }
 }
@@ -419,7 +435,10 @@ fn start_background_tasks(app_handle: tauri::AppHandle) {
 
             if interval_secs.is_none() {
                 // Auto-update is disabled, check again later
-                sleep(Duration::from_secs(app_constants::LOG_RETENTION_CHECK_INTERVAL_SECS)).await;
+                sleep(Duration::from_secs(
+                    app_constants::LOG_RETENTION_CHECK_INTERVAL_SECS,
+                ))
+                .await;
                 continue;
             }
             let interval_secs = interval_secs.unwrap();
@@ -445,16 +464,23 @@ fn start_background_tasks(app_handle: tauri::AppHandle) {
             };
 
             if elapsed >= interval_secs {
-                log::debug!("Auto-update interval elapsed ({}s), starting update check", elapsed);
+                log::debug!(
+                    "Auto-update interval elapsed ({}s), starting update check",
+                    elapsed
+                );
                 run_auto_update(&app_handle, now).await;
                 continue;
             }
 
             // Calculate sleep duration (check at most every MAX_SLEEP_CHUNK_SECS)
             let remaining = interval_secs - elapsed;
-            let sleep_duration = Duration::from_secs(remaining.min(app_constants::MAX_SLEEP_CHUNK_SECS));
+            let sleep_duration =
+                Duration::from_secs(remaining.min(app_constants::MAX_SLEEP_CHUNK_SECS));
 
-            log::debug!("Next auto-update check in {} seconds", sleep_duration.as_secs());
+            log::debug!(
+                "Next auto-update check in {} seconds",
+                sleep_duration.as_secs()
+            );
             sleep(sleep_duration).await;
         }
     });
@@ -599,20 +625,21 @@ async fn update_packages_after_buckets(app_handle: &tauri::AppHandle, silent_upd
 
     let state = app_handle.state::<state::AppState>();
     match commands::update::update_all_packages_headless(app_handle.clone(), state).await {
-        Ok(_) => {
-            let log_line = "Package update completed successfully.";
-            package_update_logs.push(log_line.to_string());
+        Ok(update_details) => {
+            package_update_logs = update_details;
 
             // Notify UI of success only if not silent update
             if !silent_update_enabled {
                 if let Some(window) = app_handle.get_webview_window("main") {
-                    let _ = window.emit(
-                        "operation-output",
-                        serde_json::json!({
-                            "line": log_line,
-                            "source": "stdout"
-                        }),
-                    );
+                    for line in &package_update_logs {
+                        let _ = window.emit(
+                            "operation-output",
+                            serde_json::json!({
+                                "line": line,
+                                "source": "stdout"
+                            }),
+                        );
+                    }
 
                     let _ = window.emit(
                         "operation-finished",
@@ -624,13 +651,23 @@ async fn update_packages_after_buckets(app_handle: &tauri::AppHandle, silent_upd
                 }
             }
 
+            // Count successful updates
+            let success_count = package_update_logs
+                .iter()
+                .filter(|line| line.contains("Updated") && !line.contains("up to date"))
+                .count() as u32;
+
             // Create package update log entry
             let package_log_entry = commands::update_log::UpdateLogEntry {
                 timestamp: chrono::Utc::now(),
                 operation_type: "package".to_string(),
                 operation_result: "success".to_string(),
-                success_count: 1,
-                total_count: 1,
+                success_count: if success_count == 0 { 1 } else { success_count },
+                total_count: if package_update_logs.len() == 0 {
+                    1
+                } else {
+                    package_update_logs.len() as u32
+                },
                 details: package_update_logs,
             };
 
@@ -686,14 +723,12 @@ async fn update_packages_after_buckets(app_handle: &tauri::AppHandle, silent_upd
 // Helper function to parse update interval from string
 fn parse_update_interval(interval_raw: &str) -> Option<u64> {
     match interval_raw {
-        "24h" | "1d" => Some(86400),      // 24 hours
-        "7d" | "1w" => Some(604800),      // 7 days
-        "1h" => Some(3600),               // 1 hour
-        "6h" => Some(21600),              // 6 hours
-        "off" => None,                    // Disabled
-        custom if custom.starts_with("custom:") => {
-            custom[7..].parse::<u64>().ok()
-        },
+        "24h" | "1d" => Some(86400), // 24 hours
+        "7d" | "1w" => Some(604800), // 7 days
+        "1h" => Some(3600),          // 1 hour
+        "6h" => Some(21600),         // 6 hours
+        "off" => None,               // Disabled
+        custom if custom.starts_with("custom:") => custom[7..].parse::<u64>().ok(),
         numeric => numeric.parse::<u64>().ok(),
     }
 }

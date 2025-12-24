@@ -1,25 +1,37 @@
 //! Command for fetching all installed Scoop packages from the filesystem.
-use crate::models::ScoopPackage;
+use crate::models::{InstallManifest, PackageManifest, ScoopPackage};
 use crate::state::{AppState, InstalledPackagesCache};
 use chrono::{DateTime, Utc};
 use rayon::prelude::*;
-use serde::Deserialize;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
 use tauri::{AppHandle, Runtime, State};
 
-/// Represents the structure of a `manifest.json` file for an installed package.
-#[derive(Deserialize, Debug)]
-struct Manifest {
-    description: String,
-    version: String,
+/// Helper to get modification time of a path (file or directory) in milliseconds.
+fn get_path_modification_time(path: &Path) -> u128 {
+    fs::metadata(path)
+        .and_then(|meta| meta.modified())
+        .ok()
+        .and_then(|time| time.duration_since(UNIX_EPOCH).ok())
+        .map(|duration| duration.as_millis())
+        .unwrap_or(0)
 }
 
-/// Represents the structure of an `install.json` file for an installed package.
-#[derive(Deserialize, Debug)]
-struct InstallManifest {
-    bucket: Option<String>,
+/// Helper to get modification time of an installation directory.
+/// Checks install.json, then manifest.json, then the directory itself.
+fn get_install_modification_time(install_dir: &Path) -> u128 {
+    let install_manifest = install_dir.join("install.json");
+    let manifest_path = install_dir.join("manifest.json");
+
+    fs::metadata(&install_manifest)
+        .or_else(|_| fs::metadata(&manifest_path))
+        .or_else(|_| fs::metadata(install_dir))
+        .and_then(|meta| meta.modified())
+        .ok()
+        .and_then(|time| time.duration_since(UNIX_EPOCH).ok())
+        .map(|duration| duration.as_millis())
+        .unwrap_or(0)
 }
 
 /// Searches for a package manifest in all bucket directories to determine the bucket.
@@ -138,38 +150,22 @@ fn compute_apps_fingerprint(app_dirs: &[PathBuf]) -> String {
         "Computing apps fingerprint for {} app directories",
         app_dirs.len()
     );
-    let mut entries = Vec::with_capacity(app_dirs.len());
+    let entries: Vec<String> = app_dirs
+        .iter()
+        .filter_map(|path| {
+            path.file_name().and_then(|n| n.to_str()).map(|name| {
+                let modified_stamp = locate_install_dir(path)
+                    .map(|install_dir| get_install_modification_time(&install_dir))
+                    .unwrap_or_else(|| get_path_modification_time(path));
+                
+                format!("{}:{}", name.to_ascii_lowercase(), modified_stamp)
+            })
+        })
+        .collect();
 
-    for path in app_dirs {
-        if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
-            let modified_stamp = locate_install_dir(path)
-                .and_then(|install_dir| {
-                    let install_manifest = install_dir.join("install.json");
-                    let manifest_path = install_dir.join("manifest.json");
-
-                    fs::metadata(&install_manifest)
-                        .or_else(|_| fs::metadata(&manifest_path))
-                        .or_else(|_| fs::metadata(&install_dir))
-                        .and_then(|meta| meta.modified())
-                        .ok()
-                        .and_then(|time| time.duration_since(UNIX_EPOCH).ok())
-                        .map(|duration| duration.as_millis())
-                })
-                .or_else(|| {
-                    fs::metadata(path)
-                        .and_then(|meta| meta.modified())
-                        .ok()
-                        .and_then(|time| time.duration_since(UNIX_EPOCH).ok())
-                        .map(|duration| duration.as_millis())
-                })
-                .unwrap_or(0);
-
-            entries.push(format!("{}:{}", name.to_ascii_lowercase(), modified_stamp));
-        }
-    }
-
-    entries.sort();
-    let fingerprint = format!("{}|{}", app_dirs.len(), entries.join(";"));
+    let mut sorted_entries = entries;
+    sorted_entries.sort();
+    let fingerprint = format!("{}|{}", app_dirs.len(), sorted_entries.join(";"));
     log::info!("Computed apps fingerprint: {}", fingerprint);
     fingerprint
 }
@@ -218,10 +214,11 @@ fn load_package_details(package_path: &Path, scoop_path: &Path) -> Result<ScoopP
     );
     let manifest_content = fs::read_to_string(&manifest_path)
         .map_err(|e| format!("Failed to read manifest.json for {}: {}", package_name, e))?;
-    let manifest: Manifest = serde_json::from_str(&manifest_content)
+
+    let manifest: PackageManifest = serde_json::from_str(&manifest_content)
         .map_err(|e| format!("Failed to parse manifest.json for {}: {}", package_name, e))?;
 
-    // Read and parse install.json
+    // install.json might not exist for versioned installs
     let install_manifest_path = install_root.join("install.json");
     log::info!(
         "Reading install.json for package: {}, path: {}",
@@ -268,7 +265,7 @@ fn load_package_details(package_path: &Path, scoop_path: &Path) -> Result<ScoopP
         source: bucket,
         updated: updated_time,
         is_installed: true,
-        info: manifest.description,
+        info: manifest.description.unwrap_or_default(),
         is_versioned_install,
         ..Default::default()
     })
@@ -317,7 +314,6 @@ async fn scan_installed_packages_internal<R: Runtime>(
     state: &AppState,
     is_warmup: bool,
 ) -> Result<Vec<ScoopPackage>, String> {
-    let mut scoop_path = state.scoop_path();
     let log_prefix = if is_warmup {
         "=== INSTALLED WARMUP ==="
     } else {
@@ -325,40 +321,18 @@ async fn scan_installed_packages_internal<R: Runtime>(
     };
 
     log::info!("{} Starting installed packages scan", log_prefix);
-    log::info!(
-        "{} Current Scoop path: {}",
-        log_prefix,
-        scoop_path.display()
-    );
 
-    let mut apps_path = scoop_path.join("apps");
-
-    if !apps_path.is_dir() {
-        log::warn!(
-            "{} ✗ Scoop apps directory does not exist at: {}",
-            log_prefix,
-            apps_path.display()
-        );
-
-        if let Some(updated_path) =
-            refresh_scoop_path_if_needed(app.clone(), &state, "apps path missing").await
-        {
-            scoop_path = updated_path;
-            apps_path = scoop_path.join("apps");
-            log::info!("{} Path refreshed to: {}", log_prefix, apps_path.display());
+    // Ensure apps path exists
+    let apps_path = match ensure_apps_path(app.clone(), state, log_prefix).await {
+        Some(path) => path,
+        None => {
+            log::warn!(
+                "{} ✗ Failed to find or refresh Scoop apps directory",
+                log_prefix
+            );
+            return Ok(vec![]);
         }
-    }
-
-    if !apps_path.is_dir() {
-        log::warn!(
-            "{} ✗ Scoop apps directory still not found after refresh at: {}",
-            log_prefix,
-            apps_path.display()
-        );
-        let mut cache_guard = state.installed_packages.lock().await;
-        *cache_guard = None;
-        return Ok(vec![]);
-    }
+    };
 
     log::info!(
         "{} ✓ Apps directory found: {}",
@@ -382,27 +356,12 @@ async fn scan_installed_packages_internal<R: Runtime>(
     let fingerprint = compute_apps_fingerprint(&app_dirs);
     log::info!("{} Computed fingerprint: {}", log_prefix, fingerprint);
 
-    {
-        let cache_guard = state.installed_packages.lock().await;
-        if let Some(cache) = cache_guard.as_ref() {
-            if cache.fingerprint == fingerprint {
-                log::info!(
-                    "{} ✓ Cache HIT - returning {} cached packages",
-                    log_prefix,
-                    cache.packages.len()
-                );
-                return Ok(cache.packages.clone());
-            } else {
-                log::info!(
-                    "{} Cache fingerprint mismatch. Old: {}, New: {}",
-                    log_prefix,
-                    cache.fingerprint,
-                    fingerprint
-                );
-            }
-        } else {
-            log::info!("{} Cache MISS - no cached data found", log_prefix);
-        }
+    // Get scoop path for use in package loading
+    let scoop_path = state.scoop_path();
+
+    // Check cache
+    if let Some(cached_packages) = check_cache(state, &fingerprint, log_prefix).await {
+        return Ok(cached_packages);
     }
 
     log::info!(
@@ -439,19 +398,8 @@ async fn scan_installed_packages_internal<R: Runtime>(
         packages.len()
     );
 
-    {
-        let mut cache_guard = state.installed_packages.lock().await;
-        *cache_guard = Some(InstalledPackagesCache {
-            packages: packages.clone(),
-            fingerprint: fingerprint.clone(),
-        });
-        log::info!(
-            "{} ✓ Cache updated with {} packages at fingerprint: {}",
-            log_prefix,
-            packages.len(),
-            fingerprint
-        );
-    }
+    // Update cache
+    update_cache(state, packages.clone(), fingerprint.clone(), log_prefix).await;
 
     log::info!(
         "{} ✓ Returning {} installed packages",
@@ -544,4 +492,81 @@ pub async fn get_package_path<R: Runtime>(
     }
 
     Ok(package_path.to_string_lossy().to_string())
+}
+
+async fn ensure_apps_path<R: Runtime>(
+    app: AppHandle<R>,
+    state: &AppState,
+    log_prefix: &str,
+) -> Option<PathBuf> {
+    let mut scoop_path = state.scoop_path();
+    let mut apps_path = scoop_path.join("apps");
+
+    if !apps_path.is_dir() {
+        log::warn!(
+            "{} ✗ Scoop apps directory does not exist at: {}",
+            log_prefix,
+            apps_path.display()
+        );
+
+        if let Some(updated_path) =
+            refresh_scoop_path_if_needed(app, state, "apps path missing").await
+        {
+            scoop_path = updated_path;
+            apps_path = scoop_path.join("apps");
+            log::info!("{} Path refreshed to: {}", log_prefix, apps_path.display());
+        }
+    }
+
+    if apps_path.is_dir() {
+        Some(apps_path)
+    } else {
+        None
+    }
+}
+
+async fn check_cache(
+    state: &AppState,
+    fingerprint: &str,
+    log_prefix: &str,
+) -> Option<Vec<ScoopPackage>> {
+    let cache_guard = state.installed_packages.lock().await;
+    if let Some(cache) = cache_guard.as_ref() {
+        if cache.fingerprint == *fingerprint {
+            log::info!(
+                "{} ✓ Cache HIT - returning {} cached packages",
+                log_prefix,
+                cache.packages.len()
+            );
+            return Some(cache.packages.clone());
+        } else {
+            log::info!(
+                "{} Cache fingerprint mismatch. Old: {}, New: {}",
+                log_prefix,
+                cache.fingerprint,
+                fingerprint
+            );
+        }
+    } else {
+        log::info!("{} Cache MISS - no cached data found", log_prefix);
+    }
+    None
+}
+
+async fn update_cache(
+    state: &AppState,
+    packages: Vec<ScoopPackage>,
+    fingerprint: String,
+    log_prefix: &str,
+) {
+    let mut cache_guard = state.installed_packages.lock().await;
+    *cache_guard = Some(InstalledPackagesCache {
+        packages: packages.clone(),
+        fingerprint,
+    });
+    log::info!(
+        "{} ✓ Cache updated with {} packages",
+        log_prefix,
+        packages.len()
+    );
 }

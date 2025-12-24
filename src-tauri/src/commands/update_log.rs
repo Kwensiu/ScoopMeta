@@ -89,6 +89,18 @@ impl UpdateLogStore {
         Ok(())
     }
 
+    /// Clears all logs
+    pub fn clear_all_logs(&mut self) -> Result<(), String> {
+        self.logs.clear();
+        self.save()
+    }
+    
+    /// Removes a specific log entry by timestamp
+    pub fn remove_log_entry(&mut self, timestamp: &str) -> Result<(), String> {
+        self.logs.retain(|log| log.timestamp.to_rfc3339() != timestamp);
+        self.save()
+    }
+    
     /// Gets recent logs, limited to the specified count
     pub fn get_recent_logs(&self, count: usize) -> Vec<UpdateLogEntry> {
         let limit = count.min(self.logs.len());
@@ -144,6 +156,30 @@ pub fn get_log_store() -> &'static mut UpdateLogStore {
     }
 }
 
+/// Checks if update history logging is enabled
+pub async fn is_update_history_enabled(app: &AppHandle) -> bool {
+    use crate::commands::settings;
+    
+    match settings::get_config_value(app.clone(), "buckets.updateHistoryEnabled".to_string()) {
+        Ok(Some(value)) => {
+            if let Some(enabled) = value.as_bool() {
+                enabled
+            } else {
+                true // Default to enabled if value is not a boolean
+            }
+        }
+        _ => true // Default to enabled if setting doesn't exist or error occurs
+    }
+}
+
+/// Conditionally adds a log entry if update history is enabled
+pub async fn add_log_entry_if_enabled(app: &AppHandle, entry: UpdateLogEntry) -> Result<(), String> {
+    if is_update_history_enabled(app).await {
+        get_log_store().add_log_entry(entry)?;
+    }
+    Ok(())
+}
+
 /// Command to get recent update logs
 #[tauri::command]
 pub fn get_update_logs(limit: Option<usize>) -> Result<Vec<UpdateLogEntry>, String> {
@@ -155,6 +191,18 @@ pub fn get_update_logs(limit: Option<usize>) -> Result<Vec<UpdateLogEntry>, Stri
 #[tauri::command]
 pub fn get_all_update_logs() -> Result<Vec<UpdateLogEntry>, String> {
     Ok(get_log_store().get_all_logs())
+}
+
+/// Command to clear all update logs
+#[tauri::command]
+pub fn clear_all_update_logs() -> Result<(), String> {
+    get_log_store().clear_all_logs()
+}
+
+/// Command to remove a specific log entry by timestamp
+#[tauri::command]
+pub fn remove_update_log_entry(timestamp: String) -> Result<(), String> {
+    get_log_store().remove_log_entry(&timestamp)
 }
 
 /// Command to add a new log entry (for testing purposes)

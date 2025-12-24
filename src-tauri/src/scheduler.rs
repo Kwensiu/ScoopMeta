@@ -1,7 +1,7 @@
-use tauri::{AppHandle, Emitter, Manager};
 use crate::commands;
 use crate::state;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use tauri::{AppHandle, Emitter, Manager};
 
 pub fn start_background_tasks(app: AppHandle) {
     tauri::async_runtime::spawn(async move {
@@ -45,21 +45,31 @@ pub fn start_background_tasks(app: AppHandle) {
             )
             .ok()
             .flatten();
-            let last_ts = last_ts_val
-                .and_then(|v| v.as_u64())
-                .unwrap_or(0u64);
+            let last_ts = last_ts_val.and_then(|v| v.as_u64()).unwrap_or(0u64);
 
-            let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-            let elapsed = if last_ts == 0 { interval_secs } else { now.saturating_sub(last_ts) };
+            let now = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_secs();
+            let elapsed = if last_ts == 0 {
+                interval_secs
+            } else {
+                now.saturating_sub(last_ts)
+            };
 
             if last_ts == 0 {
                 log::trace!("[scheduler] no previous run recorded; treating as overdue");
             }
 
             if elapsed >= interval_secs {
-                log::info!("Auto bucket update task running (interval='{}', seconds={}, elapsed={})", interval_raw, interval_secs, elapsed);
+                log::info!(
+                    "Auto bucket update task running (interval='{}', seconds={}, elapsed={})",
+                    interval_raw,
+                    interval_secs,
+                    elapsed
+                );
                 let run_started_at = now;
-                
+
                 // Check if silent auto update is enabled
                 let silent_auto_update = commands::settings::get_config_value(
                     app.clone(),
@@ -69,23 +79,25 @@ pub fn start_background_tasks(app: AppHandle) {
                 .flatten()
                 .and_then(|v| v.as_bool())
                 .unwrap_or(false);
-                
+
                 // Emit start event to show modal (only if not in silent mode)
                 if !silent_auto_update {
                     if let Some(window) = app.get_webview_window("main") {
                         let _ = window.emit("auto-operation-start", "Updating buckets...");
-                        let _ = window.emit("operation-output", serde_json::json!({
-                            "line": "Starting automatic bucket update...",
-                            "source": "stdout"
-                        }));
+                        let _ = window.emit(
+                            "operation-output",
+                            serde_json::json!({
+                                "line": "Starting automatic bucket update...",
+                                "source": "stdout"
+                            }),
+                        );
                     }
                 } else {
                     log::info!("Running silent auto update - no UI notifications will be shown");
                 }
-                
-                // Get AppState instance to pass to update_all_buckets
-                let state = app.state::<state::AppState>();
-                match commands::bucket_install::update_all_buckets(state).await {
+
+                // Update all buckets
+                match commands::bucket_install::update_all_buckets().await {
                     Ok(results) => {
                         let successes = results.iter().filter(|r| r.success).count();
                         log::info!(
@@ -93,52 +105,67 @@ pub fn start_background_tasks(app: AppHandle) {
                             successes,
                             results.len()
                         );
-                        
-                        // Prepare details for log entry
-                        let mut update_details = Vec::new();
-                        for result in &results {
-                            let detail = if result.success {
-                                format!("✓ Updated bucket: {}", result.bucket_name)
-                            } else {
-                                format!("✗ Failed to update {}: {}", result.bucket_name, result.message)
-                            };
-                            update_details.push(detail.clone());
-                        }
-                        
-                        // Create bucket update log entry
-                        let operation_result = if successes == results.len() {
-                            "success"
-                        } else if successes > 0 {
-                            "partial"
-                        } else {
-                            "failed"
-                        };
-                        
-                        let bucket_log_entry = crate::commands::update_log::UpdateLogEntry {
-                            timestamp: chrono::Utc::now(),
-                            operation_type: "bucket".to_string(),
-                            operation_result: operation_result.to_string(),
-                            success_count: successes as u32,
-                            total_count: results.len() as u32,
-                            details: update_details,
-                        };
-                        
-                        // Add to log store
-                        if let Err(e) = crate::commands::update_log::get_log_store().add_log_entry(bucket_log_entry) {
-                            log::error!("Failed to save bucket update log: {}", e);
-                        }
-                        
-                        // Stream results to modal (only if not in silent mode)
-                        if !silent_auto_update {
-                            if let Some(window) = app.get_webview_window("main") {
-                                for result in &results {
-                                    let line = if result.success {
+
+                        // Check if update history is enabled to avoid unnecessary work
+                        let history_enabled =
+                            crate::commands::update_log::is_update_history_enabled(&app).await;
+
+                        // Generate log details only if needed (for UI or history)
+                        let update_details: Vec<String> = if !silent_auto_update || history_enabled
+                        {
+                            results
+                                .iter()
+                                .map(|result| {
+                                    if result.success {
                                         format!("✓ Updated bucket: {}", result.bucket_name)
                                     } else {
-                                        format!("✗ Failed to update {}: {}", result.bucket_name, result.message)
-                                    };
+                                        format!(
+                                            "✗ Failed to update {}: {}",
+                                            result.bucket_name, result.message
+                                        )
+                                    }
+                                })
+                                .collect()
+                        } else {
+                            Vec::new()
+                        };
+
+                        // Save to update history if enabled
+                        if history_enabled {
+                            let operation_result = if successes == results.len() {
+                                "success"
+                            } else if successes > 0 {
+                                "partial"
+                            } else {
+                                "failed"
+                            };
+
+                            let bucket_log_entry = crate::commands::update_log::UpdateLogEntry {
+                                timestamp: chrono::Utc::now(),
+                                operation_type: "bucket".to_string(),
+                                operation_result: operation_result.to_string(),
+                                success_count: successes as u32,
+                                total_count: results.len() as u32,
+                                details: update_details.clone(),
+                            };
+
+                            if let Err(e) = crate::commands::update_log::add_log_entry_if_enabled(
+                                &app,
+                                bucket_log_entry,
+                            )
+                            .await
+                            {
+                                log::error!("Failed to save bucket update log: {}", e);
+                            }
+                        }
+
+                        // Stream results to UI or log
+                        if !silent_auto_update {
+                            if let Some(window) = app.get_webview_window("main") {
+                                // Reuse generated log details for UI output
+                                for (idx, result) in results.iter().enumerate() {
                                     let _ = window.emit("operation-output", serde_json::json!({
-                                        "line": line,
+                                        "line": &update_details[idx],
                                         "source": if result.success { "stdout" } else { "stderr" }
                                     }));
                                 }
@@ -148,17 +175,14 @@ pub fn start_background_tasks(app: AppHandle) {
                                 }));
                             }
                         } else {
-                            // 在静默模式下记录结果到日志
-                            for result in &results {
-                                if result.success {
-                                    log::info!("✓ Updated bucket: {}", result.bucket_name);
-                                } else {
-                                    log::warn!("✗ Failed to update {}: {}", result.bucket_name, result.message);
-                                }
-                            }
-                            log::info!("Silent bucket update completed: {} of {} succeeded", successes, results.len());
+                            // Minimal logging in silent mode
+                            log::info!(
+                                "Silent bucket update completed: {} of {} succeeded",
+                                successes,
+                                results.len()
+                            );
                         }
-                        
+
                         // Persist last run timestamp (record even if partial successes to avoid hammering)
                         let _ = commands::settings::set_config_value(
                             app.clone(),
@@ -177,28 +201,40 @@ pub fn start_background_tasks(app: AppHandle) {
                         .unwrap_or(false);
 
                         if auto_update_packages {
-                            log::info!("Auto package update task running after bucket refresh (headless with events)");
+                            log::info!("Auto package update task running after bucket refresh");
                             let state = app.state::<state::AppState>();
-                            
+
                             // Emit start event for package update (only if not in silent mode)
                             if !silent_auto_update {
                                 if let Some(window) = app.get_webview_window("main") {
-                                    let _ = window.emit("auto-operation-start", "Updating packages...");
-                                    let _ = window.emit("operation-output", serde_json::json!({
-                                        "line": "Starting automatic package update...",
-                                        "source": "stdout"
-                                    }));
+                                    let _ =
+                                        window.emit("auto-operation-start", "Updating packages...");
+                                    let _ = window.emit(
+                                        "operation-output",
+                                        serde_json::json!({
+                                            "line": "Starting automatic package update...",
+                                            "source": "stdout"
+                                        }),
+                                    );
                                 }
                             }
-                            
-                            match commands::update::update_all_packages_headless(app.clone(), state).await {
-                                Ok(_) => {
+
+                            match commands::update::update_all_packages_headless(app.clone(), state)
+                                .await
+                            {
+                                Ok(package_update_logs) => {
+                                    // Emit package update completion only if not in silent mode
                                     if !silent_auto_update {
                                         if let Some(window) = app.get_webview_window("main") {
-                                            let _ = window.emit("operation-output", serde_json::json!({
-                                                "line": "Package update completed successfully.",
-                                                "source": "stdout"
-                                            }));
+                                            for line in &package_update_logs {
+                                                let _ = window.emit(
+                                                    "operation-output",
+                                                    serde_json::json!({
+                                                        "line": line,
+                                                        "source": "stdout"
+                                                    }),
+                                                );
+                                            }
                                             let _ = window.emit("operation-finished", serde_json::json!({
                                                 "success": true,
                                                 "message": "Automatic package update completed successfully"
@@ -207,22 +243,95 @@ pub fn start_background_tasks(app: AppHandle) {
                                     } else {
                                         log::info!("Silent package update completed successfully");
                                     }
+
+                                    // Save to update history only if enabled
+                                    if crate::commands::update_log::is_update_history_enabled(&app)
+                                        .await
+                                    {
+                                        let success_count = package_update_logs
+                                            .iter()
+                                            .filter(|line| {
+                                                line.contains("Updated")
+                                                    && !line.contains("up to date")
+                                            })
+                                            .count()
+                                            as u32;
+
+                                        let package_log_entry =
+                                            crate::commands::update_log::UpdateLogEntry {
+                                                timestamp: chrono::Utc::now(),
+                                                operation_type: "package".to_string(),
+                                                operation_result: "success".to_string(),
+                                                success_count: if success_count == 0 {
+                                                    1
+                                                } else {
+                                                    success_count
+                                                },
+                                                total_count: if package_update_logs.is_empty() {
+                                                    1
+                                                } else {
+                                                    package_update_logs.len() as u32
+                                                },
+                                                details: package_update_logs,
+                                            };
+
+                                        if let Err(e) =
+                                            crate::commands::update_log::add_log_entry_if_enabled(
+                                                &app,
+                                                package_log_entry,
+                                            )
+                                            .await
+                                        {
+                                            log::error!("Failed to save package update log: {}", e);
+                                        }
+                                    }
                                 }
                                 Err(e) => {
                                     log::warn!("Auto package headless update failed: {}", e);
+
+                                    // Emit failure to UI (only if not in silent mode)
                                     if !silent_auto_update {
                                         if let Some(window) = app.get_webview_window("main") {
-                                            let _ = window.emit("operation-output", serde_json::json!({
-                                                "line": format!("Error: {}", e),
-                                                "source": "stderr"
-                                            }));
+                                            let _ = window.emit(
+                                                "operation-output",
+                                                serde_json::json!({
+                                                    "line": format!("Error: {}", e),
+                                                    "source": "stderr"
+                                                }),
+                                            );
                                             let _ = window.emit("operation-finished", serde_json::json!({
                                                 "success": false,
                                                 "message": format!("Automatic package update failed: {}", e)
                                             }));
                                         }
-                                    } else {
-                                        log::warn!("Silent package update failed: {}", e);
+                                    }
+
+                                    // Save error to update history only if enabled
+                                    if crate::commands::update_log::is_update_history_enabled(&app)
+                                        .await
+                                    {
+                                        let error_log_entry =
+                                            crate::commands::update_log::UpdateLogEntry {
+                                                timestamp: chrono::Utc::now(),
+                                                operation_type: "package".to_string(),
+                                                operation_result: "failed".to_string(),
+                                                success_count: 0,
+                                                total_count: 1,
+                                                details: vec![format!("Error: {}", e)],
+                                            };
+
+                                        if let Err(e) =
+                                            crate::commands::update_log::add_log_entry_if_enabled(
+                                                &app,
+                                                error_log_entry,
+                                            )
+                                            .await
+                                        {
+                                            log::error!(
+                                                "Failed to save package update error log: {}",
+                                                e
+                                            );
+                                        }
                                     }
                                 }
                             }
@@ -230,23 +339,29 @@ pub fn start_background_tasks(app: AppHandle) {
                     }
                     Err(e) => {
                         log::warn!("Auto bucket update failed: {}", e);
-                        
+
                         // Emit failure to modal (only if not in silent mode)
                         if !silent_auto_update {
                             if let Some(window) = app.get_webview_window("main") {
-                                let _ = window.emit("operation-output", serde_json::json!({
-                                    "line": format!("Error: {}", e),
-                                    "source": "stderr"
-                                }));
-                                let _ = window.emit("operation-finished", serde_json::json!({
-                                    "success": false,
-                                    "message": format!("Bucket update failed: {}", e)
-                                }));
+                                let _ = window.emit(
+                                    "operation-output",
+                                    serde_json::json!({
+                                        "line": format!("Error: {}", e),
+                                        "source": "stderr"
+                                    }),
+                                );
+                                let _ = window.emit(
+                                    "operation-finished",
+                                    serde_json::json!({
+                                        "success": false,
+                                        "message": format!("Bucket update failed: {}", e)
+                                    }),
+                                );
                             }
                         } else {
                             log::warn!("Silent bucket update failed: {}", e);
                         }
-                        
+
                         // Even on failure, set timestamp to avoid rapid retry storms
                         let _ = commands::settings::set_config_value(
                             app.clone(),

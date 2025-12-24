@@ -190,6 +190,31 @@ async fn install_bucket_internal(
     }
 }
 
+/// Helper function to log bucket update operations
+async fn log_bucket_update(app: &tauri::AppHandle, _bucket_name: &str, result: &BucketInstallResult) {
+    let operation_result = if result.success {
+        "success"
+    } else {
+        "failed"
+    };
+    
+    let details = vec![result.message.clone()];
+    
+    let log_entry = crate::commands::update_log::UpdateLogEntry {
+        timestamp: chrono::Utc::now(),
+        operation_type: "bucket".to_string(),
+        operation_result: operation_result.to_string(),
+        success_count: if result.success { 1 } else { 0 },
+        total_count: 1,
+        details,
+    };
+    
+    // Add to log store if enabled
+    if let Err(e) = crate::commands::update_log::add_log_entry_if_enabled(app, log_entry).await {
+        log::error!("Failed to save bucket update log: {}", e);
+    }
+}
+
 // Tauri command to install a bucket
 #[command]
 pub async fn install_bucket(options: BucketInstallOptions) -> Result<BucketInstallResult, String> {
@@ -284,41 +309,56 @@ pub async fn validate_bucket_install(
 
 // Command to update a bucket (git pull)
 #[command]
-pub async fn update_bucket(bucket_name: String) -> Result<BucketInstallResult, String> {
+pub async fn update_bucket(app: tauri::AppHandle, bucket_name: String) -> Result<BucketInstallResult, String> {
     log::info!("Updating bucket: {}", bucket_name);
 
     let bucket_path = get_bucket_path(&bucket_name)?;
 
     if !bucket_path.exists() {
-        return Ok(BucketInstallResult {
+        let result = BucketInstallResult {
             success: false,
             message: format!("Bucket '{}' does not exist", bucket_name),
-            bucket_name,
+            bucket_name: bucket_name.clone(),
             bucket_path: None,
             manifest_count: None,
-        });
+        };
+        
+        // Log failed bucket update attempt
+        log_bucket_update(&app, &bucket_name, &result).await;
+        
+        return Ok(result);
     }
 
     // Check if it's a git repository
     if !bucket_path.join(".git").exists() {
-        return Ok(BucketInstallResult {
+        let result = BucketInstallResult {
             success: false,
             message: format!(
                 "Bucket '{}' is not a git repository and cannot be updated",
                 bucket_name
             ),
-            bucket_name,
+            bucket_name: bucket_name.clone(),
             bucket_path: Some(bucket_path.to_string_lossy().to_string()),
             manifest_count: None,
-        });
+        };
+        
+        // Log failed bucket update attempt
+        log_bucket_update(&app, &bucket_name, &result).await;
+        
+        return Ok(result);
     }
 
     let bucket_name_clone = bucket_name.clone();
     let bucket_path_clone = bucket_path.clone();
 
-    tokio::task::spawn_blocking(move || update_bucket_sync(&bucket_name_clone, &bucket_path_clone))
+    let result = tokio::task::spawn_blocking(move || update_bucket_sync(&bucket_name_clone, &bucket_path_clone))
         .await
-        .map_err(|e| e.to_string())?
+        .map_err(|e| e.to_string())??;
+    
+    // Log the bucket update result
+    log_bucket_update(&app, &bucket_name, &result).await;
+    
+    Ok(result)
 }
 
 fn update_bucket_sync(
@@ -521,11 +561,20 @@ pub async fn update_all_buckets() -> Result<Vec<BucketInstallResult>, String> {
             continue;
         }
         if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
-            match update_bucket(name.to_string()).await {
-                Ok(res) => results.push(res),
-                Err(e) => results.push(BucketInstallResult {
+            let name_clone = name.to_string();
+            let path_clone = path.clone();
+            match tokio::task::spawn_blocking(move || update_bucket_sync(&name_clone, &path_clone)).await {
+                Ok(Ok(res)) => results.push(res),
+                Ok(Err(e)) => results.push(BucketInstallResult {
                     success: false,
                     message: e,
+                    bucket_name: name.to_string(),
+                    bucket_path: Some(path.to_string_lossy().to_string()),
+                    manifest_count: None,
+                }),
+                Err(e) => results.push(BucketInstallResult {
+                    success: false,
+                    message: format!("Task failed: {}", e),
                     bucket_name: name.to_string(),
                     bucket_path: Some(path.to_string_lossy().to_string()),
                     manifest_count: None,

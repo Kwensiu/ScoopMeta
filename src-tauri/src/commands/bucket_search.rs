@@ -81,7 +81,7 @@ static VERIFIED_BUCKETS_DATA: &[(&str, &str, &str, &str, u32, u32, u32, &str)] =
         418,
         45,
         367,
-        "2025-09-16",
+        "2025-09-13",
     ),
     (
         "sysinternals",
