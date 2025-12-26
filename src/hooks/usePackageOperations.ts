@@ -34,8 +34,12 @@ const addCloseListener = (handler: (wasSuccess: boolean) => void) => {
 };
 
 const performInstall = (pkg: ScoopPackage) => {
-    setOperationTitle(`Installing ${pkg.name}`);
+    // Ensure clean state before starting new operation
+    setOperationNextStep(null);
     setIsScanning(false);
+    setPendingInstallPackage(null);
+
+    setOperationTitle(`Installing ${pkg.name}`);
     invoke("install_package", {
         packageName: pkg.name,
         bucket: pkg.source,
@@ -66,8 +70,13 @@ const handleInstallConfirm = () => {
 };
 
 const handleUninstall = (pkg: ScoopPackage) => {
+    // Ensure clean state before starting new operation
+    setOperationNextStep(null);
+    setIsScanning(false);
+    setPendingInstallPackage(null);
+
     setOperationTitle(`Uninstalling ${pkg.name}`);
-    
+
     invoke("uninstall_package", {
         packageName: pkg.name,
         bucket: pkg.source,
@@ -78,6 +87,11 @@ const handleUninstall = (pkg: ScoopPackage) => {
 };
 
 const handleUpdate = (pkg: ScoopPackage) => {
+    // Ensure clean state before starting new operation
+    setOperationNextStep(null);
+    setIsScanning(false);
+    setPendingInstallPackage(null);
+
     setOperationTitle(`Updating ${pkg.name}`);
     invoke("update_package", { packageName: pkg.name }).catch(err => {
         console.error("Update invocation failed:", err);
@@ -85,6 +99,11 @@ const handleUpdate = (pkg: ScoopPackage) => {
 };
 
 const handleForceUpdate = (pkg: ScoopPackage) => {
+    // Ensure clean state before starting new operation
+    setOperationNextStep(null);
+    setIsScanning(false);
+    setPendingInstallPackage(null);
+
     setOperationTitle(`Force Updating ${pkg.name}`);
     invoke("update_package", { packageName: pkg.name, force: true }).catch(err => {
         console.error("Force update invocation failed:", err);
@@ -92,6 +111,11 @@ const handleForceUpdate = (pkg: ScoopPackage) => {
 };
 
 const handleUpdateAll = () => {
+    // Ensure clean state before starting new operation
+    setOperationNextStep(null);
+    setIsScanning(false);
+    setPendingInstallPackage(null);
+
     setOperationTitle("Updating all packages");
     return invoke("update_all_packages").catch(err => {
         console.error("Update all invocation failed:", err);
@@ -99,10 +123,12 @@ const handleUpdateAll = () => {
 };
 
 const closeOperationModal = (wasSuccess: boolean) => {
+    // Clear all operation states to ensure clean slate for next operation
     setOperationTitle(null);
     setOperationNextStep(null);
     setIsScanning(false);
-    
+    setPendingInstallPackage(null);
+
     if (wasSuccess) {
         installedPackagesStore.fetch();
     }
