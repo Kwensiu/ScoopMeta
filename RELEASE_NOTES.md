@@ -1,9 +1,14 @@
-# Release Notes 1.5.2
+# Release Notes 1.5.4
 
-## [1.5.3] - 2025-12-25
+## [1.5.4] - 2025-12-26
 
-fix(OperationModal): set z-index to z-60
-refactor: remove update logging functionality
-fix: Solving the issue of two operationmodals popping up during manual updates
+Features:  
+feat(settings): remove one of the scoop update functionality from about section  
+feat(settings): add command to get Scoop config directory  
+feat(modal): ensure clean state for new operations  
+
+Fix:  
+fix(installed-page): add margin bottom to search container  
+fix(operations): reset state before starting new package operations  
 
 ---
