@@ -189,8 +189,6 @@ async fn run_auto_update(app_handle: &tauri::AppHandle, run_started_at: u64) {
 async fn update_packages_after_buckets(app_handle: &tauri::AppHandle, silent_update_enabled: bool) {
     log::info!("Starting auto package update after bucket refresh");
 
-    let mut package_update_logs = Vec::new();
-
     // Notify UI that package update is starting only if not silent update
     if !silent_update_enabled {
         if let Some(window) = app_handle.get_webview_window("main") {
@@ -208,12 +206,10 @@ async fn update_packages_after_buckets(app_handle: &tauri::AppHandle, silent_upd
     let state = app_handle.state::<crate::state::AppState>();
     match crate::commands::update::update_all_packages_headless(app_handle.clone(), state).await {
         Ok(update_details) => {
-            package_update_logs = update_details;
-
             // Notify UI of success only if not silent update
             if !silent_update_enabled {
                 if let Some(window) = app_handle.get_webview_window("main") {
-                    for line in &package_update_logs {
+                    for line in &update_details {
                         let _ = window.emit(
                             "operation-output",
                             serde_json::json!({
@@ -232,36 +228,10 @@ async fn update_packages_after_buckets(app_handle: &tauri::AppHandle, silent_upd
                     );
                 }
             }
-
-            // Count successful updates
-            let success_count = package_update_logs
-                .iter()
-                .filter(|line| line.contains("Updated") && !line.contains("up to date"))
-                .count() as u32;
-
-            // Create package update log entry
-            let package_log_entry = crate::commands::update_log::UpdateLogEntry {
-                timestamp: chrono::Utc::now(),
-                operation_type: "package".to_string(),
-                operation_result: "success".to_string(),
-                success_count: if success_count == 0 { 1 } else { success_count },
-                total_count: if package_update_logs.len() == 0 {
-                    1
-                } else {
-                    package_update_logs.len() as u32
-                },
-                details: package_update_logs,
-            };
-
-            // Add to log store
-            if let Err(e) = crate::commands::update_log::get_log_store().add_log_entry(package_log_entry) {
-                log::error!("Failed to save package update log: {}", e);
-            }
         }
         Err(e) => {
             log::warn!("Auto package headless update failed: {}", e);
             let error_line = format!("Error: {}", e);
-            package_update_logs.push(error_line.clone());
 
             // Notify UI of error only if not silent update
             if !silent_update_enabled {
@@ -282,21 +252,6 @@ async fn update_packages_after_buckets(app_handle: &tauri::AppHandle, silent_upd
                         }),
                     );
                 }
-            }
-
-            // Create error log entry
-            let error_log_entry = crate::commands::update_log::UpdateLogEntry {
-                timestamp: chrono::Utc::now(),
-                operation_type: "package".to_string(),
-                operation_result: "failed".to_string(),
-                success_count: 0,
-                total_count: 1,
-                details: package_update_logs,
-            };
-
-            // Add to log store
-            if let Err(e) = crate::commands::update_log::get_log_store().add_log_entry(error_log_entry) {
-                log::error!("Failed to save package update error log: {}", e);
             }
         }
     }

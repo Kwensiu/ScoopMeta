@@ -154,26 +154,7 @@ export default function BucketAutoUpdateSettings() {
                         />
                     </label>
                 </div>
-                
-                <div class="flex items-center justify-between mt-4">
-                    <div class="flex flex-col">
-                        <span class="text-sm font-medium">{t("settings.bucket_auto_update.update_history_enabled")}</span>
-                        <span class="text-[11px] text-base-content/60">{t("settings.bucket_auto_update.update_history_enabled_description")}</span>
-                    </div>
-                    <label class="label cursor-pointer">
-                        <input
-                            type="checkbox"
-                            class="toggle toggle-primary"
-                            checked={settings.buckets.updateHistoryEnabled}
-                            onChange={async (e) => {
-                                await setBucketSettings({ updateHistoryEnabled: e.currentTarget.checked });
-                                await invoke("set_config_value", { key: "buckets.updateHistoryEnabled", value: e.currentTarget.checked });
-                            }}
-                        />
-                    </label>
-                </div>
             </Show>
-
             {error() && <div class="alert alert-error mt-4 text-xs">{error()}</div>}
         </Card >
     );

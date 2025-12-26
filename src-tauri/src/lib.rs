@@ -150,10 +150,6 @@ pub fn run() {
                 log::error!("Failed to setup system tray: {}", e);
             }
 
-            // Initialize update log store
-            if let Err(e) = commands::update_log::initialize_update_log_store(app.handle()) {
-                log::warn!("Failed to initialize update log store: {}", e);
-            }
 
             // Start background tasks
             scheduler::start_background_tasks(app.handle().clone());
@@ -250,12 +246,6 @@ pub fn run() {
             tray::refresh_tray_apps_menu,
             tray::get_tray_notification_strings,
             commands::update_config::reload_update_config,
-            commands::update_log::get_update_logs,
-            commands::update_log::get_all_update_logs,
-            commands::update_log::clear_all_update_logs,
-            commands::update_log::remove_update_log_entry,
-            commands::update_log::add_update_log_entry,
-            commands::update_log::get_logs_by_type,
             commands::update_config::get_update_channel,
             commands::update_config::get_update_info_for_channel,
             commands::test_update::test_update_config,

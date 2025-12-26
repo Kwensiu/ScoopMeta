@@ -40,35 +40,6 @@ pub async fn update_all_packages(
     // Execute the update through window streaming
     let result = scoop::execute_scoop(window.clone(), ScoopOp::UpdateAll, None, None).await;
 
-    // Also run headless update to capture detailed output for logging
-    let update_details = match update_all_packages_headless(app.clone(), state.clone()).await {
-        Ok(details) => details,
-        Err(e) => {
-            log::warn!("Failed to get detailed update output: {}", e);
-            vec![format!("Update completed but details unavailable: {}", e)]
-        }
-    };
-
-    // Count successful updates
-    let success_count = update_details.iter()
-        .filter(|line| line.contains("Updated") && !line.contains("up to date"))
-        .count() as u32;
-
-    // Create detailed log entry for manual updates
-    let package_log_entry = crate::commands::update_log::UpdateLogEntry {
-        timestamp: chrono::Utc::now(),
-        operation_type: "package".to_string(),
-        operation_result: if result.is_ok() { "success" } else { "failed" }.to_string(),
-        success_count: if success_count == 0 { 1 } else { success_count },
-        total_count: if update_details.len() == 0 { 1 } else { update_details.len() as u32 },
-        details: update_details,
-    };
-
-    // Add to log store if enabled
-    if let Err(e) = crate::commands::update_log::add_log_entry_if_enabled(&app, package_log_entry).await {
-        log::error!("Failed to save manual package update log: {}", e);
-    }
-
     // Return the original result (success or error)
     result?;
 

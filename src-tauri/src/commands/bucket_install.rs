@@ -190,30 +190,6 @@ async fn install_bucket_internal(
     }
 }
 
-/// Helper function to log bucket update operations
-async fn log_bucket_update(app: &tauri::AppHandle, _bucket_name: &str, result: &BucketInstallResult) {
-    let operation_result = if result.success {
-        "success"
-    } else {
-        "failed"
-    };
-    
-    let details = vec![result.message.clone()];
-    
-    let log_entry = crate::commands::update_log::UpdateLogEntry {
-        timestamp: chrono::Utc::now(),
-        operation_type: "bucket".to_string(),
-        operation_result: operation_result.to_string(),
-        success_count: if result.success { 1 } else { 0 },
-        total_count: 1,
-        details,
-    };
-    
-    // Add to log store if enabled
-    if let Err(e) = crate::commands::update_log::add_log_entry_if_enabled(app, log_entry).await {
-        log::error!("Failed to save bucket update log: {}", e);
-    }
-}
 
 // Tauri command to install a bucket
 #[command]
@@ -309,7 +285,7 @@ pub async fn validate_bucket_install(
 
 // Command to update a bucket (git pull)
 #[command]
-pub async fn update_bucket(app: tauri::AppHandle, bucket_name: String) -> Result<BucketInstallResult, String> {
+pub async fn update_bucket(_app: tauri::AppHandle, bucket_name: String) -> Result<BucketInstallResult, String> {
     log::info!("Updating bucket: {}", bucket_name);
 
     let bucket_path = get_bucket_path(&bucket_name)?;
@@ -322,10 +298,7 @@ pub async fn update_bucket(app: tauri::AppHandle, bucket_name: String) -> Result
             bucket_path: None,
             manifest_count: None,
         };
-        
-        // Log failed bucket update attempt
-        log_bucket_update(&app, &bucket_name, &result).await;
-        
+
         return Ok(result);
     }
 
@@ -341,10 +314,7 @@ pub async fn update_bucket(app: tauri::AppHandle, bucket_name: String) -> Result
             bucket_path: Some(bucket_path.to_string_lossy().to_string()),
             manifest_count: None,
         };
-        
-        // Log failed bucket update attempt
-        log_bucket_update(&app, &bucket_name, &result).await;
-        
+
         return Ok(result);
     }
 
@@ -354,10 +324,7 @@ pub async fn update_bucket(app: tauri::AppHandle, bucket_name: String) -> Result
     let result = tokio::task::spawn_blocking(move || update_bucket_sync(&bucket_name_clone, &bucket_path_clone))
         .await
         .map_err(|e| e.to_string())??;
-    
-    // Log the bucket update result
-    log_bucket_update(&app, &bucket_name, &result).await;
-    
+
     Ok(result)
 }
 

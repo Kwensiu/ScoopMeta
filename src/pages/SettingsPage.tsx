@@ -9,7 +9,6 @@ import AboutSection, { AboutSectionRef } from "../components/page/settings/About
 import DebugSettings from "../components/page/settings/DebugSettings";
 import AutoCleanupSettings from "../components/page/settings/AutoCleanupSettings";
 import BucketAutoUpdateSettings from "../components/page/settings/BucketAutoUpdateSettings";
-import UpdateHistory from "../components/page/settings/UpdateHistory";
 import WindowBehaviorSettings from "../components/page/settings/WindowBehaviorSettings";
 import ThemeSettings from "../components/page/settings/ThemeSettings";
 import UISettings from "../components/page/settings/UI Settings";
@@ -84,7 +83,6 @@ function SettingsPage(props: SettingsPageProps) {
                         <div class="space-y-6">
                             <AutoCleanupSettings />
                             <BucketAutoUpdateSettings />
-                            <UpdateHistory />
                         </div>
                     </Show>
 
