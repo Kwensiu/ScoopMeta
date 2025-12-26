@@ -188,40 +188,35 @@ function OperationModal(props: OperationModalProps) {
 
     // Only set up listeners when the panel is active (has a title)
     if (props.title) {
-      // Check if this modal should be active
-      const currentActive = activeModalId();
-      const shouldBeActive = !currentActive || currentActive === modalId();
+      // Always claim the active modal slot for new operations with a title
+      // This ensures that each new operation gets its own modal instance
+      setActiveModalId(modalId());
 
-      if (shouldBeActive) {
-        // Claim the active modal slot
-        setActiveModalId(modalId());
+      // Reset state for the new operation
+      setOutput([]);
+      setResult(null);
+      setShowNextStep(false);
+      setScanWarning(null);
 
-        // Reset state for the new operation
-        setOutput([]);
-        setResult(null);
-        setShowNextStep(false);
-        setScanWarning(null);
+      setRendered(true);
+      setIsMinimizing(true);
 
-        setRendered(true);
-        setIsMinimizing(true);
+      // Use a single requestAnimationFrame to reduce redraws
+      requestAnimationFrame(() => {
+        setIsMinimizing(false);
+      });
 
-        // Use a single requestAnimationFrame to reduce redraws
-        requestAnimationFrame(() => {
-          setIsMinimizing(false);
-        });
+      setupListeners();
 
-        setupListeners();
+      setIsMinimized(false); // Reset minimized state when new operation starts
 
-        setIsMinimized(false); // Reset minimized state when new operation starts
-
-        // Emit initial minimized state with in-progress status
-        emit('panel-minimize-state', {
-          isMinimized: false,
-          showIndicator: false,
-          title: props.title,
-          result: 'in-progress'
-        } as MinimizedState);
-      }
+      // Emit initial minimized state with in-progress status
+      emit('panel-minimize-state', {
+        isMinimized: false,
+        showIndicator: false,
+        title: props.title,
+        result: 'in-progress'
+      } as MinimizedState);
     } else {
       // If this modal no longer has a title, release the active slot if it owns it
       if (activeModalId() === modalId()) {
