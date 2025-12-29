@@ -97,6 +97,27 @@ const refetch = async () => {
   }
 }
 
+const silentRefetch = async () => {
+  setError(null);
+  try {
+    const installedPackages = await invoke<ScoopPackage[]>("refresh_installed_packages");
+    setPackages(installedPackages);
+    const buckets = new Set<string>(installedPackages.map(p => p.source));
+    setUniqueBuckets(['all', ...Array.from(buckets).sort()]);
+    setIsLoaded(true);
+
+    await Promise.all([
+      heldStore.refetch(),
+      checkForUpdates(),
+      fetchVersionedPackages()
+    ]);
+  } catch (err) {
+    console.error("Failed to silently refresh installed packages:", err);
+    setError("Failed to refresh installed packages");
+    setPackages([]);
+  }
+}
+
   const isPackageVersioned = (packageName: string) => {
     return versionedPackages().includes(packageName);
   };
@@ -112,6 +133,7 @@ const refetch = async () => {
     isPackageVersioned,
     fetch: fetchInstalledPackages,
     refetch,
+    silentRefetch,
     checkForUpdates,
     fetchVersionedPackages,
   };

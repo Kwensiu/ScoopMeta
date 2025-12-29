@@ -33,7 +33,7 @@ interface ScoopStatus {
 }
 
 export function useInstalledPackages() {
-  const { packages, loading, error, uniqueBuckets, isCheckingForUpdates, isPackageVersioned, fetch, refetch } = installedPackagesStore;
+  const { packages, loading, error, uniqueBuckets, isCheckingForUpdates, isPackageVersioned, fetch, refetch, silentRefetch } = installedPackagesStore;
   const [operatingOn, setOperatingOn] = createSignal<string | null>(null);
   const [scoopStatus, setScoopStatus] = createSignal<ScoopStatus | null>(null);
   const [statusLoading, setStatusLoading] = createSignal(false);
@@ -86,8 +86,13 @@ export function useInstalledPackages() {
     }
   };
 
-  const fetchInstalledPackages = () => {
-    refetch();
+  const fetchInstalledPackages = (silent: boolean = false) => {
+    if (silent) {
+      // Silent refresh: only update packages without showing loading state
+      silentRefetch();
+    } else {
+      refetch();
+    }
   }
 
   const handleFetchPackageInfoForVersions = (pkg: ScoopPackage) => {

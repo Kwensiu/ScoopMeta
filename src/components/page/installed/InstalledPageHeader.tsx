@@ -66,7 +66,7 @@ function InstalledPageHeader(props: InstalledHeaderProps) {
       <Show
         when={!isSearchOpen()}
         fallback={
-          <div ref={searchContainerRef} class="flex-grow flex items-center gap-2 mb-6">
+          <div ref={searchContainerRef} class="flex grow items-center gap-2 mb-6">
             <div class="join w-full">
               <span class="join-item btn btn-disabled bg-base-200 border-none"> <Search class="w-4 h-4" /></span>
               <input
@@ -93,7 +93,7 @@ function InstalledPageHeader(props: InstalledHeaderProps) {
           <button
             class="btn btn-ghost btn-circle tooltip tooltip-bottom"
             data-tip={t("installed.header.refresh")}
-            onClick={props.onRefresh}
+            onClick={() => props.onRefresh()}
           >
             <RefreshCw class="w-5 h-5" />
           </button>
@@ -137,7 +137,7 @@ function InstalledPageHeader(props: InstalledHeaderProps) {
             <label tabindex="0" class="btn btn-ghost tooltip tooltip-bottom border border-base-100/50" data-tip={t("installed.header.filter")}>
               <Funnel class="w-4 h-4" />
             </label>
-            <div tabindex="0" class="dropdown-content menu p-4 shadow bg-base-300 rounded-box w-64 z-[1]">
+            <div tabindex="0" class="dropdown-content menu p-4 shadow bg-base-300 rounded-box w-64 z-1">
               <div class="form-control">
                 <label class="label">
                   <span class="label-text">Bucket</span>

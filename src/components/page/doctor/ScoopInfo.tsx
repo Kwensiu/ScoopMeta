@@ -26,8 +26,15 @@ function ScoopInfo(props: ScoopInfoProps) {
     const [isSaving, setIsSaving] = createSignal(false);
     const [saveError, setSaveError] = createSignal<string | null>(null);
 
-    const fetchScoopInfo = async () => {
-        setIsLoading(true);
+    const fetchScoopInfo = async (silent: boolean = false) => {
+        if (!silent) {
+            setIsLoading(true);
+        } else {
+            // For silent mode, if currently loading, set to false first
+            if (isLoading()) {
+                setIsLoading(false);
+            }
+        }
         setError(null);
 
         try {
@@ -44,11 +51,15 @@ function ScoopInfo(props: ScoopInfoProps) {
             console.error("Failed to fetch scoop info:", errorMsg);
             setError("Could not load Scoop information.");
         } finally {
-            setIsLoading(false);
+            if (!silent) {
+                setIsLoading(false);
+            }
         }
     };
 
-    onMount(fetchScoopInfo);
+    onMount(() => {
+        fetchScoopInfo(true); // Use silent refresh to avoid showing loading spinner when switching to doctor page
+    });
 
     const openEditModal = () => {
         const config = scoopConfig();
@@ -114,7 +125,7 @@ function ScoopInfo(props: ScoopInfoProps) {
 
                         <button
                             class="btn btn-ghost btn-sm"
-                            onClick={fetchScoopInfo}
+                            onClick={() => fetchScoopInfo()}
                             disabled={isLoading()}
                         >
                             <RefreshCw class="w-5 h-5" classList={{ "animate-spin": isLoading() }} />

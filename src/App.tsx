@@ -26,25 +26,6 @@ import { BucketInfo, updateBucketsCache } from "./hooks/useBuckets";
 import { usePackageOperations } from "./hooks/usePackageOperations";
 import { t } from "./i18n";
 
-// Create a component to manage persistent page states
-function PersistentPage(props: { view: View; currentView: View; children: any }) {
-    let containerRef: HTMLDivElement | undefined;
-
-    // Always render the page but visually hide it when not active
-    return (
-        <div
-            ref={containerRef}
-            style={{
-                display: props.view === props.currentView ? 'block' : 'none',
-                width: '100%',
-                height: '100%'
-            }}
-        >
-            {props.children}
-        </div>
-    );
-}
-
 function App() {
     // Persist selected view across sessions.
     const [view, setView] = createStoredSignal<View>(
@@ -77,7 +58,7 @@ function App() {
 
     // Auto-update modal state
     const [autoUpdateTitle, setAutoUpdateTitle] = createSignal<string | null>(null);
-    
+
 
     // Minimized state
     const [minimizedState, setMinimizedState] = createSignal({
@@ -236,8 +217,16 @@ function App() {
             };
         };
 
-        const cleanupListeners = await setupColdStartListeners();
-        onCleanup(cleanupListeners);
+        // Store cleanup function to be called when component unmounts
+        let cleanupFunction: (() => void) | null = null;
+
+        onCleanup(() => {
+            if (cleanupFunction) {
+                cleanupFunction();
+            }
+        });
+
+        cleanupFunction = await setupColdStartListeners();
 
         // After listeners are in place, perform fast local checks (no network) sequentially
         let autoStartEnabled = false;
@@ -361,7 +350,7 @@ function App() {
         return () => {
             clearTimeout(timeoutId);
             clearTimeout(immediateFallback);
-            cleanupListeners();
+            cleanupFunction();
         };
     });
 
