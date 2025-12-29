@@ -62,8 +62,10 @@ pub fn start_background_tasks(app: AppHandle) {
                 Duration::from_secs(remaining.min(60)); // Check every minute at most
 
             log::debug!(
-                "Next auto-update check in {} seconds",
-                sleep_duration.as_secs()
+                "Next scheduler check in {} seconds (auto-update interval: {}s, remaining: {}s)",
+                sleep_duration.as_secs(),
+                interval_secs,
+                remaining
             );
             sleep(sleep_duration).await;
         }

@@ -93,8 +93,26 @@ export default function BucketAutoUpdateSettings() {
 
             {/* Custom interval */}
             <div class="mt-4 bg-base-300/40 rounded-md p-3 border border-dashed border-base-content/50">
-                <span class="text-xs font-semibold uppercase tracking-wide opacity-90">{t("settings.bucket_auto_update.custom_interval")}</span>
-                <p class="text-[11px] mt-1 mb-2 opacity-70">{t("settings.bucket_auto_update.custom_interval_description")}</p>
+                <label class="flex items-center justify-between cursor-pointer mb-3">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wide opacity-90">{t("settings.bucket_auto_update.custom_interval")}</span>
+                        <p class="text-[11px] mt-1 opacity-70">{t("settings.bucket_auto_update.custom_interval_description")}</p>
+                    </div>
+                    <input
+                        type="radio"
+                        name="bucketIntervalPreset"
+                        value="custom"
+                        checked={settings.buckets.autoUpdateInterval.startsWith('custom:')}
+                        disabled={loading() || saving()}
+                        onChange={() => {
+                            // If the current value is not a custom value, set to a default custom value
+                            if (!settings.buckets.autoUpdateInterval.startsWith('custom:')) {
+                                persistInterval('custom:3600'); // Default to 1 hour
+                            }
+                        }}
+                        class="radio radio-primary"
+                    />
+                </label>
                 <CustomIntervalEditor
                     currentValue={settings.buckets.autoUpdateInterval}
                     onPersist={persistInterval}
@@ -202,25 +220,45 @@ function CustomIntervalEditor(props: CustomIntervalEditorProps) {
     const updatePreview = () => {
         const secs = quantity() * unitSeconds(unit());
         if (secs < 300) {
-            setError("Minimum interval is 5 minutes (300 seconds).");
+            setError(t("settings.bucket_auto_update.minimum_interval"));
         } else {
             setError(null);
         }
-        setPreview(`${secs} seconds (${formatHuman(secs)})`);
+        setPreview(t("settings.bucket_auto_update.preview_format", { seconds: secs, human: formatHuman(secs) }));
     };
 
     const formatHuman = (secs: number) => {
-        if (secs % 604800 === 0) return `${secs / 604800} week(s)`;
-        if (secs % 86400 === 0) return `${secs / 86400} day(s)`;
-        if (secs % 3600 === 0) return `${secs / 3600} hour(s)`;
-        if (secs % 60 === 0) return `${secs / 60} minute(s)`;
-        return `${secs} sec`;
+    if (secs % 604800 === 0) {
+        const count = secs / 604800;
+        return count === 1 
+            ? t("settings.bucket_auto_update.week_format", { count })
+            : t("settings.bucket_auto_update.weeks_format", { count });
+    }
+    if (secs % 86400 === 0) {
+        const count = secs / 86400;
+        return count === 1 
+            ? t("settings.bucket_auto_update.day_format", { count })
+            : t("settings.bucket_auto_update.days_format", { count });
+    }
+    if (secs % 3600 === 0) {
+        const count = secs / 3600;
+        return count === 1 
+            ? t("settings.bucket_auto_update.hour_format", { count })
+            : t("settings.bucket_auto_update.hours_format", { count });
+    }
+    if (secs % 60 === 0) {
+        const count = secs / 60;
+        return count === 1 
+            ? t("settings.bucket_auto_update.minute_format", { count })
+            : t("settings.bucket_auto_update.minutes_format", { count });
+    }
+    return t("settings.bucket_auto_update.seconds_format", { count: secs });
     };
 
     const handlePersist = async () => {
         const secs = quantity() * unitSeconds(unit());
         const minSecs = props.debug ? 10 : 300;
-        if (secs < minSecs) { setError(`Interval too short (min ${minSecs}s).`); return; }
+        if (secs < minSecs) { setError(`${t("settings.bucket_auto_update.interval_too_short", { seconds: minSecs })}`); return; }
         setSaving(true);
         try {
             await onPersist(`custom:${secs}`);
@@ -235,7 +273,7 @@ function CustomIntervalEditor(props: CustomIntervalEditorProps) {
         <div class="space-y-2">
             <div class="flex gap-2 items-end">
                 <div class="flex-1">
-                    <label class="label"><span class="label-text text-xs">Quantity</span></label>
+                    <label class="label"><span class="label-text text-xs">{t("settings.bucket_auto_update.quantity")}</span></label>
                     <input
                         type="number"
                         min={1}
@@ -246,17 +284,17 @@ function CustomIntervalEditor(props: CustomIntervalEditorProps) {
                     />
                 </div>
                 <div class="flex-1">
-                    <label class="label"><span class="label-text text-xs">Unit</span></label>
+                    <label class="label"><span class="label-text text-xs">{t("settings.bucket_auto_update.unit")}</span></label>
                     <select
                         class="select select-sm select-bordered w-full"
                         value={unit()}
                         disabled={props.disabled}
                         onChange={(e) => { setUnit(e.currentTarget.value); updatePreview(); }}
                     >
-                        <option value="minutes">Minutes</option>
-                        <option value="hours">Hours</option>
-                        <option value="days">Days</option>
-                        <option value="weeks">Weeks</option>
+                        <option value="minutes">{t("settings.bucket_auto_update.minutes")}</option>
+                        <option value="hours">{t("settings.bucket_auto_update.hours")}</option>
+                        <option value="days">{t("settings.bucket_auto_update.days")}</option>
+                        <option value="weeks">{t("settings.bucket_auto_update.weeks")}</option>
                     </select>
                 </div>
                 <button
@@ -265,7 +303,7 @@ function CustomIntervalEditor(props: CustomIntervalEditorProps) {
                     disabled={props.disabled || saving() || !!error()}
                     onClick={handlePersist}
                 >
-                    {saving() ? "Saving..." : justSaved() ? "Saved!" : "Save"}
+                    {saving() ? t("settings.bucket_auto_update.saving") : justSaved() ? t("settings.bucket_auto_update.saved") : t("settings.bucket_auto_update.save")}
                 </button>
             </div>
             <div class="text-[11px] opacity-70">{preview()}</div>
@@ -281,37 +319,77 @@ function ActiveIntervalDisplay(props: { value: string }) {
     const human = () => formatIntervalDisplay(props.value);
     return (
         <div class="text-xs font-medium px-2 py-1 rounded bg-base-300 border border-base-content/10">
-            Active: {human()}
+            {t("settings.bucket_auto_update.active", { interval: human() })}
         </div>
     );
 }
 
 function formatIntervalDisplay(raw: string): string {
-    if (!raw || raw === 'off') return 'Off';
-    if (raw === '24h' || raw === '1d') return '24 Hours';
-    if (raw === '7d' || raw === '1w') return '7 Days';
-    if (raw === '1h') return '1 Hour';
-    if (raw === '6h') return '6 Hours';
+    if (!raw || raw === 'off') return t("settings.bucket_auto_update.off");
+    if (raw === '24h' || raw === '1d') return t("settings.bucket_auto_update.every_24_hours_display");
+    if (raw === '7d' || raw === '1w') return t("settings.bucket_auto_update.every_week_display");
+    if (raw === '1h') return t("settings.bucket_auto_update.one_hour_display");
+    if (raw === '6h') return t("settings.bucket_auto_update.six_hours_display");
     if (raw.startsWith('custom:')) {
         const secsStr = raw.substring(7);
         const secs = parseInt(secsStr, 10);
-        if (!Number.isFinite(secs) || secs <= 0) return 'Custom';
+        if (!Number.isFinite(secs) || secs <= 0) return t("settings.bucket_auto_update.custom_interval");
         const week = 604800, day = 86400, hour = 3600, minute = 60;
-        if (secs % week === 0) return `${secs / week} Week${secs / week === 1 ? '' : 's'}`;
-        if (secs % day === 0) return `${secs / day} Day${secs / day === 1 ? '' : 's'}`;
-        if (secs % hour === 0) return `${secs / hour} Hour${secs / hour === 1 ? '' : 's'}`;
-        if (secs % minute === 0) return `${secs / minute} Minute${secs / minute === 1 ? '' : 's'}`;
-        return `${secs} Sec`; // fallback
+        if (secs % week === 0) {
+            const count = secs / week;
+            return count === 1 
+                ? t("settings.bucket_auto_update.week_display", { count })
+                : t("settings.bucket_auto_update.weeks_display", { count });
+        }
+        if (secs % day === 0) {
+            const count = secs / day;
+            return count === 1 
+                ? t("settings.bucket_auto_update.day_display", { count })
+                : t("settings.bucket_auto_update.days_display", { count });
+        }
+        if (secs % hour === 0) {
+            const count = secs / hour;
+            return count === 1 
+                ? t("settings.bucket_auto_update.hour_display", { count })
+                : t("settings.bucket_auto_update.hours_display", { count });
+        }
+        if (secs % minute === 0) {
+            const count = secs / minute;
+            return count === 1 
+                ? t("settings.bucket_auto_update.minute_display", { count })
+                : t("settings.bucket_auto_update.minutes_display", { count });
+        }
+        return t("settings.bucket_auto_update.seconds_display", { count: secs });
     }
     // Raw seconds fallback
     if (/^\d+$/.test(raw)) {
         const secs = parseInt(raw, 10);
         const week = 604800, day = 86400, hour = 3600, minute = 60;
-        if (secs % week === 0) return `${secs / week} Week${secs / week === 1 ? '' : 's'}`;
-        if (secs % day === 0) return `${secs / day} Day${secs / day === 1 ? '' : 's'}`;
-        if (secs % hour === 0) return `${secs / hour} Hour${secs / hour === 1 ? '' : 's'}`;
-        if (secs % minute === 0) return `${secs / minute} Minute${secs / minute === 1 ? '' : 's'}`;
-        return `${secs} Sec`;
+        if (secs % week === 0) {
+            const count = secs / week;
+            return count === 1 
+                ? t("settings.bucket_auto_update.week_display", { count })
+                : t("settings.bucket_auto_update.weeks_display", { count });
+        }
+        if (secs % day === 0) {
+            const count = secs / day;
+            return count === 1 
+                ? t("settings.bucket_auto_update.day_display", { count })
+                : t("settings.bucket_auto_update.days_display", { count });
+        }
+        if (secs % hour === 0) {
+            const count = secs / hour;
+            return count === 1 
+                ? t("settings.bucket_auto_update.hour_display", { count })
+                : t("settings.bucket_auto_update.hours_display", { count });
+        }
+        if (secs % minute === 0) {
+            const count = secs / minute;
+            return count === 1 
+                ? t("settings.bucket_auto_update.minute_display", { count })
+                : t("settings.bucket_auto_update.minutes_display", { count });
+        }
+        return t("settings.bucket_auto_update.seconds_display", { count: secs });
     }
     return raw; // Unknown format, display raw
 }
