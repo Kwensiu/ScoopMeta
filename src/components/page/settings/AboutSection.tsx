@@ -293,25 +293,17 @@ export default function AboutSection(props: AboutSectionProps) {
       } catch (customError) {
         console.error('Custom update check failed:', customError);
         
-        // If both Tauri and custom update checks failed, show the current version
-        setUpdateStatus('idle');
+        // If both Tauri and custom update checks failed, show error
+        setUpdateStatus('error');
+        const errorMessage = sanitizeErrorMessage(customError);
+        setUpdateError(errorMessage);
         if (manual) {
-          try {
-            const currentVersion = await invoke<string>("get_current_version");
-            const messageText = t("settings.about.latest_version", { version: currentVersion });
-            await message(messageText, {
-              title: t("settings.about.no_updates_available"),
-              kind: "info"
-            });
-          } catch (versionError) {
-            console.error('Failed to get current version:', versionError);
-            await message(t("settings.about.latest_version_unknown"), {
-              title: t("settings.about.no_updates_available"),
-              kind: "info"
-            });
-          }
+          await message(errorMessage, {
+            title: t("settings.about.update_failed"),
+            kind: "error"
+          });
         }
-        console.log('No updates available from either method');
+        console.log('Update check failed from both methods');
       }
     } catch (error) {
       console.error('Failed to check for updates:', error);
