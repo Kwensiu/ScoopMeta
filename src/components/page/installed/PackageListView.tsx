@@ -109,6 +109,11 @@ const SwitchVersionButton = (props: {
 };
 
 function PackageListView(props: PackageListViewProps) {
+  // 检测是否为 CI 版本（beta/alpha/rc 后有额外后缀）
+  const isCiVersion = (version: string): boolean => {
+    return /beta\.\d+\..+/.test(version) || /alpha\.\d+\..+/.test(version) || /rc\.\d+\..+/.test(version);
+  };
+
   return (
     <div class="overflow-x-auto bg-base-300 rounded-xl shadow-xl">
       <table class="table">
@@ -135,7 +140,7 @@ function PackageListView(props: PackageListViewProps) {
                       </div>
                     </button>
                     <Show when={pkg.available_version && !heldStore.isHeld(pkg.name) && !pkg.is_versioned_install}>
-                      <div class="tooltip" data-tip={`Update available: ${pkg.available_version}`}>
+                      <div class="tooltip" data-tip={`Update available: ${pkg.available_version}${isCiVersion(pkg.available_version || '') ? ' (CI 版本，Scoop 可能无法自动更新)' : ''}`}>
                         <CircleArrowUp class="w-4 h-4 text-primary cursor-pointer transition-transform hover:scale-125 mr-1" onClick={() => props.onUpdate(pkg)} />
                       </div>
                     </Show>
@@ -164,7 +169,7 @@ function PackageListView(props: PackageListViewProps) {
                     <label tabindex="0" class="btn btn-ghost btn-xs btn-circle bg-base-400">
                       <Ellipsis class="w-4 h-4" />
                     </label>
-                    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-400 rounded-box w-44 z-[100]">
+                    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-400 rounded-box w-44 z-100">
                       <li>
                         <HoldToggleButton
                           pkgName={pkg.name}

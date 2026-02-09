@@ -36,8 +36,13 @@ const PackageCard = (props: {
 }) => {
   const { pkg } = props;
 
+  // 检测是否为 CI 版本（beta/alpha/rc 后有额外后缀）
+  const isCiVersion = (version: string): boolean => {
+    return /beta\.\d+\..+/.test(version) || /alpha\.\d+\..+/.test(version) || /rc\.\d+\..+/.test(version);
+  };
+
   return (
-    <div class="card bg-base-300 shadow-xl transition-all transform hover:scale-101 hover:bg-base-400 z-0 focus-within:z-20" data-no-close-search>
+    <div class="card bg-base-300 shadow-xl transition-all transform hover:scale-101 hover:bg-base-400 z-0 hover:z-20 focus-within:z-20" data-no-close-search>
       <div class="card-body">
         <div class="flex justify-between items-start mb-2">
           <div class="flex-1 min-w-0">
@@ -48,7 +53,7 @@ const PackageCard = (props: {
                 </div>
               </button>
               <Show when={pkg.available_version && !heldStore.isHeld(pkg.name) && !pkg.is_versioned_install}>
-                <div class="tooltip" data-tip={t("installed.list.update_available_tooltip", { version: pkg.available_version })}>
+                <div class="tooltip" data-tip={`${t("installed.list.update_available_tooltip", { version: pkg.available_version })}${isCiVersion(pkg.available_version || '') ? ' (CI 版本，Scoop 可能无法自动更新)' : ''}`}>
                   <ArrowUpCircle class="w-4 h-4 text-primary cursor-pointer transition-transform hover:scale-125 mr-1" onClick={() => props.onUpdate(pkg)} />
                 </div>
               </Show>
@@ -64,11 +69,11 @@ const PackageCard = (props: {
               </Show>
             </h2>
           </div>
-          <div class="dropdown dropdown-end flex-shrink-0">
+          <div class="dropdown dropdown-end shrink-0">
             <label tabindex="0" class="btn btn-ghost btn-xs btn-circle bg-base-400">
               <Ellipsis class="w-4 h-4" />
             </label>
-            <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-400 rounded-box w-44 z-[1]">
+            <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-400 rounded-box w-44 z-1">
               <li>
                 <HoldToggleButton
                   pkgName={pkg.name}
