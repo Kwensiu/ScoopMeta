@@ -42,19 +42,19 @@ const PackageCard = (props: {
   };
 
   return (
-    <div class="card bg-base-300 shadow-xl transition-all transform hover:scale-101 hover:bg-base-400 z-0 hover:z-20 focus-within:z-20" data-no-close-search>
+    <div class="card bg-base-300 shadow-xl transition-all transform hover:scale-101 hover:bg-base-400 z-0 hover:z-20 focus-within:z-20 cursor-pointer" onClick={() => props.onViewInfo(pkg)} data-no-close-search>
       <div class="card-body">
         <div class="flex justify-between items-start mb-2">
           <div class="flex-1 min-w-0">
             <h2 class="card-title">
-              <button class="hover:underline overflow-hidden" onClick={() => props.onViewInfo(pkg)}>
+              <button class="hover:underline overflow-hidden" onClick={(e) => { e.stopPropagation(); props.onViewInfo(pkg); }}>
                 <div class="truncate" style="max-width: 10rem;">
                   {pkg.name}
                 </div>
               </button>
               <Show when={pkg.available_version && !heldStore.isHeld(pkg.name) && !pkg.is_versioned_install}>
-                <div class="tooltip" data-tip={`${t("installed.list.update_available_tooltip", { version: pkg.available_version })}${isCiVersion(pkg.available_version || '') ? ' (CI 版本，Scoop 可能无法自动更新)' : ''}`}>
-                  <ArrowUpCircle class="w-4 h-4 text-primary cursor-pointer transition-transform hover:scale-125 mr-1" onClick={() => props.onUpdate(pkg)} />
+                <div class="tooltip" data-tip={t("installed.list.update_available_tooltip", { version: pkg.available_version }) + (isCiVersion(pkg.available_version || '') ? t("installed.list.ci_version_note") : '')}>
+                  <ArrowUpCircle class="w-4 h-4 text-primary cursor-pointer transition-transform hover:scale-125 mr-1" onClick={(e) => { e.stopPropagation(); props.onUpdate(pkg); }} />
                 </div>
               </Show>
               <Show when={pkg.is_versioned_install}>
@@ -70,7 +70,7 @@ const PackageCard = (props: {
             </h2>
           </div>
           <div class="dropdown dropdown-end shrink-0">
-            <label tabindex="0" class="btn btn-ghost btn-xs btn-circle bg-base-400">
+            <label tabindex="0" class="btn btn-ghost btn-xs btn-circle bg-base-400" onClick={(e) => e.stopPropagation()}>
               <Ellipsis class="w-4 h-4" />
             </label>
             <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-400 rounded-box w-44 z-1">

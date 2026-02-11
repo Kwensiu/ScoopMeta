@@ -120,27 +120,19 @@
     "unknown": "未知",
     "view_on_github": "在 GitHub 上查看"
   },
-  "warnings": {
-    "multi_instance": {
-      "title": "多实例操作警告",
-      "message": "您同时运行了多个操作，这可能会影响性能和稳定性。建议等待当前操作完成后再开始新操作。",
-      "understand": "我已了解",
-      "dont_show_again": "不再提示"
-    }
-  },
   "buttons": {
-    "show_more": "显示更多",
-    "show_less": "收起",
-    "collapse": "收起",
-    "hide": "隐藏",
-    "close_dialog": "关闭",
     "cancel": "取消",
     "close": "关闭",
+    "close_dialog": "关闭",
+    "collapse": "收起",
     "confirm": "确认",
+    "hide": "隐藏",
     "install": "安装",
     "removeAll": "移除全部",
     "removeSelected": "选择",
     "search": "搜索",
+    "show_less": "收起",
+    "show_more": "显示更多",
     "uninstall": "卸载",
     "update": "更新",
     "update_all": "全部更新"
@@ -278,6 +270,7 @@
       "unhold_package": "取消保留",
       "uninstall": "卸载",
       "update_available_tooltip": "可用更新：v{{version}}",
+      "ci_version_note": " (CI 版本，Scoop 可能无法自动更新该程序)",
       "updated": "更新",
       "version": "版本",
       "versioned_tooltip": "版本化安装 - 无法更新"
@@ -349,7 +342,7 @@
     "sure": "确定？",
     "switch": "切换",
     "switch_version": "切换版本",
-    "title": " ",
+    "title": "关于 {{name}} 的信息",
     "uninstall": "卸载",
     "update": "更新",
     "update_date": "更新日期",
@@ -483,49 +476,49 @@
       "auto_update_packages_description": "仓库更新后将尝试更新已安装的软件包",
       "custom_interval": "自定义间隔",
       "custom_interval_description": "自定义计划（分钟、小时、天、周）。",
+      "day_display": "{{count}} 天",
+      "day_format": "{{count}} 天",
       "days": "天",
+      "days_format": "{{count}} 天",
       "debug": "调试：10 秒间隔",
       "debug_description": "每 10 秒运行一次调度程序（仅限调试）",
       "description": "Rscoop 将自动更新在所有已安装的仓库，以保持最新的清单。",
       "error": "保存自动更新间隔失败。",
       "every_24_hours": "每 24 小时",
       "every_24_hours_description": "每天运行一次",
+      "every_24_hours_display": "24 小时",
       "every_week": "每周",
       "every_week_description": "每 7 天运行一次",
+      "every_week_display": "7 天",
+      "hour_display": "{{count}} 小时",
+      "hour_format": "{{count}} 小时",
       "hours": "小时",
+      "hours_format": "{{count}} 小时",
       "interval_too_short": "间隔太短（最少 {{minSecs}} 秒）。",
       "minimum_interval": "最小间隔为 5 分钟（300 秒）。",
+      "minute_display": "{{count}} 分钟",
+      "minute_format": "{{count}} 分钟",
       "minutes": "分钟",
+      "minutes_format": "{{count}} 分钟",
       "off": "关闭",
       "off_description": "禁用自动计划更新",
+      "one_hour_display": "1 小时",
+      "preview_format": "{{seconds}} 秒 ({{human}})",
       "quantity": "数量",
       "save": "保存",
       "saved": "已保存！",
       "saving": "保存中...",
+      "second_display": "{{count}} 秒",
+      "seconds_format": "{{count}} 秒",
       "silent_update": "静默更新",
       "silent_update_description": "启用后，自动更新将在后台运行，不会显示弹窗，更新记录将保存在设置页面",
+      "six_hours_display": "6 小时",
       "title": "自动更新",
       "unit": "单位",
-      "weeks": "周",
-      "week_format": "{{count}} 周",
-      "weeks_format": "{{count}} 周",
-      "day_format": "{{count}} 天", 
-      "days_format": "{{count}} 天",
-      "hour_format": "{{count}} 小时",
-      "hours_format": "{{count}} 小时",
-      "minute_format": "{{count}} 分钟",
-      "minutes_format": "{{count}} 分钟",
-      "seconds_format": "{{count}} 秒",
-      "second_display": "{{count}} 秒",
-      "preview_format": "{{seconds}} 秒 ({{human}})",
-      "every_24_hours_display": "24 小时",
-      "every_week_display": "7 天",
-      "one_hour_display": "1 小时",
-      "six_hours_display": "6 小时",
       "week_display": "{{count}} 周",
-      "day_display": "{{count}} 天",
-      "hour_display": "{{count}} 小时",
-      "minute_display": "{{count}} 分钟"
+      "week_format": "{{count}} 周",
+      "weeks": "周",
+      "weeks_format": "{{count}} 周"
     },
     "category": {
       "about": "关于",
@@ -574,11 +567,11 @@
     },
     "startup": {
       "description": "配置 Rscoop 是否应该在 Windows 启动时自动运行。",
-      "title": "自启设置",
       "silent_startup": {
-        "title": "静默启动",
-        "description": "启用后，Rscoop 自启动时会最小化到系统托盘，不显示主窗口。"
-      }
+        "description": "启用后，Rscoop 自启动时会最小化到系统托盘，不显示主窗口。",
+        "title": "静默启动"
+      },
+      "title": "自启设置"
     },
     "theme": {
       "description": "在深色和浅色主题之间切换。",
@@ -589,14 +582,31 @@
     "title": "设置",
     "tray": {
       "close_and_disable": "关闭并禁用托盘",
-      "keep_in_tray": "保持在托盘",
-      "notification_message": "Rscoop 已最小化到系统托盘，并将在后台继续运行。\n\n您可以：\n• 点击托盘图标恢复窗口\n• 右键单击托盘图标访问上下文菜单\n• 在设置 > 窗口行为中更改此行为\n\n您想要怎么做？",
-      "notification_title": "Rscoop - 最小化到托盘",
-      "show": "显示 Rscoop",
       "hide": "隐藏 Rscoop",
+      "keep_in_tray": "保持在托盘",
+      "notification_message": "Rscoop 已最小化到系统托盘，将继续在后台运行。\n\n您可以：\n• 点击托盘图标恢复窗口\n• 右键点击托盘图标访问上下文菜单\n• 在设置 > 窗口行为中更改此行为\n\n您想做什么？",
+      "notification_title": "Rscoop - 最小化到托盘",
+      "quit": "退出",
       "refresh_apps": "刷新应用程序",
       "scoop_apps": "Scoop 应用程序",
-      "quit": "退出"
+      "show": "显示 Rscoop"
+    },
+    "tray_apps": {
+      "available_apps": "可用的应用程序",
+      "configure": "配置",
+      "description": "选择要在系统托盘右键菜单中显示的应用程序",
+      "enable_tray_apps": "启用托盘应用程序",
+      "enable_tray_apps_description": "在系统托盘右键菜单中显示应用程序快捷方式",
+      "help_text": "默认不显示任何应用程序。您可以从下方列表中添加要显示的应用，并使用排序按钮调整显示顺序。",
+      "manage_context_menu": "管理右键菜单",
+      "manage_tray_apps": "管理托盘应用程序",
+      "manage_tray_apps_description": "配置在托盘右键菜单中显示的应用程序",
+      "no_apps_found": "未找到已安装的 Scoop 应用程序",
+      "no_available_apps": "没有更多可用的应用程序",
+      "no_selected_apps": "尚未选择任何应用程序",
+      "selected_apps": "已选择的应用程序",
+      "selected_count": "{{count}} 个应用程序已选择",
+      "title": "托盘应用程序"
     },
     "ui": {
       "UDA_botton_description": "更改全局\"全部更新\"按钮的可见性",
@@ -619,27 +629,10 @@
       "title": "VirusTotal 集成"
     },
     "window_behavior": {
-      "description": "启用托盘支持，允许 Rscoop 在关闭后于系统托盘中运行。",
-      "title": "托盘支持",
       "close_to_tray": "最小化到托盘",
-      "close_to_tray_description": "关闭窗口时最小化到系统托盘而不是退出程序"
-    },
-    "tray_apps": {
-      "title": "托盘应用程序",
-      "enable_tray_apps": "启用托盘应用程序",
-      "enable_tray_apps_description": "在系统托盘右键菜单中显示应用程序快捷方式",
-      "manage_context_menu": "管理右键菜单",
-      "manage_tray_apps": "管理托盘应用程序",
-      "manage_tray_apps_description": "配置在托盘右键菜单中显示的应用程序",
-      "configure": "配置",
-      "description": "选择要在系统托盘右键菜单中显示的应用程序",
-      "help_text": "默认不显示任何应用程序。您可以从下方列表中添加要显示的应用，并使用排序按钮调整显示顺序。",
-      "no_apps_found": "未找到已安装的 Scoop 应用程序",
-      "selected_count": "{{count}} 个应用程序已选择",
-      "selected_apps": "已选择的应用程序",
-      "available_apps": "可用的应用程序",
-      "no_selected_apps": "尚未选择任何应用程序",
-      "no_available_apps": "没有更多可用的应用程序"
+      "close_to_tray_description": "关闭窗口时最小化到系统托盘而不是退出程序",
+      "description": "启用托盘支持，允许 Rscoop 在关闭后于系统托盘中运行。",
+      "title": "托盘支持"
     }
   },
   "status": {
@@ -653,6 +646,19 @@
   },
   "switch_to_chinese": "切换到中文",
   "switch_to_english": "切换到英文",
+  "tray": {
+    "hide": "隐藏 Rscoop",
+    "quit": "退出",
+    "refresh_apps": "刷新应用程序",
+    "scoop_apps": "Scoop 应用程序",
+    "show": "显示 Rscoop"
+  },
+  "tray_notification": {
+    "close_button": "关闭并禁用托盘",
+    "keep_button": "保持在托盘",
+    "message": "Rscoop 已最小化到系统托盘，并将在后台继续运行。\n\n您可以：\n• 点击托盘图标恢复窗口\n• 右键单击托盘图标访问上下文菜单\n• 在设置 > 窗口行为中更改此行为\n\n您想要怎么做？",
+    "title": "Rscoop - 最小化到托盘"
+  },
   "update": {
     "all": "全部更新",
     "all_tooltip": "更新所有软件包",
@@ -669,6 +675,14 @@
     "test_restart_required": "切换到测试版通道，重启应用后生效。",
     "test_warning_title": "测试通道警告",
     "title": "更新通道"
+  },
+  "warnings": {
+    "multi_instance": {
+      "dont_show_again": "不再提示",
+      "message": "您同时运行了多个操作，这可能会影响性能和稳定性。建议等待当前操作完成后再开始新操作。",
+      "title": "多实例操作警告",
+      "understand": "我已了解"
+    }
   },
   "welcome": "欢迎使用 Rscoop！"
 }

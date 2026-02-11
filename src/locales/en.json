@@ -120,23 +120,19 @@
     "unknown": "Unknown",
     "view_on_github": "View on GitHub"
   },
-  "warnings": {
-    "multi_instance": {
-      "title": "Multi-Instance Operation Warning",
-      "message": "You are running multiple operations simultaneously, which may affect performance and stability. It is recommended to wait for the current operation to complete before starting a new one.",
-      "understand": "I Understand",
-      "dont_show_again": "Don't Show Again"
-    }
-  },
   "buttons": {
     "cancel": "Cancel",
-    "close_dialog": "Close",
     "close": "Close",
+    "close_dialog": "Close",
+    "collapse": "Collapse",
     "confirm": "Confirm",
+    "expand": "Expand",
     "install": "Install",
     "removeAll": "Remove All",
     "removeSelected": "Remove Selected",
     "search": "Search",
+    "show_less": "Show Less",
+    "show_more": "Show More",
     "uninstall": "Uninstall",
     "update": "Update",
     "update_all": "Update All"
@@ -273,7 +269,8 @@
       "switch_version": "Switch Version",
       "unhold_package": "Unhold Package",
       "uninstall": "Uninstall",
-      "update_available_tooltip": "Update available: v{{version}}",
+      "update_available_tooltip": "Update available: {{version}}",
+      "ci_version_note": " (CI version, Scoop may not be able to update automatically)",
       "updated": "Updated",
       "version": "Version",
       "versioned_tooltip": "Versioned install - cannot be updated"
@@ -479,49 +476,49 @@
       "auto_update_packages_description": "Run full package update after bucket refresh",
       "custom_interval": "Custom Interval",
       "custom_interval_description": "Define a custom schedule (minutes, hours, days, weeks).",
+      "day_display": "{{count}} Day",
+      "day_format": "{{count}} day",
       "days": "Days",
+      "days_format": "{{count}} days",
       "debug": "Debug: 10s Interval",
       "debug_description": "Runs scheduler every 10 seconds (debug only)",
       "description": "Rscoop will automatically run updates on all installed buckets to keep manifests fresh.",
       "error": "Failed to save auto-update interval.",
       "every_24_hours": "Every 24 Hours",
       "every_24_hours_description": "Run once per day",
+      "every_24_hours_display": "24 Hours",
       "every_week": "Every Week",
       "every_week_description": "Run once every 7 days",
+      "every_week_display": "7 Days",
+      "hour_display": "{{count}} Hour",
+      "hour_format": "{{count}} hour",
       "hours": "Hours",
+      "hours_format": "{{count}} hours",
       "interval_too_short": "Interval too short (min {{minSecs}}s).",
       "minimum_interval": "Minimum interval is 5 minutes (300 seconds).",
+      "minute_display": "{{count}} Minute",
+      "minute_format": "{{count}} minute",
       "minutes": "Minutes",
+      "minutes_format": "{{count}} minutes",
       "off": "Off",
       "off_description": "Disable scheduled bucket updates",
+      "one_hour_display": "1 Hour",
+      "preview_format": "{{seconds}} seconds ({{human}})",
       "quantity": "Quantity",
       "save": "Save",
       "saved": "Saved!",
       "saving": "Saving...",
+      "second_display": "{{count}} Second",
+      "seconds_format": "{{count}} seconds",
       "silent_update": "Silent Update",
       "silent_update_description": "When enabled, auto-updates will run in the background without showing popups. Update logs will be saved and can be viewed in settings.",
+      "six_hours_display": "6 Hours",
       "title": "Bucket Auto Update",
       "unit": "Unit",
-      "weeks": "Weeks",
-      "week_format": "{{count}} week",
-      "weeks_format": "{{count}} weeks",
-      "day_format": "{{count}} day", 
-      "days_format": "{{count}} days",
-      "hour_format": "{{count}} hour",
-      "hours_format": "{{count}} hours",
-      "minute_format": "{{count}} minute",
-      "minutes_format": "{{count}} minutes",
-      "seconds_format": "{{count}} seconds",
-      "second_display": "{{count}} Second",
-      "preview_format": "{{seconds}} seconds ({{human}})",
-      "every_24_hours_display": "24 Hours",
-      "every_week_display": "7 Days",
-      "one_hour_display": "1 Hour",
-      "six_hours_display": "6 Hours",
       "week_display": "{{count}} Week",
-      "day_display": "{{count}} Day", 
-      "hour_display": "{{count}} Hour",
-      "minute_display": "{{count}} Minute"
+      "week_format": "{{count}} week",
+      "weeks": "Weeks",
+      "weeks_format": "{{count}} weeks"
     },
     "category": {
       "about": "About",
@@ -570,11 +567,11 @@
     },
     "startup": {
       "description": "Configure whether Rscoop should automatically start when Windows boots.",
-      "title": "Startup Settings",
       "silent_startup": {
-        "title": "Silent Startup",
-        "description": "When enabled, Rscoop will start minimized to the system tray without showing the main window."
-      }
+        "description": "When enabled, Rscoop will start minimized to the system tray without showing the main window.",
+        "title": "Silent Startup"
+      },
+      "title": "Startup Settings"
     },
     "theme": {
       "description": "Switch between dark and light themes.",
@@ -585,14 +582,31 @@
     "title": "Settings",
     "tray": {
       "close_and_disable": "Close and Disable Tray",
+      "hide": "Hide Rscoop",
       "keep_in_tray": "Keep in Tray",
       "notification_message": "Rscoop has been minimized to the system tray and will continue running in the background.\n\nYou can:\n• Click the tray icon to restore the window\n• Right-click the tray icon to access the context menu\n• Change this behavior in Settings > Window Behavior\n\nWhat would you like to do?",
       "notification_title": "Rscoop - Minimized to Tray",
-      "show": "Show Rscoop",
-      "hide": "Hide Rscoop",
+      "quit": "Quit",
       "refresh_apps": "Refresh Apps",
       "scoop_apps": "Scoop Apps",
-      "quit": "Quit"
+      "show": "Show Rscoop"
+    },
+    "tray_apps": {
+      "available_apps": "Available Applications",
+      "configure": "Configure",
+      "description": "Select applications to display in the system tray right-click menu",
+      "enable_tray_apps": "Enable Tray Applications",
+      "enable_tray_apps_description": "Show application shortcuts in the system tray right-click menu",
+      "help_text": "By default, no applications are displayed. You can add applications to show from the list below and use the sort buttons to adjust the display order.",
+      "manage_context_menu": "Manage Context Menu",
+      "manage_tray_apps": "Manage Tray Applications",
+      "manage_tray_apps_description": "Configure applications to display in the tray right-click menu",
+      "no_apps_found": "No installed Scoop applications found",
+      "no_available_apps": "No more available applications",
+      "no_selected_apps": "No applications selected yet",
+      "selected_apps": "Selected Applications",
+      "selected_count": "{{count}} applications selected",
+      "title": "Tray Applications"
     },
     "ui": {
       "UDA_botton_description": "Change the visibility of the global 'Update All' button.",
@@ -615,27 +629,10 @@
       "title": "VirusTotal Integration"
     },
     "window_behavior": {
-      "description": "Enable tray support to allow Rscoop to run in the system tray when closed.",
-      "title": "Tray Support",
       "close_to_tray": "Minimize to Tray",
-      "close_to_tray_description": "Minimize to system tray when closing the window instead of exiting the program"
-    },
-    "tray_apps": {
-      "title": "Tray Applications",
-      "enable_tray_apps": "Enable Tray Applications",
-      "enable_tray_apps_description": "Show application shortcuts in the system tray right-click menu",
-      "manage_context_menu": "Manage Context Menu",
-      "manage_tray_apps": "Manage Tray Applications",
-      "manage_tray_apps_description": "Configure applications to display in the tray right-click menu",
-      "configure": "Configure",
-      "description": "Select applications to display in the system tray right-click menu",
-      "help_text": "By default, no applications are displayed. You can add applications to show from the list below and use the sort buttons to adjust the display order.",
-      "no_apps_found": "No installed Scoop applications found",
-      "selected_count": "{{count}} applications selected",
-      "selected_apps": "Selected Applications",
-      "available_apps": "Available Applications",
-      "no_selected_apps": "No applications selected yet",
-      "no_available_apps": "No more available applications"
+      "close_to_tray_description": "Minimize to system tray when closing the window instead of exiting the program",
+      "description": "Enable tray support to allow Rscoop to run in the system tray when closed.",
+      "title": "Tray Support"
     }
   },
   "status": {
@@ -649,6 +646,19 @@
   },
   "switch_to_chinese": "Switch to Chinese",
   "switch_to_english": "Switch to English",
+  "tray": {
+    "hide": "Hide Rscoop",
+    "quit": "Quit",
+    "refresh_apps": "Refresh Apps",
+    "scoop_apps": "Scoop Apps",
+    "show": "Show Rscoop"
+  },
+  "tray_notification": {
+    "close_button": "Close and Disable Tray",
+    "keep_button": "Keep in Tray",
+    "message": "Rscoop has been minimized to the system tray and will continue running in the background.\n\nYou can:\n• Click the tray icon to restore the window\n• Right-click the tray icon to access the context menu\n• Change this behavior in Settings > Window Behavior\n\nWhat would you like to do?",
+    "title": "Rscoop - Minimized to Tray"
+  },
   "update": {
     "all": "Update ALL",
     "all_tooltip": "Update All Packages",
@@ -666,18 +676,13 @@
     "test_warning_title": "Test Channel Warning",
     "title": "Update Channel"
   },
-  "tray": {
-    "show": "Show Rscoop",
-    "hide": "Hide Rscoop",
-    "refresh_apps": "Refresh Apps",
-    "scoop_apps": "Scoop Apps",
-    "quit": "Quit"
-  },
-  "tray_notification": {
-    "title": "Rscoop - Minimized to Tray",
-    "message": "Rscoop has been minimized to the system tray and will continue running in the background.\n\nYou can:\n• Click the tray icon to restore the window\n• Right-click the tray icon to access the context menu\n• Change this behavior in Settings > Window Behavior\n\nWhat would you like to do?",
-    "close_button": "Close and Disable Tray",
-    "keep_button": "Keep in Tray"
+  "warnings": {
+    "multi_instance": {
+      "dont_show_again": "Don't Show Again",
+      "message": "You are running multiple operations simultaneously, which may affect performance and stability. It is recommended to wait for the current operation to complete before starting a new one.",
+      "title": "Multi-Instance Operation Warning",
+      "understand": "I Understand"
+    }
   },
   "welcome": "Welcome to Rscoop!"
 }
