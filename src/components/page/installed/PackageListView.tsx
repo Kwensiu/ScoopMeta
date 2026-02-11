@@ -165,6 +165,7 @@ function PackageListView(props: PackageListViewProps) {
                     classList={{
                       'dropdown-top': index() * 2 >= props.packages().length - 1,
                     }}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <label tabindex="0" class="btn btn-ghost btn-xs btn-circle bg-base-400">
                       <Ellipsis class="w-4 h-4" />

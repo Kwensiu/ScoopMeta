@@ -69,8 +69,8 @@ const PackageCard = (props: {
               </Show>
             </h2>
           </div>
-          <div class="dropdown dropdown-end shrink-0">
-            <label tabindex="0" class="btn btn-ghost btn-xs btn-circle bg-base-400" onClick={(e) => e.stopPropagation()}>
+          <div class="dropdown dropdown-end shrink-0" onClick={(e) => e.stopPropagation()}>
+            <label tabindex="0" class="btn btn-ghost btn-xs btn-circle bg-base-400">
               <Ellipsis class="w-4 h-4" />
             </label>
             <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-400 rounded-box w-44 z-1">
