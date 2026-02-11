@@ -111,7 +111,11 @@ pub fn run() {
                 file_name: None,
             }),
         ])
-        .level(log::LevelFilter::Trace)
+        .level(if cfg!(debug_assertions) {
+            log::LevelFilter::Trace
+        } else {
+            log::LevelFilter::Info
+        })
         .level_for("lnk", log::LevelFilter::Warn)
         .level_for("reqwest", log::LevelFilter::Warn)
         .level_for("tauri_plugin_updater", log::LevelFilter::Debug)

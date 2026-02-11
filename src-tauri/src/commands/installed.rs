@@ -130,23 +130,23 @@ fn find_latest_version_dir(package_path: &Path) -> Option<PathBuf> {
 
 fn locate_install_dir(package_path: &Path) -> Option<PathBuf> {
     let current_path = package_path.join("current");
-    log::info!(
+    log::debug!(
         "Locating install directory for package: {}, checking current path: {}",
         package_path.display(),
         current_path.display()
     );
 
     if current_path.is_dir() {
-        log::info!("Found current directory: {}", current_path.display());
+        log::debug!("Found current directory: {}", current_path.display());
         Some(current_path)
     } else {
-        log::info!("Current directory not found, searching for latest version directory");
+        log::debug!("Current directory not found, searching for latest version directory");
         find_latest_version_dir(package_path)
     }
 }
 
 fn compute_apps_fingerprint(app_dirs: &[PathBuf]) -> String {
-    log::info!(
+    log::debug!(
         "Computing apps fingerprint for {} app directories",
         app_dirs.len()
     );
@@ -166,7 +166,7 @@ fn compute_apps_fingerprint(app_dirs: &[PathBuf]) -> String {
     let mut sorted_entries = entries;
     sorted_entries.sort();
     let fingerprint = format!("{}|{}", app_dirs.len(), sorted_entries.join(";"));
-    log::info!("Computed apps fingerprint: {}", fingerprint);
+    log::debug!("Computed apps fingerprint: {}", fingerprint);
     fingerprint
 }
 
@@ -180,12 +180,12 @@ fn load_package_details(package_path: &Path, scoop_path: &Path) -> Result<ScoopP
         .ok_or_else(|| format!("Invalid package directory name: {:?}", package_path))?
         .to_string();
 
-    log::info!("Loading package details for: {}", package_name);
+    log::debug!("Loading package details for: {}", package_name);
 
     let current_path = package_path.join("current");
 
     let install_root = if current_path.is_dir() {
-        log::info!("Found current directory for package: {}", package_name);
+        log::debug!("Found current directory for package: {}", package_name);
         current_path.clone()
     } else if let Some(fallback_dir) = find_latest_version_dir(package_path) {
         log::info!(
@@ -207,7 +207,7 @@ fn load_package_details(package_path: &Path, scoop_path: &Path) -> Result<ScoopP
 
     // Read and parse manifest.json
     let manifest_path = install_root.join("manifest.json");
-    log::info!(
+    log::debug!(
         "Reading manifest.json for package: {}, path: {}",
         package_name,
         manifest_path.display()
@@ -220,7 +220,7 @@ fn load_package_details(package_path: &Path, scoop_path: &Path) -> Result<ScoopP
 
     // install.json might not exist for versioned installs
     let install_manifest_path = install_root.join("install.json");
-    log::info!(
+    log::debug!(
         "Reading install.json for package: {}, path: {}",
         package_name,
         install_manifest_path.display()
@@ -236,16 +236,16 @@ fn load_package_details(package_path: &Path, scoop_path: &Path) -> Result<ScoopP
         .clone()
         .or_else(|| find_package_bucket(scoop_path, &package_name))
         .unwrap_or_else(|| {
-            log::info!("Using default bucket 'main' for package: {}", package_name);
+            log::debug!("Using default bucket 'main' for package: {}", package_name);
             "main".to_string()
         });
 
-    log::info!("Determined bucket for package {}: {}", package_name, bucket);
+    log::debug!("Determined bucket for package {}: {}", package_name, bucket);
 
     // Check if this is a versioned install - versioned installs don't have a bucket field in install.json
     // AND cannot be found in any bucket directory (indicating custom/generated manifest)
     let is_versioned_install = install_manifest.bucket.is_none();
-    log::info!(
+    log::debug!(
         "Is versioned install for {}: {}",
         package_name,
         is_versioned_install
@@ -257,7 +257,7 @@ fn load_package_details(package_path: &Path, scoop_path: &Path) -> Result<ScoopP
         .map(|t| DateTime::<Utc>::from(t).to_rfc3339())
         .unwrap_or_default();
 
-    log::info!("Package {} last updated: {}", package_name, updated_time);
+    log::debug!("Package {} last updated: {}", package_name, updated_time);
 
     Ok(ScoopPackage {
         name: package_name,
@@ -320,7 +320,7 @@ async fn scan_installed_packages_internal<R: Runtime>(
         "=== INSTALLED SCAN ==="
     };
 
-    log::info!("{} Starting installed packages scan", log_prefix);
+    log::debug!("{} Starting installed packages scan", log_prefix);
 
     // Ensure apps path exists
     let apps_path = match ensure_apps_path(app.clone(), state, log_prefix).await {
@@ -334,7 +334,7 @@ async fn scan_installed_packages_internal<R: Runtime>(
         }
     };
 
-    log::info!(
+    log::debug!(
         "{} ✓ Apps directory found: {}",
         log_prefix,
         apps_path.display()
@@ -347,14 +347,14 @@ async fn scan_installed_packages_internal<R: Runtime>(
         .filter(|path| path.is_dir())
         .collect();
 
-    log::info!(
+    log::debug!(
         "{} Found {} app directories in apps path",
         log_prefix,
         app_dirs.len()
     );
 
     let fingerprint = compute_apps_fingerprint(&app_dirs);
-    log::info!("{} Computed fingerprint: {}", log_prefix, fingerprint);
+    log::debug!("{} Computed fingerprint: {}", log_prefix, fingerprint);
 
     // Get scoop path for use in package loading
     let scoop_path = state.scoop_path();
@@ -375,7 +375,7 @@ async fn scan_installed_packages_internal<R: Runtime>(
         .filter_map(
             |path| match load_package_details(path.as_path(), &scoop_path) {
                 Ok(package) => {
-                    log::info!("Successfully loaded package: {}", package.name);
+                    log::debug!("Successfully loaded package: {}", package.name);
                     Some(package)
                 }
                 Err(e) => {
@@ -401,7 +401,7 @@ async fn scan_installed_packages_internal<R: Runtime>(
     // Update cache
     update_cache(state, packages.clone(), fingerprint.clone(), log_prefix).await;
 
-    log::info!(
+    log::debug!(
         "{} ✓ Returning {} installed packages",
         log_prefix,
         packages.len()

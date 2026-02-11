@@ -131,27 +131,6 @@ function ScoopStatusModal(props: ScoopStatusModalProps) {
 
       <Show when={props.status && !props.loading && !props.error}>
         <div class="space-y-4">
-          {/* Overall Status */}
-          <div
-            class="alert"
-            classList={{
-              "alert-success alert-outline": props.status!.is_everything_ok,
-              "alert-warning alert-outline": !props.status!.is_everything_ok,
-            }}
-          >
-            <Show
-              when={props.status!.is_everything_ok}
-              fallback={<TriangleAlert class="w-4 h-4" />}
-            >
-              <CircleCheckBig class="w-4 h-4" />
-            </Show>
-            <span>
-              {props.status!.is_everything_ok
-                ? t('scoop_status.everything_ok')
-                : t('scoop_status.some_issues_found')}
-            </span>
-          </div>
-
           {/* Scoop Updates */}
           <Show when={props.status!.scoop_needs_update}>
             <div class="alert alert-warning alert-outline">
