@@ -23,15 +23,14 @@ export default function Card(props: CardProps) {
             : undefined;
     return (
         <section
-            class={`card bg-base-300 shadow-xl relative ${props.class ?? ""}`}
+            class={`card bg-base-300 shadow-xl ${props.class ?? ""}`}
             aria-describedby={descriptionId}
-            aria-labelledby={additionalContentId}
         >
             <div class="card-body p-4">
                 <div class="flex items-center justify-between">
-                    <h2 class="card-title text-xl flex items-center max-w-[calc(100%-80px)]">
+                    <h2 class="card-title text-xl flex items-center">
                         {props.icon && (
-                            <Dynamic component={props.icon} class="w-6 h-6 ml-1 mr-2 text-primary" />
+                            <Dynamic component={props.icon} class="w-6 h-6 mr-2 text-primary" />
                         )}
 
                         {props.title}
@@ -42,7 +41,7 @@ export default function Card(props: CardProps) {
                 </div>
 
                 <Show when={props.description}>
-                    <div id={descriptionId}>
+                    <div id={descriptionId} class=" mb-4">
                         {props.description}
                     </div>
                 </Show>
