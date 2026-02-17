@@ -9,10 +9,26 @@ import type {
   MultiInstanceWarning 
 } from "../types/operations";
 
+// Command execution state interface
+export interface CommandExecutionState {
+  command: string;
+  output: OperationOutput[];
+  isRunning: boolean;
+  useScoopPrefix: boolean;
+}
+
 // Wrap reactive computations in createRoot for proper disposal
 const operationsStore = createRoot(() => {
 // Operation state store
   const [operations, setOperations] = createStore<Record<string, OperationState>>({});
+
+  // Command execution state - persists across page navigation
+  const [commandExecution, setCommandExecution] = createStore<CommandExecutionState>({
+    command: "",
+    output: [],
+    isRunning: false,
+    useScoopPrefix: true
+  });
 
   // Current active operations count - automatically calculated using createMemo
   const activeOperationsCount = createMemo(() => {
@@ -130,12 +146,42 @@ const operationsStore = createRoot(() => {
       setMultiInstanceWarning((prev: MultiInstanceWarning) => ({ ...prev, ...updates }));
     };
 
+    // Command execution methods
+    const setCommand = (command: string) => {
+      setCommandExecution("command", command);
+    };
+
+    const setCommandRunning = (isRunning: boolean) => {
+      setCommandExecution("isRunning", isRunning);
+    };
+
+    const toggleScoopPrefix = () => {
+      setCommandExecution("useScoopPrefix", prev => !prev);
+    };
+
+    const addCommandOutput = (output: OperationOutput) => {
+      setCommandExecution("output", prev => [...prev, output]);
+    };
+
+    const clearCommandOutput = () => {
+      setCommandExecution("output", []);
+    };
+
+    const resetCommandState = () => {
+      setCommandExecution({
+        command: "",
+        output: [],
+        isRunning: false,
+        useScoopPrefix: true
+      });
+    };
 
     return {
       // State
       operations: () => operations,
       activeOperationsCount,
       multiInstanceWarning,
+      commandExecution: () => commandExecution,
 
       // Operation methods
       addOperation,
@@ -146,6 +192,14 @@ const operationsStore = createRoot(() => {
       toggleMinimize,
       setOperationStatus,
       getActiveOperations,
+
+      // Command execution methods
+      setCommand,
+      setCommandRunning,
+      toggleScoopPrefix,
+      addCommandOutput,
+      clearCommandOutput,
+      resetCommandState,
 
       // Warning management
       checkMultiInstanceWarning,

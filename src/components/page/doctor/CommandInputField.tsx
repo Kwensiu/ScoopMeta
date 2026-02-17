@@ -1,25 +1,26 @@
-import { createSignal, For, createEffect } from "solid-js";
+import { For, createEffect, onCleanup } from "solid-js";
 import { Terminal } from "lucide-solid";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import { stripAnsi } from "../../../utils/ansiUtils";
 import Card from "../../common/Card";
 import { t } from "../../../i18n";
-
-interface OperationOutput {
-    line: string;
-    source: string;
-}
+import { useOperations } from "../../../stores/operations";
 
 function CommandInputField() {
-    const [command, setCommand] = createSignal("");
-    const [output, setOutput] = createSignal<OperationOutput[]>([]);
-    const [isRunning, setIsRunning] = createSignal(false);
-    const [useScoopPrefix, setUseScoopPrefix] = createSignal(true);
+    const { commandExecution, setCommand, setCommandRunning, toggleScoopPrefix, addCommandOutput, clearCommandOutput } = useOperations();
+    
+    const exec = commandExecution();
     let scrollRef: HTMLDivElement | undefined;
+    let currentUnlisteners: UnlistenFn[] = [];
+
+    onCleanup(() => {
+        currentUnlisteners.forEach(unlisten => unlisten());
+        currentUnlisteners = [];
+    });
 
     createEffect(() => {
-        if (output().length > 0 && scrollRef) {
+        if (exec.output.length > 0 && scrollRef) {
             const isNearBottom = scrollRef.scrollHeight - scrollRef.scrollTop <= scrollRef.clientHeight + 100;
             if (isNearBottom) {
                 scrollRef.scrollTop = scrollRef.scrollHeight;
@@ -42,38 +43,52 @@ function CommandInputField() {
     };
 
     const handleRunCommand = async () => {
-        if (!command().trim() || isRunning()) return;
+        if (!exec.command.trim() || exec.isRunning) return;
 
         try {
-            const fullCommand = useScoopPrefix() ? `scoop ${command()}` : command();
+            const fullCommand = exec.useScoopPrefix ? `scoop ${exec.command}` : exec.command;
 
-            setOutput(prev => [...prev, { line: `> ${fullCommand}`, source: 'command' }]);
-            setIsRunning(true);
+            addCommandOutput({ line: `> ${fullCommand}`, source: 'command', timestamp: Date.now() });
+            setCommandRunning(true);
 
             const unlisten: UnlistenFn = await listen('operation-output', (event: any) => {
                 const cleanLine = {
                     line: fixEncoding(stripAnsi(event.payload.line)),
-                    source: event.payload.source
+                    source: event.payload.source,
+                    timestamp: Date.now()
                 };
-                setOutput(prev => [...prev, cleanLine]);
+                addCommandOutput(cleanLine);
             });
 
             const unlistenFinished: UnlistenFn = await listen('operation-finished', (event: any) => {
                 unlisten();
                 unlistenFinished();
-                setIsRunning(false);
-                setOutput(prev => [...prev, { line: fixEncoding(stripAnsi(event.payload.message)), source: event.payload.success ? 'success' : 'error' }]);
+                currentUnlisteners = currentUnlisteners.filter(u => u !== unlisten && u !== unlistenFinished);
+                setCommandRunning(false);
+                addCommandOutput({ 
+                    line: fixEncoding(stripAnsi(event.payload.message)), 
+                    source: event.payload.success ? 'success' : 'error',
+                    timestamp: Date.now()
+                });
             });
 
-            if (useScoopPrefix()) {
-                await invoke("run_scoop_command", { command: command() });
+            currentUnlisteners.push(unlisten, unlistenFinished);
+
+            if (exec.useScoopPrefix) {
+                await invoke("run_scoop_command", { command: exec.command });
             } else {
-                await invoke("run_powershell_command", { command: command() });
+                await invoke("run_powershell_command", { command: exec.command });
             }
         } catch (error: any) {
             console.error("Failed to execute command:", error);
-            setIsRunning(false);
-            setOutput(prev => [...prev, { line: "Error: " + error.message, source: 'error' }]);
+            setCommandRunning(false);
+            currentUnlisteners.forEach(unlisten => unlisten());
+            currentUnlisteners = [];
+            addCommandOutput({ 
+                line: "Error: " + error.message, 
+                source: 'error',
+                timestamp: Date.now()
+            });
         }
     };
 
@@ -84,11 +99,11 @@ function CommandInputField() {
     };
 
     const handleClearOutput = () => {
-        setOutput([]);
+        clearCommandOutput();
     };
 
-    const toggleScoopPrefix = () => {
-        setUseScoopPrefix(!useScoopPrefix());
+    const handleToggleScoopPrefix = () => {
+        toggleScoopPrefix();
     };
 
     return (
@@ -101,29 +116,29 @@ function CommandInputField() {
             <div class="form-control">
                 <div class="join w-full">
                     <span
-                        class={`btn join-item transition-all duration-300 cursor-pointer ${useScoopPrefix()
+                        class={`btn join-item transition-all duration-300 cursor-pointer ${exec.useScoopPrefix
                             ? 'btn-success'
                             : 'bg-gray-500 text-gray-300 hover:bg-gray-600'
                             }`}
-                        onClick={toggleScoopPrefix}
+                        onClick={handleToggleScoopPrefix}
                         style={{
-                            "text-decoration": useScoopPrefix() ? "none" : "line-through"
+                            "text-decoration": exec.useScoopPrefix ? "none" : "line-through"
                         }}
-                        title={useScoopPrefix() ? t('doctor.command_input.scoop_prefix_enabled') : t('doctor.command_input.scoop_prefix_disabled')}
+                        title={exec.useScoopPrefix ? t('doctor.command_input.scoop_prefix_enabled') : t('doctor.command_input.scoop_prefix_disabled')}
                     >
                         scoop
                     </span>
                     <input
                         type="text"
-                        placeholder={useScoopPrefix() ? t('doctor.command_input.enter_command') : t('doctor.command_input.enter_full_command')}
+                        placeholder={exec.useScoopPrefix ? t('doctor.command_input.enter_command') : t('doctor.command_input.enter_full_command')}
                         class="input input-bordered join-item flex-1"
-                        value={command()}
+                        value={exec.command}
                         onInput={(e) => setCommand(e.currentTarget.value)}
                         onKeyPress={handleKeyPress}
-                        disabled={isRunning()}
+                        disabled={exec.isRunning}
                     />
-                    <button class="btn btn-primary join-item" onClick={handleRunCommand} disabled={isRunning()}>
-                        {isRunning() ? (
+                    <button class="btn btn-primary join-item" onClick={handleRunCommand} disabled={exec.isRunning}>
+                        {exec.isRunning ? (
                             <>
                                 <span class="loading loading-spinner loading-xs"></span>
                                 {t('doctor.command_input.running')}
@@ -141,7 +156,7 @@ function CommandInputField() {
             {/* 终端模拟显示框 */}
             <div class="mt-4">
                 <div ref={el => scrollRef = el} class="bg-black rounded-lg p-3 font-mono text-sm max-h-60 overflow-y-auto">
-                    <For each={output()}>
+                    <For each={exec.output}>
                         {(line) => (
                             <div class={
                                 line.source === 'stderr' || line.source === 'error' ? 'text-red-500' :
@@ -153,12 +168,12 @@ function CommandInputField() {
                             </div>
                         )}
                     </For>
-                    {output().length === 0 && !isRunning() && (
+                    {exec.output.length === 0 && !exec.isRunning && (
                         <div class="text-gray-500">
                             {t('doctor.command_input.waiting_for_commands')}
                         </div>
                     )}
-                    {isRunning() && (
+                    {exec.isRunning && (
                         <div class="flex items-center text-white">
                             <span class="loading loading-spinner loading-xs mr-2"></span>
                             {t('doctor.command_input.executing_command')}

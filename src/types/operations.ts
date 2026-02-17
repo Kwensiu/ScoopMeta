@@ -23,8 +23,8 @@ export interface OperationOutput {
   operationId?: string;
   operation_id?: string; // Support both camelCase and snake_case for compatibility
   line: string;
-  source: "stdout" | "stderr";
-  message: string;
+  source: string; // Support custom source values
+  message?: string; // Optional message property
   timestamp: number;
 }
 
