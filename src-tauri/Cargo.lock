@@ -3,6 +3,43 @@
 version = 4
 
 [[package]]
+name = "Rscoop"
+version = "1.6.0"
+dependencies = [
+ "aes-gcm",
+ "base64 0.22.1",
+ "chrono",
+ "csv",
+ "dirs",
+ "git2",
+ "itertools",
+ "lazy_static",
+ "lnk",
+ "log",
+ "once_cell",
+ "rayon",
+ "regex",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-log",
+ "tauri-plugin-opener",
+ "tauri-plugin-process",
+ "tauri-plugin-shell",
+ "tauri-plugin-single-instance",
+ "tauri-plugin-store",
+ "tauri-plugin-updater",
+ "tempfile",
+ "tokio",
+ "url",
+ "windows-sys 0.61.2",
+ "winreg",
+]
+
+[[package]]
 name = "adler2"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3945,43 +3982,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "rscoop"
-version = "1.6.0"
-dependencies = [
- "aes-gcm",
- "base64 0.22.1",
- "chrono",
- "csv",
- "dirs",
- "git2",
- "itertools",
- "lazy_static",
- "lnk",
- "log",
- "once_cell",
- "rayon",
- "regex",
- "reqwest",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-log",
- "tauri-plugin-opener",
- "tauri-plugin-process",
- "tauri-plugin-shell",
- "tauri-plugin-single-instance",
- "tauri-plugin-store",
- "tauri-plugin-updater",
- "tempfile",
- "tokio",
- "url",
- "windows-sys 0.61.2",
- "winreg",
 ]
 
 [[package]]

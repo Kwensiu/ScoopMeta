@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "rscoop",
+  "productName": "Rscoop",
   "version": "1.6.0",
   "identifier": "com.rscoop.app",
   "build": {
@@ -33,11 +33,7 @@
         "https://github.com/Kwensiu/Rscoop/releases/latest/download/update.json"
       ],
       "windows": {
-        "installMode": "passive",
-        "customInstallArgs": [
-          "/CURRENTUSER",
-          "/MERGETASKS=!desktopicon,!quicklaunchicon"
-        ]
+        "installMode": "basicUi"
       }
     },
     "store": null,
@@ -55,6 +51,9 @@
       "icons/icon.ico"
     ],
     "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico"
+      },
       "wix": {
         "fragmentPaths": [
           "./windows/fragments/env-refresh.wxs"

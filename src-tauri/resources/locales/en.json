@@ -448,6 +448,7 @@
       "clear_data": "Clear Data",
       "clear_data_description": "This will clear all cache data of Rscoop and restart App",
       "clear_error": "Clear Error",
+      "clear_cache_error": "Clear Cache Error",
       "clear_success": "Clear Success",
       "clearing": "Clearing",
       "data_directory": "Data Directory",

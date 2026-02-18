@@ -490,11 +490,20 @@ pub fn clear_registry_data() -> Result<(), String> {
     log::info!("Attempting to clear Windows registry entries");
     
     use std::process::Command;
+    use crate::commands::startup::cleanup_startup_entries;
+    
+    // First, clean up startup registry entries
+    match cleanup_startup_entries() {
+        Ok(_) => log::info!("Successfully cleaned up startup registry entries"),
+        Err(e) => log::warn!("Failed to cleanup startup registry entries: {}", e),
+    }
     
     // Clear registry entries using reg command
     let registry_keys = vec![
         r"HKEY_CURRENT_USER\Software\com.rscoop.app",
         r"HKEY_CURRENT_USER\Software\Rscoop",
+        r"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\Rscoop",
+        r"HKEY_LOCAL_MACHINE\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Rscoop",
     ];
     
     for key in registry_keys {

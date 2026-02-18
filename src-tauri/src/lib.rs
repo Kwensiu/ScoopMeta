@@ -25,7 +25,6 @@ mod app_constants {
     pub const DEFAULT_SCOOP_PATH_WINDOWS: &str = "C:\\scoop";
 }
 
-#[cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[cfg(windows)]
@@ -251,6 +250,7 @@ pub fn run() {
             commands::startup::set_auto_start_enabled,
             commands::startup::is_silent_startup_enabled,
             commands::startup::set_silent_startup_enabled,
+            commands::startup::cleanup_startup_entries,
             cold_start::is_cold_start_ready,
             tray::refresh_tray_apps_menu,
             tray::get_current_language,
