@@ -6,8 +6,6 @@ import { View } from "../types/scoop";
 
 /// Current store file name for frontend settings
 const STORE_NAME = 'settings.json';
-/// Legacy store file names (for migration)
-const LEGACY_STORE_NAMES = ['settings.dat', 'signals.dat'];
 
 /// Global store instance for frontend settings (shared with signals)
 let globalStore: Store | null = null;
@@ -108,12 +106,6 @@ function createSettingsStore() {
     globalStore = await getSettingsStore();
     storeInitialized = true;
     
-    // Migration: migrate from legacy store files if they exist
-    await migrateFromLegacyStores();
-    
-    // Migration: migrate from core.json if it exists
-    await migrateFromCoreStore();
-    
     // First-time setup: migrate from localStorage if exists
     try {
       const localStorageData = localStorage.getItem('rscoop-settings');
@@ -128,82 +120,6 @@ function createSettingsStore() {
     }
     
     return globalStore;
-  };
-
-  /// Migrate data from legacy store files (settings.dat, signals.dat) to settings.json
-  const migrateFromLegacyStores = async () => {
-    if (!globalStore) return;
-
-    for (const legacyStoreName of LEGACY_STORE_NAMES) {
-      try {
-        const legacyStore = await Store.load(legacyStoreName);
-        const hasData = await legacyStore.length() > 0;
-        
-        if (hasData) {
-          console.log(`Migrating data from ${legacyStoreName} to ${STORE_NAME}`);
-          
-          // Get all entries from legacy store
-          const entries = await legacyStore.entries();
-          for (const [key, value] of entries) {
-            // Only migrate if key doesn't already exist in new store
-            if (!(await globalStore!.has(key))) {
-              await globalStore!.set(key, value);
-            }
-          }
-          
-          console.log(`Successfully migrated ${legacyStoreName} to ${STORE_NAME}`);
-        }
-      } catch (error) {
-        // Legacy store might not exist, which is fine
-        console.log(`No legacy store ${legacyStoreName} to migrate`);
-      }
-    }
-  };
-
-  /// Migrate data from core.json to settings.json
-  const migrateFromCoreStore = async () => {
-    if (!globalStore) return;
-
-    try {
-      const coreStore = await Store.load('core.json');
-      const hasData = await coreStore.length() > 0;
-      
-      if (hasData) {
-        console.log('Migrating data from core.json to settings.json');
-        
-        // Get current settings to merge with core data
-        const currentSettings = await globalStore.get<Settings>('settings') || defaultSettings;
-        
-        // Read core data
-        const scoopPath = await coreStore.get<string>('scoop_path');
-        const language = await coreStore.get<string>('settings.language') || 'en';
-        const firstTrayNotificationShown = await coreStore.get<boolean>('window.firstTrayNotificationShown') ?? true;
-        const trayAppsList = await coreStore.get<string[]>('tray.appsList') || [];
-        
-        // Create merged settings with core data (no core wrapper)
-        const mergedSettings = {
-          ...currentSettings,
-          scoopPath,
-          language,
-          trayAppsList,
-          window: {
-            ...currentSettings.window,
-            firstTrayNotificationShown,
-          },
-        };
-        
-        // Save merged settings
-        await globalStore.set('settings', mergedSettings);
-        
-        console.log('Successfully migrated core.json to settings.json');
-        
-        // Optionally clear core.json after successful migration
-        // We'll keep it for now as a backup
-      }
-    } catch (error) {
-      // Core store might not exist, which is fine
-      console.log('No core.json store to migrate');
-    }
   };
 
   const getInitialSettings = async (): Promise<Settings> => {
