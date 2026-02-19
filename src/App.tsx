@@ -463,19 +463,19 @@ function App() {
                         ></label>
                         <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
                             <li>
-                                <a onClick={() => setView("search")}>Search</a>
+                                <a onClick={() => setView("search")}>{t('app.search')}</a>
                             </li>
                             <li>
-                                <a onClick={() => setView("bucket")}>Buckets</a>
+                                <a onClick={() => setView("bucket")}>{t('app.buckets')}</a>
                             </li>
                             <li>
-                                <a onClick={() => setView("installed")}>Installed Packages</a>
+                                <a onClick={() => setView("installed")}>{t('installed.header.title')}</a>
                             </li>
                             <li>
-                                <a onClick={() => setView("settings")}>Settings</a>
+                                <a onClick={() => setView("settings")}>{t('settings.title')}</a>
                             </li>
                             <li>
-                                <a onClick={() => setView("doctor")}>Doctor</a>
+                                <a onClick={() => setView("doctor")}>{t('doctor.title')}</a>
                             </li>
                         </ul>
                     </div>

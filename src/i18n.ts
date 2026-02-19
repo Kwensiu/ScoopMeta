@@ -19,6 +19,12 @@ export interface Dict {
     doctor: string;
     settings: string;
   };
+  app_update: {
+    available: string;
+    install_now: string;
+    installing: string;
+    later: string;
+  };
   buttons: {
     install: string;
     uninstall: string;
@@ -27,6 +33,7 @@ export interface Dict {
     cancel: string;
     confirm: string;
     close: string;
+    go_to_buckets: string;
   };
   status: {
     installed: string;

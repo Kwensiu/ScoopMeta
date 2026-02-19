@@ -14,7 +14,7 @@
     "installing": "安装中...",
     "later": "稍后"
   },
-  "bottons.go_to_buckets": "前往仓库",
+  "buttons.go_to_buckets": "前往仓库",
   "bucket": {
     "card": {
       "branch": "分支",

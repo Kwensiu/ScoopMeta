@@ -14,7 +14,7 @@
     "installing": "Installing...",
     "later": "Later"
   },
-  "bottons.go_to_buckets": "Go to bucket",
+  "buttons.go_to_buckets": "Go to bucket",
   "bucket": {
     "card": {
       "branch": "Branch",
