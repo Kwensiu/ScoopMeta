@@ -276,7 +276,10 @@
       "versioned_tooltip": "Versioned install - cannot be updated"
     }
   },
-  "language": "Language",
+  "language": {
+    "description": "Select your preferred language for the application interface.",
+    "title": "Language"
+  },
   "messages": {
     "confirm_uninstall": "Are you sure you want to uninstall this package?",
     "init_timeout": "Initialization is taking longer than expected.",

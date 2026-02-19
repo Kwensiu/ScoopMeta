@@ -306,6 +306,14 @@ const { locale, setLocale, dict, t } = createRoot(() => {
     }
   });
 
+  // Sync locale with settings store language
+  createEffect(() => {
+    const settingsLang = settingsStore.settings.language;
+    if (settingsLang && (settingsLang === 'en' || settingsLang === 'zh') && settingsLang !== locale()) {
+      setLocale(settingsLang as Locale);
+    }
+  });
+
   // Create a resource to load the dictionary for the current locale
   const [dict] = createResource(locale, async (lang) => {
     try {

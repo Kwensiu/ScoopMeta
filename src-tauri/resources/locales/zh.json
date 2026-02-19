@@ -276,7 +276,10 @@
       "versioned_tooltip": "版本化安装 - 无法更新"
     }
   },
-  "language": "语言",
+  "language": {
+    "description": "选择您偏好的应用程序界面语言。",
+    "title": "语言"
+  },
   "messages": {
     "confirm_uninstall": "确定要卸载此软件包吗？",
     "init_timeout": "初始化时间比预期长。",
@@ -593,7 +596,7 @@
       "close_and_disable": "关闭并禁用托盘",
       "hide": "隐藏 Rscoop",
       "keep_in_tray": "保持在托盘",
-      "notification_message": "Rscoop 已最小化到系统托盘，将继续在后台运行。\n\n您可以：\n• 点击托盘图标恢复窗口\n• 右键点击托盘图标访问上下文菜单\n• 在设置 > 窗口行为中更改此行为\n\n您想做什么？",
+      "notification_message": "Rscoop 已最小化到系统托盘，并继续在后台运行。\n\n您可以：\n• 点击托盘图标恢复窗口\n• 右键点击托盘图标访问上下文菜单\n• 在设置 > 窗口行为中更改此行为\n\n您想做什么？",
       "notification_title": "Rscoop - 最小化到托盘",
       "quit": "退出",
       "refresh_apps": "刷新应用程序",
