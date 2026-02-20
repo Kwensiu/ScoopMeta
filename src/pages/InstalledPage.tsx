@@ -124,13 +124,13 @@ function InstalledPage(props: InstalledPageProps) {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
             </svg>
           </div>
-          <h3 class="text-2xl font-bold mb-2">{t('no_packages_found.title')}</h3>
+          <h3 class="text-2xl font-bold mb-2">{t('noPackagesFound.title')}</h3>
           <p class="text-lg text-base-content/70 mb-6 max-w-md">
             <Show when={searchQuery() || selectedBucket() !== 'all'}>
-              {t('no_packages_found.no_match_criteria')}
+              {t('noPackagesFound.noMatchCriteria')}
             </Show>
             <Show when={!searchQuery() && selectedBucket() === 'all'}>
-              {t('no_packages_found.no_installed_yet')}
+              {t('noPackagesFound.noInstalledYet')}
             </Show>
           </p>
           <Show when={searchQuery() || selectedBucket() !== 'all'}>
@@ -141,7 +141,7 @@ function InstalledPage(props: InstalledPageProps) {
                 setSelectedBucket("all");
               }}
             >
-              {t('no_packages_found.clear_filters')}
+              {t('noPackagesFound.clearFilters')}
             </button>
           </Show>
           <Show when={!searchQuery() && selectedBucket() === 'all'}>
@@ -149,7 +149,7 @@ function InstalledPage(props: InstalledPageProps) {
               class="btn btn-primary"
               onClick={() => props.onNavigate?.("search")}
             >
-              {t('no_packages_found.browse_packages')}
+              {t('noPackagesFound.browsePackages')}
             </button>
           </Show>
         </div>
@@ -193,7 +193,7 @@ function InstalledPage(props: InstalledPageProps) {
       <Show when={changeBucketModalOpen()}>
         <FloatingConfirmationPanel
           isOpen={changeBucketModalOpen()}
-          title={t('package_info.change_bucket_for', { name: currentPackageForBucketChange()?.name })}
+          title={t('packageInfo.changeBucketFor', { name: currentPackageForBucketChange()?.name })}
           onConfirm={async () => {
             await handleChangeBucketConfirm();
           }}
@@ -206,7 +206,7 @@ function InstalledPage(props: InstalledPageProps) {
                 onInput={(e) => setNewBucketName(e.currentTarget.value)}
                 class="select select-bordered w-full max-w-xs"
               >
-                <option value="" disabled>{t('package_info.bucket')}</option>
+                <option value="" disabled>{t('packageInfo.bucket')}</option>
                 <For each={buckets()}>
                   {(bucket) => (
                     <option value={bucket.name}>{bucket.name}</option>
@@ -214,12 +214,12 @@ function InstalledPage(props: InstalledPageProps) {
                 </For>
               </select>
               <div class="text-sm text-base-content/70 mt-2">
-                {t('package_info.current')}: {currentPackageForBucketChange()?.source}
+                {t('packageInfo.current')}: {currentPackageForBucketChange()?.source}
               </div>
             </div>
             <div class="p-3 bg-info/10 rounded-lg border border-info/20">
               <p class="text-xs text-info-content/85">
-                <strong class="text-yellow-800 dark:text-yellow-200">{t('package_info.warning')}:</strong> {t('package_info.ensure_software_present')}
+                <strong class="text-yellow-800 dark:text-yellow-200">{t('packageInfo.warning')}:</strong> {t('packageInfo.ensureSoftwarePresent')}
               </p>
             </div>
           </div>

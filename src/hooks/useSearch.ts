@@ -32,7 +32,7 @@ interface UseSearchReturn {
   handleInstall: (pkg: ScoopPackage) => void;
   handleUninstall: (pkg: ScoopPackage) => void;
   handleInstallConfirm: () => void;
-  closeOperationModal: (wasSuccess: boolean) => void;
+  closeOperationModal: (operationId: string, wasSuccess: boolean) => void;
 
   // Cleanup function
   cleanup: () => void;
@@ -185,7 +185,7 @@ export function useSearch(): UseSearchReturn {
     };
 
     // Enhanced close operation modal that refreshes search results
-    const closeOperationModal = async (wasSuccess: boolean) => {
+    const closeOperationModal = async (_operationId: string, wasSuccess: boolean) => {
         packageOperations.closeOperationModal(wasSuccess);
         if (wasSuccess) {
             // Refresh search results to reflect installation state changes

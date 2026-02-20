@@ -30,14 +30,14 @@ function ShimDetailsModal(props: ShimDetailsModalProps) {
 
                 <div class="py-4 space-y-3">
                     <p class="text-sm  break-all">
-                        <span class="font-semibold text-base-content">{t('doctor.shim_details.source')}: </span> {props.shim.source}
+                        <span class="font-semibold text-base-content">{t('doctor.shimDetails.source')}: </span> {props.shim.source}
                     </p>
                     <p class="text-sm  break-all">
-                        <span class="font-semibold text-base-content">{t('doctor.shim_details.path')}: </span> {props.shim.path}
+                        <span class="font-semibold text-base-content">{t('doctor.shimDetails.path')}: </span> {props.shim.path}
                     </p>
                     <Show when={props.shim.args}>
                         <p class="text-sm  break-all">
-                            <span class="font-semibold text-base-content">{t('doctor.shim_details.arguments')}: </span>
+                            <span class="font-semibold text-base-content">{t('doctor.shimDetails.arguments')}: </span>
                             <span class="font-mono bg-base-300 px-1 rounded">{props.shim.args}</span>
                         </p>
                     </Show>
@@ -45,11 +45,11 @@ function ShimDetailsModal(props: ShimDetailsModalProps) {
 
                 <div class="modal-action">
                     <button class="btn btn-error" onClick={handleRemove} disabled={props.isOperationRunning}>
-                        <Trash2 class="w-4 h-4" /> {t('doctor.shim_details.remove')}
+                        <Trash2 class="w-4 h-4" /> {t('doctor.shimDetails.remove')}
                     </button>
                     <button class="btn" onClick={handleAlter} disabled={props.isOperationRunning}>
-                        <Show when={!props.shim.isHidden} fallback={<><Eye class="w-4 h-4" /> {t('doctor.shim_details.unhide')}</>}>
-                            <EyeOff class="w-4 h-4" /> {t('doctor.shim_details.hide')}
+                        <Show when={!props.shim.isHidden} fallback={<><Eye class="w-4 h-4" /> {t('doctor.shimDetails.unhide')}</>}>
+                            <EyeOff class="w-4 h-4" /> {t('doctor.shimDetails.hide')}
                         </Show>
                     </button>
                 </div>

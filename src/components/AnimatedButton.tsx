@@ -18,10 +18,10 @@ const AnimatedButton = (props: AnimatedButtonProps) => {
   const [shouldHideText, setShouldHideText] = createSignal(false);
 
   // Use createMemo to memoize the localized strings
-  const defaultText = createMemo(() => props.defaultText || t('buttons.update_all'));
+  const defaultText = createMemo(() => props.defaultText || t('buttons.updateAll'));
   const loadingText = createMemo(() => props.loadingText || t('update.loading'));
   const successText = createMemo(() => props.successText || t('update.success'));
-  const tooltip = createMemo(() => props.tooltip || t('update.all_tooltip'));
+  const tooltip = createMemo(() => props.tooltip || t('update.allTooltip'));
 
   // Calculate button width based on text content using memoization
   const buttonWidth = createMemo(() => {

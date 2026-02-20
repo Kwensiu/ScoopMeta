@@ -17,11 +17,11 @@ function Cleanup(props: CleanupProps) {
             <div class="flex gap-2 mt-2">
                 <button class="btn btn-primary" onClick={props.onCleanupApps}>
                     <Trash2 class="w-4 h-4 mr-2" />
-                    {t('doctor.cleanup.cleanup_old_versions')}
+                    {t('doctor.cleanup.cleanupOldVersions')}
                 </button>
                 <button class="btn btn-secondary" onClick={props.onCleanupCache}>
                     <Archive class="w-4 h-4 mr-2" />
-                    {t('doctor.cleanup.cleanup_outdated_cache')}
+                    {t('doctor.cleanup.cleanupOutdatedCache')}
                 </button>
             </div>
         </Card>

@@ -26,14 +26,14 @@ function SearchBar(props: SearchBarProps) {
                     <button
                         onClick={() => props.setSearchTerm("")}
                         class="p-1 mr-1 rounded-full text-gray-500 hover:text-base-700 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none"
-                        aria-label={t("search.bar.clear_search")}
+                        aria-label={t("search.bar.clearSearch")}
                     >
                         <X class="h-5 w-5" />
                     </button>
                 </Show>
                 <span
                     class="tooltip tooltip-left"
-                    data-tip={t("search.bar.exact_match_tooltip")}
+                    data-tip={t("search.bar.exactMatchTooltip")}
                 >
                     <CircleQuestionMark size={16} class="text-gray-400" />
                 </span>

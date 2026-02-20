@@ -336,15 +336,15 @@ function App() {
                                         d="M12 9v2m0 4v2m0 4v2M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2h-4m-6 0V3m0 0a2 2 0 012-2h0a2 2 0 012 2v0m0 0h4v4m0-4h0a2 2 0 00-2-2h0a2 2 0 00-2 2v4" />
                                 </svg>
                                 <div>
-                                    <h3 class="font-bold text-lg">{t('msi_notice.title')}</h3>
+                                    <h3 class="font-bold text-lg">{t('msiNotice.title')}</h3>
                                     <p class="text-sm opacity-90">
-                                        {t('msi_notice.description')}
+                                        {t('msiNotice.description')}
                                     </p>
                                 </div>
                             </div>
 
                             <div class="text-sm opacity-90">
-                                <p innerHTML={t('msi_notice.instruction')}></p>
+                                <p innerHTML={t('msiNotice.instruction')}></p>
                             </div>
 
                             <div class="flex justify-end gap-2">
@@ -352,27 +352,27 @@ function App() {
                                     console.log("Proceed Anyway clicked");
                                     setBypassCwdMismatch(true);
                                 }}>
-                                    {t('msi_notice.proceed_anyway')}
+                                    {t('msiNotice.proceedAnyway')}
                                 </button>
                                 <button class="btn btn-sm btn-outline btn-info" onClick={handleCloseApp}>
-                                    {t('msi_notice.close_app')}
+                                    {t('msiNotice.closeApp')}
                                 </button>
                             </div>
 
                             <details class="mt-2 text-sm opacity-80">
                                 <summary class="cursor-pointer hover:underline">
-                                    {t('msi_notice.more_details')}
+                                    {t('msiNotice.moreDetails')}
                                 </summary>
-                                <p class="mt-2">{t('msi_notice.details_description')}</p>
+                                <p class="mt-2">{t('msiNotice.detailsDescription')}</p>
                                 <ul class="list-disc list-inside mt-1">
-                                    <li>{t('msi_notice.details_point1')}</li>
-                                    <li>{t('msi_notice.details_point2')}</li>
-                                    <li>{t('msi_notice.details_point3')}</li>
-                                    <li>{t('msi_notice.details_point4')}</li>
+                                    <li>{t('msiNotice.detailsPoint1')}</li>
+                                    <li>{t('msiNotice.detailsPoint2')}</li>
+                                    <li>{t('msiNotice.detailsPoint3')}</li>
+                                    <li>{t('msiNotice.detailsPoint4')}</li>
                                 </ul>
-                                <p class="mt-2">{t('msi_notice.details_solution')}</p>
+                                <p class="mt-2">{t('msiNotice.detailsSolution')}</p>
                                 <p class="mt-3 opacity-70">
-                                    {t('msi_notice.workaround')} <a href="https://github.com/amarbego/rscoop" target="_blank" class="link underline">Open a PR</a>.
+                                    {t('msiNotice.workaround')} <a href="https://github.com/amarbego/rscoop" target="_blank" class="link underline">Open a PR</a>.
                                 </p>
                             </details>
                         </div>
@@ -382,20 +382,20 @@ function App() {
 
             <Show when={update() && !error() && !isScoopInstalled() && (!hasCwdMismatch() || bypassCwdMismatch())}>
                 <div class="bg-sky-600 text-white p-2 text-center text-sm flex justify-center items-center gap-4">
-                    <span>{t('app_update.available', { version: update()!.version })}</span>
+                    <span>{t('appUpdate.available', { version: update()!.version })}</span>
                     <button
                         class="bg-sky-800 hover:bg-sky-900 text-white font-bold py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={isInstalling()}
                         onClick={handleInstallUpdate}
                     >
-                        {isInstalling() ? t('app_update.installing') : t('app_update.install_now')}
+                        {isInstalling() ? t('appUpdate.installing') : t('appUpdate.installNow')}
                     </button>
                     <button
                         class="hover:bg-sky-700 text-white font-bold py-1 px-3 rounded text-xs disabled:opacity-50"
                         disabled={isInstalling()}
                         onClick={() => setUpdate(null)}
                     >
-                        {t('app_update.later')}
+                        {t('appUpdate.later')}
                     </button>
                 </div>
             </Show>
@@ -407,8 +407,8 @@ function App() {
                     <span class="loading loading-spinner loading-lg mt-4"></span>
                     <Show when={initTimedOut()}>
                         <div class="mt-4 text-warning text-center max-w-md">
-                            <p>{t('messages.init_timeout')}</p>
-                            <p class="text-sm mt-2">{t('messages.init_timeout_reason')}</p>
+                            <p>{t('messages.initTimeout')}</p>
+                            <p class="text-sm mt-2">{t('messages.initTimeoutReason')}</p>
                         </div>
                     </Show>
                 </div>
@@ -420,7 +420,7 @@ function App() {
                     <p>{error()}</p>
                     <Show when={initTimedOut()}>
                         <div class="mt-4 text-center max-w-md">
-                            <p class="text-sm">{t('messages.init_timeout_show')}</p>
+                            <p class="text-sm">{t('messages.initTimeoutShow')}</p>
                         </div>
                     </Show>
                 </div>

@@ -44,23 +44,23 @@ const MultiInstanceWarning = () => {
             <TriangleAlert class="w-5 h-5 shrink-0 mt-0.5" />
             <div class="flex-1 min-w-0">
               <div class="font-bold mb-1">
-                {t('warnings.multi_instance.title')}
+                {t('warnings.multiInstance.title')}
               </div>
               <div class="text-sm mb-3">
-                {t('warnings.multi_instance.message')}
+                {t('warnings.multiInstance.message')}
               </div>
               <div class="flex gap-2">
                 <button
                   class="btn btn-sm btn-outline"
                   onClick={handleClose}
                 >
-                  {t('warnings.multi_instance.dont_show_again')}
+                  {t('warnings.multiInstance.dontShowAgain')}
                 </button>
                 <button
                   class="btn btn-sm btn-ghost"
                   onClick={() => setIsVisible(false)}
                 >
-                  {t('buttons.close_dialog')}
+                  {t('buttons.closeDialog')}
                 </button>
               </div>
             </div>

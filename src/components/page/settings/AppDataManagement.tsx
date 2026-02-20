@@ -77,7 +77,7 @@ export default function AppDataManagement() {
             setLoadError(null);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
-            setLoadError(t("settings.app_data.load_error") + ": " + errorMessage);
+            setLoadError(t("settings.appData.loadError") + ": " + errorMessage);
             console.error("Failed to load app data info:", error);
         } finally {
             setIsLoading(false);
@@ -129,7 +129,7 @@ export default function AppDataManagement() {
                 }, 1000);
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error);
-                setClearError(t("settings.app_data.clear_error") + ": " + errorMessage);
+                setClearError(t("settings.appData.clearError") + ": " + errorMessage);
                 setIsClearing(false);
             }
         } else {
@@ -165,7 +165,7 @@ export default function AppDataManagement() {
                 // Could show success message here if needed
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error);
-                setClearCacheError(t("settings.app_data.clear_cache_error") + ": " + errorMessage);
+                setClearCacheError(t("settings.appData.clearCacheError") + ": " + errorMessage);
                 setIsClearingCache(false);
             }
         } else {
@@ -180,9 +180,9 @@ export default function AppDataManagement() {
 
     return (
         <Card
-            title={t("settings.app_data.title")}
+            title={t("settings.appData.title")}
             icon={HardDrive}
-            description={t("settings.app_data.description")}
+            description={t("settings.appData.description")}
         >
             <Show when={!isLoading()}>
 
@@ -199,7 +199,7 @@ export default function AppDataManagement() {
                                 <div class="flex items-start gap-2">
                                     <Folder class="text-primary mt-0.5" size={18} />
                                     <div>
-                                        <h3 class="font-medium text-sm">{t("settings.app_data.data_directory")}</h3>
+                                        <h3 class="font-medium text-sm">{t("settings.appData.dataDirectory")}</h3>
                                         <p class="text-xs text-base-content/70 break-all mt-0.5">{appDataDirPath()}</p>
                                     </div>
                                 </div>
@@ -207,7 +207,7 @@ export default function AppDataManagement() {
                                     class="btn btn-xs btn-primary"
                                     onClick={openAppDataDir}
                                 >
-                                    {t("settings.app_data.open_directory")}
+                                    {t("settings.appData.openDirectory")}
                                 </button>
                             </div>
 
@@ -216,7 +216,7 @@ export default function AppDataManagement() {
                                 <div class="flex items-start gap-2">
                                     <FileText class="text-primary mt-0.5" size={18} />
                                     <div>
-                                        <h3 class="font-medium text-sm">{t("settings.app_data.log_directory")}</h3>
+                                        <h3 class="font-medium text-sm">{t("settings.appData.logDirectory")}</h3>
                                         <p class="text-xs text-base-content/70 break-all mt-0.5">{logDir()}</p>
                                     </div>
                                 </div>
@@ -224,17 +224,17 @@ export default function AppDataManagement() {
                                     class="btn btn-xs btn-primary"
                                     onClick={openLogDir}
                                 >
-                                    {t("settings.app_data.open_directory")}
+                                    {t("settings.appData.openDirectory")}
                                 </button>
                             </div>
 
                             {/* Clear Cache */}
                             <ActionButton
-                                title={t("settings.app_data.clear_cache")}
-                                description={t("settings.app_data.clear_cache_description")}
-                                buttonText={t("settings.app_data.clear_cache_button")}
-                                confirmText={t("settings.app_data.sure")}
-                                loadingText={t("settings.app_data.clearing_cache")}
+                                title={t("settings.appData.clearCache")}
+                                description={t("settings.appData.clearCacheDescription")}
+                                buttonText={t("settings.appData.clearCacheButton")}
+                                confirmText={t("settings.appData.sure")}
+                                loadingText={t("settings.appData.clearingCache")}
                                 icon={Trash2}
                                 color="warning"
                                 isLoading={isClearingCache}
@@ -244,11 +244,11 @@ export default function AppDataManagement() {
 
                             {/* Factory Reset */}
                             <ActionButton
-                                title={t("settings.app_data.factory_reset")}
-                                description={t("settings.app_data.factory_reset_description")}
-                                buttonText={t("settings.app_data.factory_reset_button")}
-                                confirmText={t("settings.app_data.sure")}
-                                loadingText={t("settings.app_data.resetting")}
+                                title={t("settings.appData.factoryReset")}
+                                description={t("settings.appData.factoryResetDescription")}
+                                buttonText={t("settings.appData.factoryResetButton")}
+                                confirmText={t("settings.appData.sure")}
+                                loadingText={t("settings.appData.resetting")}
                                 icon={Trash2}
                                 color="error"
                                 isLoading={isClearing}

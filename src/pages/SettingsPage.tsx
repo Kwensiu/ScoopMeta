@@ -35,7 +35,7 @@ function SettingsPage(props: SettingsPageProps) {
         { key: 'automation', labelkey: "settings.category.automation" },
         { key: 'management', labelkey: "settings.category.management" },
         { key: 'security', labelkey: "settings.category.security" },
-        { key: 'window', labelkey: "settings.category.window_ui" },
+        { key: 'window', labelkey: "settings.category.windowUi" },
         { key: 'about', labelkey: "settings.category.about" },
     ];
     const [activeTab, setActiveTab] = createLocalStorageSignal<string>('settingsActiveTab', 'automation');

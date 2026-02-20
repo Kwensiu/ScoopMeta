@@ -158,23 +158,23 @@ function PackageInfoModal(props: PackageInfoModalProps) {
     if (!props.info?.details) return [];
 
     const desiredOrder = [
-      { key: 'Name', label: t('package_info.name') },
-      { key: 'Description', label: t('package_info.description') },
-      { key: 'Bucket', label: t('package_info.bucket') },
-      { key: 'Installed Version', label: t('package_info.installed_version') },
-      { key: 'Latest Version', label: t('package_info.latest_version') },
-      { key: 'Version', label: t('package_info.version') },
+      { key: 'Name', label: t('packageInfo.name') },
+      { key: 'Description', label: t('packageInfo.description') },
+      { key: 'Bucket', label: t('packageInfo.bucket') },
+      { key: 'Installed Version', label: t('packageInfo.installedVersion') },
+      { key: 'Latest Version', label: t('packageInfo.latestVersion') },
+      { key: 'Version', label: t('packageInfo.version') },
       // 根据 context 决定是否添加日期信息
       ...(props.pkg && props.context === 'installed'
-        ? [{ key: 'Install Date', label: t('package_info.install_date') }]
+        ? [{ key: 'Install Date', label: t('packageInfo.installDate') }]
         : []),
       ...(props.pkg && props.context === 'search'
-        ? [{ key: 'Update Date', label: t('package_info.update_date') }]
+        ? [{ key: 'Update Date', label: t('packageInfo.updateDate') }]
         : []),
-      { key: 'Includes', label: t('package_info.includes') },
-      { key: 'Installed', label: t('package_info.installed') },
-      { key: 'Homepage', label: t('package_info.homepage') },
-      { key: 'License', label: t('package_info.license') }
+      { key: 'Includes', label: t('packageInfo.includes') },
+      { key: 'Installed', label: t('packageInfo.installed') },
+      { key: 'Homepage', label: t('packageInfo.homepage') },
+      { key: 'License', label: t('packageInfo.license') }
     ];
 
     const detailsMap = new Map(props.info.details);
@@ -282,7 +282,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       console.error(`Failed to fetch manifest for ${pkg.name}:`, errorMsg);
-      setManifestError(t('package_info.error_loading_manifest', { name: pkg.name, error: errorMsg }));
+      setManifestError(t('packageInfo.errorLoadingManifest', { name: pkg.name, error: errorMsg }));
     } finally {
       setManifestLoading(false);
     }
@@ -308,7 +308,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       console.error(`Failed to fetch versions for ${pkg.name}:`, errorMsg);
-      setVersionError(t('package_info.error_loading_versions', { name: pkg.name, error: errorMsg }));
+      setVersionError(t('packageInfo.errorLoadingVersions', { name: pkg.name, error: errorMsg }));
     } finally {
       setVersionLoading(false);
     }
@@ -335,7 +335,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       console.error(`Failed to switch ${pkg.name} to version ${targetVersion}:`, errorMsg);
-      setVersionError(t('package_info.error_switching_version', { version: targetVersion, error: errorMsg }));
+      setVersionError(t('packageInfo.errorSwitchingVersion', { version: targetVersion, error: errorMsg }));
     } finally {
       setSwitchingVersion(null);
     }
@@ -395,7 +395,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
             }}
           >
             <div class="flex justify-between items-start p-4 border-b border-base-300">
-              <h3 class="font-bold text-lg">{t('package_info.title', { name: props.pkg?.name })}</h3>
+              <h3 class="font-bold text-lg">{t('packageInfo.title', { name: props.pkg?.name })}</h3>
               <div class="flex gap-2">
                 <div class="dropdown dropdown-end">
                   <label tabindex="0" class="btn btn-ghost btn-sm btn-circle">
@@ -405,7 +405,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                     <li>
                       <a onClick={() => props.pkg && fetchManifest(props.pkg)}>
                         <FileText class="w-4 h-4 mr-2" />
-                        {t('package_info.view_manifest')}
+                        {t('packageInfo.viewManifest')}
                       </a>
                     </li>
                     <Show when={props.pkg?.is_installed}>
@@ -418,12 +418,12 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                               });
                               await openPath(packagePath);
                             } catch (error) {
-                              console.error(t('package_info.failed_to_open_path'), error);
+                              console.error(t('packageInfo.failedToOpenPath'), error);
                             }
                           }
                         }}>
                           <ExternalLink class="w-4 h-4 mr-2" />
-                          {t('package_info.open_in_explorer')}
+                          {t('packageInfo.openInExplorer')}
                         </button>
                       </li>
                     </Show>
@@ -431,7 +431,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                       <li>
                         <a onClick={() => props.pkg && fetchVersionInfo(props.pkg)}>
                           <RefreshCw class="w-4 h-4 mr-2" />
-                          {t('package_info.switch_version')}
+                          {t('packageInfo.switchVersion')}
                         </a>
                       </li>
                     </Show>
@@ -447,12 +447,12 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                               console.log("Package structure debug:", debug);
                               alert(debug);
                             } catch (error) {
-                              console.error(t('package_info.debug_failed'), error);
+                              console.error(t('packageInfo.debugFailed'), error);
                             }
                           }
                         }}>
                           <FileText class="w-4 h-4 mr-2" />
-                          {t('package_info.debug_structure')}
+                          {t('packageInfo.debugStructure')}
                         </a>
                       </li>
                     </Show>
@@ -482,7 +482,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
               <Show when={props.info}>
                 <div class="flex flex-col md:flex-row gap-6">
                   <div class="flex-1">
-                    <h4 class="text-lg font-medium mb-3 pb-2 border-b">{t('package_info.details')}</h4>
+                    <h4 class="text-lg font-medium mb-3 pb-2 border-b">{t('packageInfo.details')}</h4>
                     <div class="grid grid-cols-1 gap-x-4 gap-y-2 text-sm">
                       <For each={orderedDetails()}>
                         {([label, value, originalKey]) => (
@@ -508,7 +508,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                   </div>
                   <Show when={props.info?.notes}>
                     <div class="flex-1">
-                      <h4 class="text-lg font-medium mb-3 border-b pb-2">{t('package_info.notes')}</h4>
+                      <h4 class="text-lg font-medium mb-3 border-b pb-2">{t('packageInfo.notes')}</h4>
                       <div
                         class="rounded-xl overflow-hidden border border-base-content/10 shadow-inner"
                         style={{ "background-color": codeBgColor() }}
@@ -524,10 +524,10 @@ function PackageInfoModal(props: PackageInfoModalProps) {
 
               {/* Version Switcher Section */}
               <Show when={versionInfo() || versionLoading()}>
-                <div class="divider">{t('package_info.version_manager')}</div>
+                <div class="divider">{t('packageInfo.versionManager')}</div>
                 <Show when={versionLoading()} fallback={
                   <div class="bg-base-300 rounded-lg p-4">
-                    <h4 class="text-lg font-medium mb-3">{t('package_info.available_versions')}</h4>
+                    <h4 class="text-lg font-medium mb-3">{t('packageInfo.availableVersions')}</h4>
                     <Show when={versionError()}>
                       <div role="alert" class="alert alert-error mb-3">
                         <span>{versionError()}</span>
@@ -546,7 +546,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                               <div>
                                 <div class="font-semibold text-sm">{version.version}</div>
                                 <Show when={version.is_current}>
-                                  <div class="text-xs text-primary font-medium">{t('package_info.current')}</div>
+                                  <div class="text-xs text-primary font-medium">{t('packageInfo.current')}</div>
                                 </Show>
                               </div>
                               <Show when={!version.is_current}>
@@ -556,7 +556,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                                   onClick={() => props.pkg && switchVersion(props.pkg, version.version)}
                                 >
                                   <Show when={switchingVersion() === version.version}
-                                    fallback={t('package_info.switch')}
+                                    fallback={t('packageInfo.switch')}
                                   >
                                     <span class="loading loading-spinner loading-xs"></span>
                                   </Show>
@@ -648,7 +648,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                     }}
                   >
 
-                    {updateConfirm() ? t('package_info.force_update') : t('package_info.update')}
+                    {updateConfirm() ? t('packageInfo.forceUpdate') : t('packageInfo.update')}
                   </button>
                 </Show>
                 {/* Change Bucket Bottom in PackageInfoModal */}
@@ -662,7 +662,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                       }
                     }}
                   >
-                    {t('package_info.change_bucket')}
+                    {t('packageInfo.changeBucket')}
                   </button>
                 </Show>
               </div>
@@ -714,14 +714,14 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                       }}
                     >
                       <Trash2 class="w-4 h-4 mr-2" />
-                      {uninstallConfirm() ? t('package_info.sure') : t('buttons.uninstall')}
+                      {uninstallConfirm() ? t('packageInfo.sure') : t('buttons.uninstall')}
                     </button>
                   </Show>
                   <button class="btn" onClick={(e) => {
                     e.preventDefault();
                     handleClose();
                   }}>
-                    {props.showBackButton ? t('package_info.back_to_bucket') : t('package_info.close')}
+                    {props.showBackButton ? t('packageInfo.backToBucket') : t('packageInfo.close')}
                   </button>
                 </form>
               </div>

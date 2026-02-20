@@ -21,7 +21,7 @@ function ScoopProxySettings() {
         } catch (err) {
             const errorMsg = err instanceof Error ? err.message : String(err);
             console.error("Failed to fetch scoop proxy:", errorMsg);
-            setError(t('doctor.proxy_settings.load_error'));
+            setError(t('doctor.proxySettings.loadError'));
         } finally {
             setIsLoading(false);
         }
@@ -38,31 +38,31 @@ function ScoopProxySettings() {
         } catch (err) {
             const errorMsg = err instanceof Error ? err.message : String(err);
             console.error("Failed to save scoop proxy:", errorMsg);
-            setError(`${t('doctor.proxy_settings.save_error')} ${errorMsg}`);
+            setError(`${t('doctor.proxySettings.saveError')} ${errorMsg}`);
         } finally {
             setIsSaving(false);
         }
     };
 
     const handleSaveProxy = async () => {
-        await saveProxySetting(proxyValue(), t('doctor.proxy_settings.save_success'));
+        await saveProxySetting(proxyValue(), t('doctor.proxySettings.saveSuccess'));
     };
 
     const handleClearProxy = async () => {
         setProxyValue("");
-        await saveProxySetting("", t('doctor.proxy_settings.clear_success'));
+        await saveProxySetting("", t('doctor.proxySettings.clearSuccess'));
     };
 
     return (
         <Card
-            title={t('doctor.proxy_settings.title')}
+            title={t('doctor.proxySettings.title')}
             icon={Globe}
-            description={t('doctor.proxy_settings.description')}
+            description={t('doctor.proxySettings.description')}
         >
             <div class="form-control w-full max-w-lg">
                 <label class="label">
                     <span class="label-text font-semibold">
-                        {t('doctor.proxy_settings.proxy_address')}
+                        {t('doctor.proxySettings.proxyAddress')}
                     </span>
                 </label>
 
@@ -70,7 +70,7 @@ function ScoopProxySettings() {
                     <div class="join w-full">
                         <input
                             type="text"
-                            placeholder={isLoading() ? t('doctor.proxy_settings.loading') : t('doctor.proxy_settings.proxy_placeholder')}
+                            placeholder={isLoading() ? t('doctor.proxySettings.loading') : t('doctor.proxySettings.proxyPlaceholder')}
                             class="input input-bordered join-item flex-1 min-w-70"
                             value={proxyValue()}
                             onInput={(e) => setProxyValue(e.currentTarget.value)}
@@ -81,14 +81,14 @@ function ScoopProxySettings() {
                             onClick={handleSaveProxy}
                             disabled={isLoading() || isSaving()}
                         >
-                            {t('doctor.proxy_settings.save')}
+                            {t('doctor.proxySettings.save')}
                         </button>
                         <button
                             class="btn join-item bg-orange-500 hover:bg-orange-600 border-none"
                             onClick={handleClearProxy}
                             disabled={isLoading() || isSaving() || !proxyValue()}
                         >
-                            {t('doctor.proxy_settings.clear')}
+                            {t('doctor.proxySettings.clear')}
                         </button>
                     </div>
                 </div>

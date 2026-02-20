@@ -34,7 +34,7 @@ interface BucketInfoModalProps {
 // Component to render bucket detail values
 function DetailValue(props: { value: string | number | undefined }) {
   const displayValue = () => {
-    if (props.value === undefined || props.value === null) return t("bucket_info.unknown");
+    if (props.value === undefined || props.value === null) return t("bucketInfo.unknown");
     return String(props.value);
   };
 
@@ -47,12 +47,12 @@ function ManifestsList(props: { manifests: string[]; loading: boolean; onPackage
     <Show when={!props.loading} fallback={
       <div class="flex items-center gap-2 py-4 z-0">
         <span class="loading loading-spinner loading-sm"></span>
-        <span class="text-sm">{t("bucket_info.loading_packages")}</span>
+        <span class="text-sm">{t("bucketInfo.loadingPackages")}</span>
       </div>
     }>
       <Show when={props.manifests.length > 0} fallback={
         <div class="text-center py-4">
-          <p class="text-sm text-base-content/70">{t("bucket_info.no_packages_found")}</p>
+          <p class="text-sm text-base-content/70">{t("bucketInfo.noPackagesFound")}</p>
         </div>
       }>
         <div class="max-h-60 overflow-y-auto">
@@ -65,7 +65,7 @@ function ManifestsList(props: { manifests: string[]; loading: boolean; onPackage
                   <div
                     class="hover:text-primary cursor-pointer py-0.5 px-1 rounded hover:bg-base-300 transition-colors"
                     onClick={() => props.onPackageClick?.(cleanName)}
-                    title={t("bucket_info.click_to_view_info", { name: cleanName })}
+                    title={t("bucketInfo.clickToViewInfo", { name: cleanName })}
                   >
                     {manifest}
                   </div>
@@ -190,12 +190,12 @@ function BucketInfoModal(props: BucketInfoModalProps) {
     if (!props.bucket) return [];
 
     const details: [string, string | number | undefined][] = [
-      [t("bucket_info.name"), props.bucket.name],
-      [t("bucket_info.type"), props.bucket.is_git_repo ? t("bucket_info.git_repository") : t("bucket_info.local_directory")],
-      [t("bucket_info.packages"), props.bucket.manifest_count],
-      [t("bucket_info.branch"), props.bucket.git_branch],
-      [t("bucket_info.last_updated"), props.bucket.last_updated],
-      [t("bucket_info.path"), props.bucket.path],
+      [t("bucketInfo.name"), props.bucket.name],
+      [t("bucketInfo.type"), props.bucket.is_git_repo ? t("bucketInfo.gitRepository") : t("bucketInfo.localDirectory")],
+      [t("bucketInfo.packages"), props.bucket.manifest_count],
+      [t("bucketInfo.branch"), props.bucket.git_branch],
+      [t("bucketInfo.lastUpdated"), props.bucket.last_updated],
+      [t("bucketInfo.path"), props.bucket.path],
     ];
 
     // Filter out undefined values
@@ -207,12 +207,12 @@ function BucketInfoModal(props: BucketInfoModalProps) {
       <Show when={props.bucket?.is_git_repo}>
         <div class="badge badge-info badge-sm">
           <GitBranch class="w-3 h-3 mr-1" />
-          {t("bucket_info.git")}
+          {t("bucketInfo.git")}
         </div>
       </Show>
       <Show when={isExternalBucket()}>
         <div class="badge badge-warning badge-sm">
-          {t("bucket_info.external")}
+          {t("bucketInfo.external")}
         </div>
       </Show>
       <div class="dropdown dropdown-end">
@@ -233,7 +233,7 @@ function BucketInfoModal(props: BucketInfoModalProps) {
                 }
               }}>
                 <FolderOpen class="w-4 h-4 mr-2" />
-                {t("bucket_info.open_in_explorer")}
+                {t("bucketInfo.openInExplorer")}
               </button>
             </li>
           </Show>
@@ -241,7 +241,7 @@ function BucketInfoModal(props: BucketInfoModalProps) {
             <li>
               <button type="button" onClick={(e) => { e.stopPropagation(); handleRefreshBucket(); }}>
                 <RefreshCw class="w-4 h-4 mr-2" />
-                {t("bucket_info.refresh_bucket")}
+                {t("bucketInfo.refreshBucket")}
               </button>
             </li>
           </Show>
@@ -263,7 +263,7 @@ function BucketInfoModal(props: BucketInfoModalProps) {
               class={(!props.bucket?.git_url && !props.searchBucket?.url) ? "text-base-content/50" : ""}
             >
               <ExternalLink class="w-4 h-4 mr-2" />
-              {t("bucket_info.view_on_github")}
+              {t("bucketInfo.viewOnGithub")}
             </button>
           </li>
         </ul>
@@ -285,12 +285,12 @@ function BucketInfoModal(props: BucketInfoModalProps) {
             fallback={
               <>
                 <Download class="w-4 h-4 mr-2" />
-                {t("bucket_info.install")}
+                {t("bucketInfo.install")}
               </>
             }
           >
             <LoaderCircle class="w-4 h-4 mr-2 animate-spin" />
-            {t("bucket_info.installing")}
+            {t("bucketInfo.installing")}
           </Show>
         </button>
       </Show>
@@ -306,16 +306,16 @@ function BucketInfoModal(props: BucketInfoModalProps) {
             fallback={
               <>
                 <Trash2 class="w-4 h-4 mr-2" />
-                {t("bucket_info.remove")}
+                {t("bucketInfo.remove")}
               </>
             }
           >
             <LoaderCircle class="w-4 h-4 mr-2 animate-spin" />
-            {t("bucket_info.removing")}
+            {t("bucketInfo.removing")}
           </Show>
         </button>
       </Show>
-      <button class="btn-close-outline" onClick={props.onClose}>{t("bucket_info.close")}</button>
+      <button class="btn-close-outline" onClick={props.onClose}>{t("bucketInfo.close")}</button>
     </>
   );
 
@@ -326,7 +326,7 @@ function BucketInfoModal(props: BucketInfoModalProps) {
         onClose={props.onClose}
         title={
           <span class="flex items-center gap-2">
-            {t("bucket_info.bucket")}: <span class="text-info font-mono">{props.bucket?.name || props.searchBucket?.name}</span>
+            {t("bucketInfo.bucket")}: <span class="text-info font-mono">{props.bucket?.name || props.searchBucket?.name}</span>
           </span>
         }
         size="large"
@@ -345,7 +345,7 @@ function BucketInfoModal(props: BucketInfoModalProps) {
         <Show when={props.bucket || props.searchBucket}>
           <div class="flex flex-col md:flex-row gap-6">
             <div class="flex-1">
-              <h4 class="text-lg font-medium mb-3 pb-2 border-b">{t("bucket_info.details")}</h4>
+              <h4 class="text-lg font-medium mb-3 pb-2 border-b">{t("bucketInfo.details")}</h4>
               <div class="grid grid-cols-1 gap-x-4 gap-y-2 text-sm">
                 <Show
                   when={props.bucket && isInstalled()}
@@ -353,24 +353,24 @@ function BucketInfoModal(props: BucketInfoModalProps) {
                     // Show basic info for external buckets
                     <Show when={props.searchBucket}>
                       <div class="grid grid-cols-3 gap-2 py-1 border-b border-base-content/10">
-                        <div class="font-semibold text-base-content/70 col-span-1">{t("bucket_info.name")}:</div>
+                        <div class="font-semibold text-base-content/70 col-span-1">{t("bucketInfo.name")}:</div>
                         <div class="col-span-2">{props.searchBucket!.name}</div>
                       </div>
                       <div class="grid grid-cols-3 gap-2 py-1 border-b border-base-content/10">
-                        <div class="font-semibold text-base-content/70 col-span-1">{t("bucket_info.type")}:</div>
-                        <div class="col-span-2">{t("bucket_info.git_repository")}</div>
+                        <div class="font-semibold text-base-content/70 col-span-1">{t("bucketInfo.type")}:</div>
+                        <div class="col-span-2">{t("bucketInfo.gitRepository")}</div>
                       </div>
                       <div class="grid grid-cols-3 gap-2 py-1 border-b border-base-content/10">
-                        <div class="font-semibold text-base-content/70 col-span-1">{t("bucket_info.packages")}:</div>
+                        <div class="font-semibold text-base-content/70 col-span-1">{t("bucketInfo.packages")}:</div>
                         <div class="col-span-2">
                           <div class="flex items-center gap-1">
                             <span class="font-bold text-primary">{props.searchBucket!.apps}</span>
-                            <span class="text-xs text-base-content/70">{t("bucket_info.packages_count")}</span>
+                            <span class="text-xs text-base-content/70">{t("bucketInfo.packagesCount")}</span>
                           </div>
                         </div>
                       </div>
                       <div class="grid grid-cols-3 gap-2 py-1 border-b border-base-content/10">
-                        <div class="font-semibold text-base-content/70 col-span-1">{t("bucket_info.repository")}:</div>
+                        <div class="font-semibold text-base-content/70 col-span-1">{t("bucketInfo.repository")}:</div>
                         <div class="col-span-2">
                           <a
                             href={props.searchBucket!.url}
@@ -385,7 +385,7 @@ function BucketInfoModal(props: BucketInfoModalProps) {
                       </div>
                       <Show when={props.searchBucket!.last_updated !== "Unknown"}>
                         <div class="grid grid-cols-3 gap-2 py-1 border-b border-base-content/10">
-                          <div class="font-semibold text-base-content/70 col-span-1">{t("bucket_info.last_updated")}:</div>
+                          <div class="font-semibold text-base-content/70 col-span-1">{t("bucketInfo.lastUpdated")}:</div>
                           <div class="col-span-2">{formatBucketDate(props.searchBucket!.last_updated)}</div>
                         </div>
                       </Show>
@@ -417,7 +417,7 @@ function BucketInfoModal(props: BucketInfoModalProps) {
                                     }
                                   }
                                 }}
-                                title={t("bucket_info.open_in_explorer")}
+                                title={t("bucketInfo.openInExplorer")}
                               >
                                 {value}
                               </div>
@@ -425,7 +425,7 @@ function BucketInfoModal(props: BucketInfoModalProps) {
                             <Match when={key === 'Manifests'}>
                               <div class="flex items-center gap-1">
                                 <span class="font-bold text-primary">{value}</span>
-                                <span class="text-xs text-base-content/70">{t("bucket_info.packages_count")}</span>
+                                <span class="text-xs text-base-content/70">{t("bucketInfo.packagesCount")}</span>
                               </div>
                             </Match>
                           </Switch>
@@ -436,7 +436,7 @@ function BucketInfoModal(props: BucketInfoModalProps) {
 
                   <Show when={props.bucket?.git_url}>
                     <div class="grid grid-cols-3 gap-2 py-1 border-b border-base-content/10">
-                      <div class="font-semibold text-base-content/70 col-span-1">{t("bucket_info.repository")}:</div>
+                      <div class="font-semibold text-base-content/70 col-span-1">{t("bucketInfo.repository")}:</div>
                       <div class="col-span-2">
                         <a
                           href={props.bucket!.git_url}
@@ -461,7 +461,7 @@ function BucketInfoModal(props: BucketInfoModalProps) {
                   // Show description when bucket is not installed or no manifests available
                   <Show when={props.description && !isInstalled()}>
 
-                    <h4 class="text-lg font-medium mb-3 border-b pb-2">{t("bucket_info.description")}</h4>
+                    <h4 class="text-lg font-medium mb-3 border-b pb-2">{t("bucketInfo.description")}</h4>
                     <div class="rounded-lg p-4" style={{ "background-color": BgColor() }}>
                       <p class="text-sm  leading-relaxed">
                         {props.description}
@@ -471,7 +471,7 @@ function BucketInfoModal(props: BucketInfoModalProps) {
                 }
               >
                 <h4 class="text-lg font-medium mb-3 border-b pb-2 flex items-center gap-2">
-                  {t("bucket_info.available_packages")} ({props.manifests.length})
+                  {t("bucketInfo.availablePackages")} ({props.manifests.length})
                 </h4>
                 <div class="bg-base-100 rounded-lg p-3">
                   <ManifestsList

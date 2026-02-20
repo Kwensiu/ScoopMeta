@@ -91,13 +91,13 @@ function BucketSearch(props: BucketSearchProps) {
         <Show when={!props.isActive()}>
           <div class="flex items-center gap-3 px-4 py-2 rounded-lg border border-primary/20 hover:border-primary/40 transition-all duration-200">
             <div class="flex flex-col">
-              <span class="text-sm font-semibold text-primary">{t("bucket.search.discover_new")}</span>
-              <span class="text-xs text-base-content/60 hidden sm:block">{t("bucket.search.discover_description")}</span>
+              <span class="text-sm font-semibold text-primary">{t("bucket.search.discoverNew")}</span>
+              <span class="text-xs text-base-content/60 hidden sm:block">{t("bucket.search.discoverDescription")}</span>
             </div>
             <button
               onClick={props.onToggle}
               class="btn btn-circle btn-primary hover:btn-primary hover:scale-110 transition-all duration-200 shadow-lg"
-              aria-label={t("bucket.search.search_for_buckets")}
+              aria-label={t("bucket.search.searchForBuckets")}
             >
               <Search class="h-5 w-5" />
             </button>
@@ -128,7 +128,7 @@ function BucketSearch(props: BucketSearchProps) {
               <input
                 ref={inputRef}
                 type="text"
-                placeholder={t("bucket.search.search_buckets")}
+                placeholder={t("bucket.search.searchBuckets")}
                 class="input input-bordered w-full pl-10 pr-4 bg-base-300 transition-colors duration-200"
                 value={searchInput()}
                 onInput={(e) => handleSearchInput(e.currentTarget.value)}
@@ -140,7 +140,7 @@ function BucketSearch(props: BucketSearchProps) {
               <button
                 onClick={() => handleSearchInput("")}
                 class="btn btn-circle btn-sm btn-ghost hover:btn-error"
-                aria-label={t("bucket.search.clear_search")}
+                aria-label={t("bucket.search.clearSearch")}
                 disabled={bucketSearch.isSearching()}
               >
                 <X class="h-4 w-4" />
@@ -150,7 +150,7 @@ function BucketSearch(props: BucketSearchProps) {
             <button
               onClick={closeSearch}
               class="btn btn-circle btn-outline hover:btn-error transition-colors"
-              aria-label={t("bucket.search.close_search")}
+              aria-label={t("bucket.search.closeSearch")}
             >
               <X class="h-5 w-5" />
             </button>
@@ -161,7 +161,7 @@ function BucketSearch(props: BucketSearchProps) {
             <div class="flex items-center gap-4">
               {/* Sort Options */}
               <div class="flex items-center gap-2">
-                <span class="text-base-content/70">{t("bucket.search.sort_by")}</span>
+                <span class="text-base-content/70">{t("bucket.search.sortBy")}</span>
                 <select
                   class="select select-sm select-bordered"
                   value={bucketSearch.sortBy()}
@@ -175,17 +175,17 @@ function BucketSearch(props: BucketSearchProps) {
                     inputRef?.focus();
                   }}
                 >
-                  <option value="stars">{t("bucket.search.sort_stars")}</option>
-                  <option value="relevance">{t("bucket.search.sort_relevance")}</option>
-                  <option value="apps">{t("bucket.search.sort_apps")}</option>
-                  <option value="name">{t("bucket.search.sort_name")}</option>
+                  <option value="stars">{t("bucket.search.sortStars")}</option>
+                  <option value="relevance">{t("bucket.search.sortRelevance")}</option>
+                  <option value="apps">{t("bucket.search.sortApps")}</option>
+                  <option value="name">{t("bucket.search.sortName")}</option>
                 </select>
               </div>
 
               {/* Results Count */}
               <Show when={bucketSearch.searchResults().length > 0 && !bucketSearch.isSearching()}>
                 <div class="text-base-content/70">
-                  {t("bucket.search.results_count", {
+                  {t("bucket.search.resultsCount", {
                     count: bucketSearch.searchResults().length,
                     total: bucketSearch.totalCount()
                   })}
@@ -205,7 +205,7 @@ function BucketSearch(props: BucketSearchProps) {
                   disabled={bucketSearch.isSearching()}
                 >
                   <TriangleAlert class="h-4 w-4 mr-1" />
-                  {t("bucket.search.community_buckets")}
+                  {t("bucket.search.communityBuckets")}
                 </button>
               </Show>
 
@@ -217,10 +217,10 @@ function BucketSearch(props: BucketSearchProps) {
                   }}
                   class="btn btn-sm btn-outline btn-error"
                   disabled={bucketSearch.isSearching()}
-                  title={t("bucket.search.disable_community_title")}
+                  title={t("bucket.search.disableCommunityTitle")}
                 >
                   <X class="h-4 w-4 mr-1" />
-                  {t("bucket.search.disable_community")}
+                  {t("bucket.search.disableCommunity")}
                 </button>
               </Show>
             </div>
@@ -241,11 +241,11 @@ function BucketSearch(props: BucketSearchProps) {
         <div class="modal modal-open backdrop-blur-sm">
           <div class="modal-box bg-base-200 w-11/12 max-w-2xl max-h-[80vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
-              <h3 class="font-bold text-lg">{t("bucket.search.expand_search_title")}</h3>
+              <h3 class="font-bold text-lg">{t("bucket.search.expandSearchTitle")}</h3>
               <Show when={expandedInfo()}>
                 <div class="flex items-center gap-2 text-warning">
                   <TriangleAlert class="h-5 w-5" />
-                  <span class="font-medium text-sm">{t("bucket.search.large_dataset_warning")}</span>
+                  <span class="font-medium text-sm">{t("bucket.search.largeDatasetWarning")}</span>
                 </div>
               </Show>
             </div>
@@ -255,11 +255,11 @@ function BucketSearch(props: BucketSearchProps) {
 
                 <div class="bg-base-400 p-4 rounded-lg space-y-2">
                   <div class="flex justify-between">
-                    <span>{t("bucket.search.estimated_download_size")}</span>
+                    <span>{t("bucket.search.estimatedDownloadSize")}</span>
                     <span class="font-bold">{expandedInfo()?.estimated_size_mb} MB</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>{t("bucket.search.total_buckets")}</span>
+                    <span>{t("bucket.search.totalBuckets")}</span>
                     <span class="font-bold">~{expandedInfo()?.total_buckets}</span>
                   </div>
                 </div>
@@ -271,19 +271,19 @@ function BucketSearch(props: BucketSearchProps) {
 
                 <div class="bg-yellow-50 dark:bg-yellow-950 p-3 rounded-lg">
                   <p class="text-sm text-yellow-800 dark:text-yellow-200">
-                    <strong>{t("bucket.search.note")}:</strong> {t("bucket.search.expand_note")}
+                    <strong>{t("bucket.search.note")}:</strong> {t("bucket.search.expandNote")}
                   </p>
                 </div>
 
                 {/* Filter Options */}
                 <div class="bg-base-200 p-4 rounded-lg space-y-2">
                   <div class="flex justify-between items-center">
-                    <span class="font-bold">{t("bucket.search.filter_options")}</span>
+                    <span class="font-bold">{t("bucket.search.filterOptions")}</span>
                   </div>
 
                   {/* Disable Chinese Buckets */}
                   <div class="flex justify-between items-center">
-                    <span class="text-sm">{t("bucket.search.disable_chinese_buckets")}</span>
+                    <span class="text-sm">{t("bucket.search.disableChineseBuckets")}</span>
                     <input
                       type="checkbox"
                       class="checkbox checkbox-primary"
@@ -294,7 +294,7 @@ function BucketSearch(props: BucketSearchProps) {
 
                   {/* Minimum Star Limit */}
                   <div class="flex justify-between items-center">
-                    <span class="text-sm">{t("bucket.search.minimum_github_stars")}</span>
+                    <span class="text-sm">{t("bucket.search.minimumGithubStars")}</span>
                     <input
                       type="number"
                       class="input input-bordered input-sm w-20"
@@ -320,7 +320,7 @@ function BucketSearch(props: BucketSearchProps) {
                 onClick={confirmExpandedSearch}
                 disabled={bucketSearch.isSearching()}
               >
-                {t("bucket.search.enable_expanded_search")}
+                {t("bucket.search.enableExpandedSearch")}
               </button>
             </div>
           </div>

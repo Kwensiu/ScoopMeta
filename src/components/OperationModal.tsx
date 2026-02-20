@@ -409,7 +409,7 @@ function OperationModal(props: OperationModalProps) {
               <Show when={currentOperation?.status === 'in-progress'}>
                 <div class="flex items-center animate-pulse mt-2">
                   <span class="loading loading-spinner loading-xs mr-2"></span>
-                  {t('status.in_progress')}
+                  {t('status.inProgress')}
                 </div>
               </Show>
             </div>

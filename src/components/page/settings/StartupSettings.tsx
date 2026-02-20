@@ -74,8 +74,8 @@ export default function StartupSettings() {
                 <div class="divider my-4"></div>
                 <div class="flex items-center justify-between">
                     <div class="flex flex-col">
-                        <span class="text-sm font-medium">{t("settings.startup.silent_startup.title")}</span>
-                        <span class="text-[11px] text-base-content/60">{t("settings.startup.silent_startup.description")}</span>
+                        <span class="text-sm font-medium">{t("settings.startup.silentStartup.title")}</span>
+                        <span class="text-[11px] text-base-content/60">{t("settings.startup.silentStartup.description")}</span>
                     </div>
                     <label class="label cursor-pointer">
                         <input

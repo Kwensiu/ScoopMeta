@@ -116,14 +116,14 @@ function CacheManager(props: CacheManagerProps) {
         )).sort();
 
         setConfirmationDetails({
-            title: t('doctor.cache_manager.confirm_deletion'),
+            title: t('doctor.cacheManager.confirmDeletion'),
             content: (
                 <>
-                    <p>{t('doctor.cache_manager.delete_files', { count: selectedFiles.length, packageCount: packageNames.length })}</p>
+                    <p>{t('doctor.cacheManager.deleteFiles', { count: selectedFiles.length, packageCount: packageNames.length })}</p>
                     <ul class="list-disc list-inside bg-base-100 p-2 rounded-md max-h-40 overflow-y-auto">
                         <For each={packageNames}>{(name) => <li>{name}</li>}</For>
                     </ul>
-                    <p>{t('doctor.cache_manager.action_cannot_be_undone')}</p>
+                    <p>{t('doctor.cacheManager.actionCannotBeUndone')}</p>
                 </>
             ),
             onConfirm: async () => {
@@ -144,8 +144,8 @@ function CacheManager(props: CacheManagerProps) {
 
     const handleClearAll = () => {
         setConfirmationDetails({
-            title: t('doctor.cache_manager.confirm_deletion'),
-            content: <p>{t('doctor.cache_manager.delete_all', { count: cacheContents().length })}</p>,
+            title: t('doctor.cacheManager.confirmDeletion'),
+            content: <p>{t('doctor.cacheManager.deleteAll', { count: cacheContents().length })}</p>,
             onConfirm: async () => {
                 setIsLoading(true);
                 try {
@@ -166,7 +166,7 @@ function CacheManager(props: CacheManagerProps) {
     return (
         <>
             <Card
-                title={t('doctor.cache_manager.title')}
+                title={t('doctor.cacheManager.title')}
                 icon={Database}
                 headerAction={
                     <div class="flex items-center gap-2">
@@ -193,7 +193,7 @@ function CacheManager(props: CacheManagerProps) {
                             <button
                                 class="btn btn-ghost btn-sm"
                                 onClick={props.onOpenDirectory}
-                                title={t('doctor.cache_manager.open_cache_directory')}
+                                title={t('doctor.cacheManager.openCacheDirectory')}
                             >
                                 <Folder class="w-5 h-5" />
                             </button>
@@ -210,7 +210,7 @@ function CacheManager(props: CacheManagerProps) {
             >
                 <input
                     type="text"
-                    placeholder={t('doctor.cache_manager.filter_placeholder')}
+                    placeholder={t('doctor.cacheManager.filterPlaceholder')}
                     class="input input-bordered w-full mt-2 mb-4"
                     value={filter()}
                     onInput={(e) => setFilter(e.currentTarget.value)}
@@ -228,8 +228,8 @@ function CacheManager(props: CacheManagerProps) {
                     <Show when={!isLoading() && cacheContents().length === 0 && !error()}>
                         <div class="text-center p-8">
                             <Inbox class="w-16 h-16 mx-auto text-base-content/30" />
-                            <p class="mt-4 text-lg font-semibold">{t('doctor.cache_manager.cache_is_empty')}</p>
-                            <p class="text-base-content/60">{t('doctor.cache_manager.no_cached_files')}</p>
+                            <p class="mt-4 text-lg font-semibold">{t('doctor.cacheManager.cacheIsEmpty')}</p>
+                            <p class="text-base-content/60">{t('doctor.cacheManager.noCachedFiles')}</p>
                         </div>
                     </Show>
 
@@ -248,9 +248,9 @@ function CacheManager(props: CacheManagerProps) {
                                                 />
                                             </label>
                                         </th>
-                                        <th>{t('doctor.cache_manager.name')}</th>
-                                        <th>{t('doctor.cache_manager.version')}</th>
-                                        <th>{t('doctor.cache_manager.size')}</th>
+                                        <th>{t('doctor.cacheManager.name')}</th>
+                                        <th>{t('doctor.cacheManager.version')}</th>
+                                        <th>{t('doctor.cacheManager.size')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -286,7 +286,7 @@ function CacheManager(props: CacheManagerProps) {
             <ConfirmationModal
                 isOpen={isConfirmModalOpen()}
                 title={confirmationDetails().title}
-                confirmText={t('doctor.cache_manager.delete')}
+                confirmText={t('doctor.cacheManager.delete')}
                 onConfirm={() => {
                     confirmationDetails().onConfirm();
                     setIsConfirmModalOpen(false);

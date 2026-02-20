@@ -14,9 +14,9 @@ export default function HeldPackagesManagement(props: HeldPackagesManagementProp
 
   return (
     <Card
-      title={t("settings.held_packages.title")}
+      title={t("settings.heldPackages.title")}
       icon={CirclePause}
-      description={t("settings.held_packages.description")}
+      description={t("settings.heldPackages.description")}
     >
       <Show
         when={!heldPackagesStore.isLoading}
@@ -24,7 +24,7 @@ export default function HeldPackagesManagement(props: HeldPackagesManagementProp
       >
         <Show
           when={heldPackagesStore.packages.length > 0}
-          fallback={<p class="text-base-content/60 p-4 text-center">{t("settings.held_packages.no_packages_held")}</p>}
+          fallback={<p class="text-base-content/60 p-4 text-center">{t("settings.heldPackages.noPackagesHeld")}</p>}
         >
           <div class="max-h-60 overflow-y-auto pr-2">
             <ul class="space-y-2">
@@ -39,7 +39,7 @@ export default function HeldPackagesManagement(props: HeldPackagesManagementProp
                       disabled={props.operationInProgress}
                     >
                       <LockOpen class="w-4 h-4 mr-1" />
-                      {t("settings.held_packages.unhold")}
+                      {t("settings.heldPackages.unhold")}
                     </button>
                   </li>
                 )}

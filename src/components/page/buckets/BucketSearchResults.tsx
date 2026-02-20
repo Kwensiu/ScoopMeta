@@ -80,7 +80,7 @@ function BucketSearchResults(props: BucketSearchResultsProps) {
       {/* Header */}
       <div class="flex items-center justify-between">
         <h2 class="text-xl font-bold">
-          {t("bucket.search_results.title")}
+          {t("bucket.searchResults.title")}
           <Show when={!props.loading}>
             <span class="text-base-content/60 ml-2 text-lg font-normal">
               ({props.buckets.length}{props.totalCount > props.buckets.length ? ` of ${props.totalCount}` : ''})
@@ -91,7 +91,7 @@ function BucketSearchResults(props: BucketSearchResultsProps) {
         <Show when={props.isExpandedSearch}>
           <div class="badge badge-info badge-outline badge-lg">
             <Shield class="w-3 h-3 mr-1" />
-            {t("bucket.search_results.expanded_search")}
+            {t("bucket.searchResults.expandedSearch")}
           </div>
         </Show>
       </div>
@@ -100,7 +100,7 @@ function BucketSearchResults(props: BucketSearchResultsProps) {
       <Show when={props.loading}>
         <div class="flex justify-center items-center py-12">
           <span class="loading loading-spinner loading-lg mr-3"></span>
-          <span class="text-lg">{t("bucket.search_results.searching_buckets")}</span>
+          <span class="text-lg">{t("bucket.searchResults.searchingBuckets")}</span>
         </div>
       </Show>
 
@@ -115,9 +115,9 @@ function BucketSearchResults(props: BucketSearchResultsProps) {
       <Show when={!props.loading && !props.error && props.buckets.length === 0}>
         <div class="text-center py-12">
           <Package class="w-16 h-16 mx-auto text-base-content/40 mb-4" />
-          <h3 class="text-xl font-semibold mb-2">{t("bucket.search_results.no_buckets_found")}</h3>
+          <h3 class="text-xl font-semibold mb-2">{t("bucket.searchResults.noBucketsFound")}</h3>
           <p class="text-base-content/70">
-            {t("bucket.search_results.try_adjust_terms")}
+            {t("bucket.searchResults.tryAdjustTerms")}
           </p>
         </div>
       </Show>
@@ -135,7 +135,7 @@ function BucketSearchResults(props: BucketSearchResultsProps) {
                       <Show when={bucket.is_verified}>
                         <div class="badge badge-info badge-outline absolute top-[21px] right-[16px] z-10">
                           <Shield class="w-3 h-3 mr-1" />
-                          {t("bucket.search_results.verified")}
+                          {t("bucket.searchResults.verified")}
                         </div>
                       </Show>
                       <button
@@ -149,7 +149,7 @@ function BucketSearchResults(props: BucketSearchResultsProps) {
                             console.error('Failed to open GitHub URL:', error);
                           }
                         }}
-                        title={t("bucket.search_results.open_in_github")}
+                        title={t("bucket.searchResults.openInGithub")}
                       >
                         <ExternalLink class="w-4 h-4" />
                       </button>
@@ -159,7 +159,7 @@ function BucketSearchResults(props: BucketSearchResultsProps) {
                 description={
                   <>
                     <p class="text-sm line-clamp-2 mb-4 min-h-10">
-                      {bucket.description || t("bucket.search_results.no_description")}
+                      {bucket.description || t("bucket.searchResults.noDescription")}
                     </p>
 
                     {/* Full Name */}
@@ -189,7 +189,7 @@ function BucketSearchResults(props: BucketSearchResultsProps) {
                     <Show when={bucket.last_updated !== "Unknown"}>
                       <div class="flex items-center gap-1 text-xs text-base-content/60 border-b pb-3 mb-3">
                         <Clock class="w-3 h-3" />
-                        <span>{t("bucket.search_results.updated", { date: formatBucketDate(bucket.last_updated) })}</span>
+                        <span>{t("bucket.searchResults.updated", { date: formatBucketDate(bucket.last_updated) })}</span>
                       </div>
                     </Show>
                   </>
@@ -205,19 +205,19 @@ function BucketSearchResults(props: BucketSearchResultsProps) {
                         class="btn btn-primary btn-sm flex-1"
                         onClick={(e) => handleInstallBucket(bucket, e)}
                         disabled={bucketInstall.isBucketBusy(bucket.name)}
-                        title={t("bucket.search_results.install_title")}
+                        title={t("bucket.searchResults.installTitle")}
                       >
                         <Show
                           when={bucketInstall.isBucketInstalling(bucket.name)}
                           fallback={
                             <>
                               <Download class="w-4 h-4 mr-1" />
-                              {t("bucket.search_results.install")}
+                              {t("bucket.searchResults.install")}
                             </>
                           }
                         >
                           <LoaderCircle class="w-4 h-4 mr-1 animate-spin" />
-                          {t("bucket.search_results.installing")}
+                          {t("bucket.searchResults.installing")}
                         </Show>
                       </button>
                     }
@@ -226,19 +226,19 @@ function BucketSearchResults(props: BucketSearchResultsProps) {
                       class="btn btn-error btn-sm flex-1"
                       onClick={(e) => handleRemoveBucket(bucket.name, e)}
                       disabled={bucketInstall.isBucketBusy(bucket.name)}
-                      title={t("bucket.search_results.removing_title")}
+                      title={t("bucket.searchResults.removingTitle")}
                     >
                       <Show
                         when={bucketInstall.isBucketRemoving(bucket.name)}
                         fallback={
                           <>
                             <Trash2 class="w-4 h-4 mr-1" />
-                            {t("bucket.search_results.remove")}
+                            {t("bucket.searchResults.remove")}
                           </>
                         }
                       >
                         <LoaderCircle class="w-4 h-4 mr-1 animate-spin" />
-                        {t("bucket.search_results.removing")}
+                        {t("bucket.searchResults.removing")}
                       </Show>
                     </button>
                   </Show>
@@ -246,9 +246,9 @@ function BucketSearchResults(props: BucketSearchResultsProps) {
                   <button
                     class="btn-outline btn btn-sm"
                     onClick={() => props.onBucketSelect?.(bucket)}
-                    title={t("bucket.search_results.view_details")}
+                    title={t("bucket.searchResults.viewDetails")}
                   >
-                    {t("bucket.search_results.details")}
+                    {t("bucket.searchResults.details")}
                   </button>
                 </div>
               </Card>

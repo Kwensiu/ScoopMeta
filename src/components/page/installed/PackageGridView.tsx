@@ -53,17 +53,17 @@ const PackageCard = (props: {
                 </div>
               </button>
               <Show when={pkg.available_version && !heldStore.isHeld(pkg.name) && !pkg.is_versioned_install}>
-                <div class="tooltip" data-tip={t("installed.list.update_available_tooltip", { version: pkg.available_version }) + (isCiVersion(pkg.available_version || '') ? t("installed.list.ci_version_note") : '')}>
+                <div class="tooltip" data-tip={t("installed.list.updateAvailableTooltip", { version: pkg.available_version }) + (isCiVersion(pkg.available_version || '') ? t("installed.list.ciVersionNote") : '')}>
                   <ArrowUpCircle class="w-4 h-4 text-primary cursor-pointer transition-transform hover:scale-125 mr-1" onClick={(e) => { e.stopPropagation(); props.onUpdate(pkg); }} />
                 </div>
               </Show>
               <Show when={pkg.is_versioned_install}>
-                <div class="tooltip" data-tip={t("installed.list.versioned_tooltip")}>
+                <div class="tooltip" data-tip={t("installed.list.versionedTooltip")}>
                   <Lock class="w-4 h-4 text-cyan-400" />
                 </div>
               </Show>
               <Show when={heldStore.isHeld(pkg.name) && !pkg.is_versioned_install}>
-                <div class="tooltip" data-tip={t("installed.list.held_tooltip")}>
+                <div class="tooltip" data-tip={t("installed.list.heldTooltip")}>
                   <Lock class="w-4 h-4 text-warning" />
                 </div>
               </Show>
@@ -93,7 +93,7 @@ const PackageCard = (props: {
               <li>
                 <a onClick={() => props.onChangeBucket(pkg)}>
                   <ArrowLeftRight class="w-4 h-4 mr-2" />
-                  {t("installed.list.change_bucket")}
+                  {t("installed.list.changeBucket")}
                 </a>
               </li>
               <li>
@@ -111,7 +111,7 @@ const PackageCard = (props: {
         <p class="text-xs text-base-content/70">
           {t("installed.grid.bucket")} {pkg.source}
         </p>
-        <p class="text-xs text-base-content/50" title={pkg.updated}>{t("installed.grid.updated_on")} {formatIsoDate(pkg.updated)}</p>
+        <p class="text-xs text-base-content/50" title={pkg.updated}>{t("installed.grid.updatedOn")} {formatIsoDate(pkg.updated)}</p>
       </div>
     </div>
   );
@@ -135,20 +135,20 @@ const HoldToggleButton = (props: {
               fallback={
                 <a onClick={() => props.onHold(props.pkgName)}>
                   <Lock class="w-4 h-4 mr-2" />
-                  <span>{t("installed.list.hold_package")}</span>
+                  <span>{t("installed.list.holdPackage")}</span>
                 </a>
               }
             >
               <a onClick={() => props.onUnhold(props.pkgName)}>
                 <LockOpen class="w-4 h-4 mr-2" />
-                <span>{t("installed.list.unhold_package")}</span>
+                <span>{t("installed.list.unholdPackage")}</span>
               </a>
             </Show>
           }
         >
           <a class="btn-disabled cursor-not-allowed">
             <Lock class="w-4 h-4 mr-2 text-cyan-400" />
-            <span>{t("installed.list.cannot_unhold")}</span>
+            <span>{t("installed.list.cannotUnhold")}</span>
           </a>
         </Show>
       }
@@ -172,7 +172,7 @@ const SwitchVersionButton = (props: {
       <li>
         <a onClick={() => props.onViewInfoForVersions(props.pkg)}>
           <RefreshCw class="w-4 h-4 mr-2" />
-          {t("installed.list.switch_version")}
+          {t("installed.list.switchVersion")}
         </a>
       </li>
     </Show>

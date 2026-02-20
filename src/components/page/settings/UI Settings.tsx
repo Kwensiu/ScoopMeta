@@ -16,9 +16,9 @@ function UISettings() {
 
     return (
         <Card
-            title={t("settings.ui.UDA_botton_title")}
+            title={t("settings.ui.UDABottonTitle")}
             icon={settings.ui.showGlobalUpdateButton ? Eye : EyeOff}
-            description={t("settings.ui.UDA_botton_description")}
+            description={t("settings.ui.UDABottonDescription")}
             headerAction={
                 <SettingsToggle
                     checked={settings.ui.showGlobalUpdateButton}

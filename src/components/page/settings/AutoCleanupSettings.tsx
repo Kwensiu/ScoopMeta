@@ -19,9 +19,9 @@ function AutoCleanupSettings() {
 
     return (
         <Card
-            title={t("settings.auto_cleanup.title")}
+            title={t("settings.autoCleanup.title")}
             icon={Recycle}
-            description={t("settings.auto_cleanup.description")}
+            description={t("settings.autoCleanup.description")}
             headerAction={
                 <SettingsToggle
                     checked={settings.cleanup.autoCleanupEnabled}
@@ -39,10 +39,10 @@ function AutoCleanupSettings() {
                             <div class="flex-1">
                                 <h3 class="font-medium flex items-center text-sm">
                                     <Sparkles class="w-4 h-4 mr-2 text-primary" />
-                                    {t("settings.auto_cleanup.clean_old_versions")}
+                                    {t("settings.autoCleanup.cleanOldVersions")}
                                 </h3>
                                 <p class="text-xs mt-1 text-base-content/60">
-                                    {t("settings.auto_cleanup.clean_old_versions_description")}
+                                    {t("settings.autoCleanup.cleanOldVersionsDescription")}
                                 </p>
                             </div>
                             <input
@@ -56,7 +56,7 @@ function AutoCleanupSettings() {
                         <Show when={settings.cleanup.cleanupOldVersions}>
                             <div class="mt-4">
                                 <label for="preserveVersionCount" class="block text-xs font-semibold mb-2">
-                                    {t("settings.auto_cleanup.versions_to_keep", { count: localVersionCount() })}
+                                    {t("settings.autoCleanup.versionsToKeep", { count: localVersionCount() })}
                                 </label>
                                 <input
                                     type="range"
@@ -75,9 +75,9 @@ function AutoCleanupSettings() {
                     <div class="bg-base-300/60 rounded-lg p-4 border border-base-content/50">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
-                                <h3 class="font-medium text-sm">{t("settings.auto_cleanup.clean_outdated_cache")}</h3>
+                                <h3 class="font-medium text-sm">{t("settings.autoCleanup.cleanOutdatedCache")}</h3>
                                 <p class="text-xs mt-1 text-base-content/60">
-                                    {t("settings.auto_cleanup.clean_outdated_cache_description")}
+                                    {t("settings.autoCleanup.cleanOutdatedCacheDescription")}
                                 </p>
                             </div>
                             <input

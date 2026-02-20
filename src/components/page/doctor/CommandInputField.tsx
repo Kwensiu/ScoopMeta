@@ -108,10 +108,10 @@ function CommandInputField() {
 
     return (
         <Card
-            title={t('doctor.command_input.title')}
+            title={t('doctor.commandInput.title')}
             icon={Terminal}
-            // description={t('doctor.command_input.description')}
-            additionalContent={t('doctor.command_input.switch_input_mode')}
+            // description={t('doctor.commandInput.description')}
+            additionalContent={t('doctor.commandInput.switchInputMode')}
         >
             <div class="form-control">
                 <div class="join w-full">
@@ -124,13 +124,13 @@ function CommandInputField() {
                         style={{
                             "text-decoration": exec.useScoopPrefix ? "none" : "line-through"
                         }}
-                        title={exec.useScoopPrefix ? t('doctor.command_input.scoop_prefix_enabled') : t('doctor.command_input.scoop_prefix_disabled')}
+                        title={exec.useScoopPrefix ? t('doctor.commandInput.scoopPrefixEnabled') : t('doctor.commandInput.scoopPrefixDisabled')}
                     >
                         scoop
                     </span>
                     <input
                         type="text"
-                        placeholder={exec.useScoopPrefix ? t('doctor.command_input.enter_command') : t('doctor.command_input.enter_full_command')}
+                        placeholder={exec.useScoopPrefix ? t('doctor.commandInput.enterCommand') : t('doctor.commandInput.enterFullCommand')}
                         class="input input-bordered join-item flex-1"
                         value={exec.command}
                         onInput={(e) => setCommand(e.currentTarget.value)}
@@ -141,12 +141,12 @@ function CommandInputField() {
                         {exec.isRunning ? (
                             <>
                                 <span class="loading loading-spinner loading-xs"></span>
-                                {t('doctor.command_input.running')}
+                                {t('doctor.commandInput.running')}
                             </>
                         ) : (
                             <>
                                 <Terminal class="w-4 h-4" />
-                                {t('doctor.command_input.run')}
+                                {t('doctor.commandInput.run')}
                             </>
                         )}
                     </button>
@@ -170,35 +170,35 @@ function CommandInputField() {
                     </For>
                     {exec.output.length === 0 && !exec.isRunning && (
                         <div class="text-gray-500">
-                            {t('doctor.command_input.waiting_for_commands')}
+                            {t('doctor.commandInput.waitingForCommands')}
                         </div>
                     )}
                     {exec.isRunning && (
                         <div class="flex items-center text-white">
                             <span class="loading loading-spinner loading-xs mr-2"></span>
-                            {t('doctor.command_input.executing_command')}
+                            {t('doctor.commandInput.executingCommand')}
                         </div>
                     )}
                     {/* 占位元素，用于确保滚动到底部 */}
                     <div />
                 </div>
                 <div class="mt-2 flex justify-end">
-                    <button class="btn btn-xs btn-ghost" onClick={handleClearOutput}>{t('doctor.command_input.clear_output')}</button>
+                    <button class="btn btn-xs btn-ghost" onClick={handleClearOutput}>{t('doctor.commandInput.clearOutput')}</button>
                 </div>
             </div>
 
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                 <div class="bg-info/10 p-2 rounded">
-                    <p><strong>{t('doctor.command_input.package_management')}:</strong> install, uninstall, update, info</p>
+                    <p><strong>{t('doctor.commandInput.packageManagement')}:</strong> install, uninstall, update, info</p>
                 </div>
                 <div class="bg-info/10 p-2 rounded">
-                    <p><strong>{t('doctor.command_input.information')}:</strong> list, status, checkup</p>
+                    <p><strong>{t('doctor.commandInput.information')}:</strong> list, status, checkup</p>
                 </div>
                 <div class="bg-info/10 p-2 rounded">
-                    <p><strong>{t('doctor.command_input.search')}:</strong> search, show, cat</p>
+                    <p><strong>{t('doctor.commandInput.search')}:</strong> search, show, cat</p>
                 </div>
                 <div class="bg-info/10 p-2 rounded">
-                    <p><strong>{t('doctor.command_input.maintenance')}:</strong> cleanup, cache, reset</p>
+                    <p><strong>{t('doctor.commandInput.maintenance')}:</strong> cleanup, cache, reset</p>
                 </div>
             </div>
         </Card>

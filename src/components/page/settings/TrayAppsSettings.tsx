@@ -74,14 +74,14 @@ function TrayAppsSettings() {
 
     return (
         <Card
-            title={t("settings.tray_apps.title")}
+            title={t("settings.trayApps.title")}
             icon={Monitor}
-            description={t("settings.tray_apps.description")}
+            description={t("settings.trayApps.description")}
         >
             <Show when={!isLoading()} fallback={<div>{t("loading")}</div>}>
                 <div class="space-y-3">
                     <p class="text-sm text-base-content/70 mb-4">
-                        {t("settings.tray_apps.help_text")}
+                        {t("settings.trayApps.helpText")}
                     </p>
 
                     <Show when={availableApps().length === 0} fallback={
@@ -106,14 +106,14 @@ function TrayAppsSettings() {
                         </div>
                     }>
                         <p class="text-sm text-base-content/50">
-                            {t("settings.tray_apps.no_apps_found")}
+                            {t("settings.trayApps.noAppsFound")}
                         </p>
                     </Show>
 
                     <Show when={selectedApps().length > 0}>
                         <div class="mt-4 p-3 bg-info/10 rounded-lg border border-info/20">
                             <p class="text-sm font-medium text-info mb-2">
-                                {t("settings.tray_apps.selected_count", { count: selectedApps().length })}
+                                {t("settings.trayApps.selectedCount", { count: selectedApps().length })}
                             </p>
                             <div class="flex flex-wrap gap-2">
                                 <For each={selectedApps()}>

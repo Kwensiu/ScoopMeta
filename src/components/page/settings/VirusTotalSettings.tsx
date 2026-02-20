@@ -28,7 +28,7 @@ export default function VirusTotalSettings() {
         } catch (err) {
             const errorMsg = err instanceof Error ? err.message : String(err);
             console.error("Failed to fetch API key:", errorMsg);
-            setError(t("settings.virustotal.load_error"));
+            setError(t("settings.virustotal.loadError"));
         } finally {
             setIsLoading(false);
         }
@@ -47,7 +47,7 @@ export default function VirusTotalSettings() {
         setSuccessMessage(null);
 
         if (!validateApiKey(apiKey())) {
-            setError(t("settings.virustotal.invalid_api_key"));
+            setError(t("settings.virustotal.invalidApiKey"));
             return;
         }
 
@@ -57,12 +57,12 @@ export default function VirusTotalSettings() {
             if (apiKey() && !settings.virustotal.enabled) {
                 await setVirusTotalSettings({ enabled: true });
             }
-            setSuccessMessage(t("settings.virustotal.save_success"));
+            setSuccessMessage(t("settings.virustotal.saveSuccess"));
             setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err) {
             const errorMsg = err instanceof Error ? err.message : String(err);
             console.error("Failed to save API key:", errorMsg);
-            setError(t("settings.virustotal.save_error"));
+            setError(t("settings.virustotal.saveError"));
         }
     };
 
@@ -92,7 +92,7 @@ export default function VirusTotalSettings() {
             <label class="label">
                 <span class="label-text font-semibold flex items-center">
                     <KeyRound class="w-4 h-4 mr-2" />
-                    {t("settings.virustotal.api_key")}
+                    {t("settings.virustotal.apiKey")}
                 </span>
             </label>
             <div class="form-control w-full max-w-lg">
@@ -100,7 +100,7 @@ export default function VirusTotalSettings() {
                 <div class="join w-full">
                     <input
                         type="password"
-                        placeholder={isLoading() ? t("settings.virustotal.loading") : t("settings.virustotal.api_key_placeholder")}
+                        placeholder={isLoading() ? t("settings.virustotal.loading") : t("settings.virustotal.apiKeyPlaceholder")}
                         class="input input-bordered join-item w-full bg-base-100"
                         value={apiKey()}
                         onInput={(e) => setApiKey(e.currentTarget.value)}
@@ -120,7 +120,7 @@ export default function VirusTotalSettings() {
                         <SettingsToggle
                             checked={settings.virustotal.autoScanOnInstall}
                             onChange={async (checked) => await setVirusTotalSettings({ autoScanOnInstall: checked })}
-                            label={t("settings.virustotal.auto_scan_packages")}
+                            label={t("settings.virustotal.autoScanPackages")}
                         />
                     </div>
                 </div>

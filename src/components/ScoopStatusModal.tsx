@@ -40,15 +40,15 @@ const getBadgeClass = (info: string): string => {
 function AppsWithIssuesTable(props: { apps: AppWithIssue[] }) {
   return (
     <div class="space-y-2">
-      <h4 class="font-semibold">{t('scoop_status.apps_with_issues')}</h4>
+      <h4 class="font-semibold">{t('scoopStatus.appsWithIssues')}</h4>
       <div class="overflow-x-auto">
         <table class="table table-zebra w-full">
           <thead>
             <tr>
-              <th>{t('scoop_status.table.name')}</th>
-              <th>{t('scoop_status.table.installed')}</th>
-              <th>{t('scoop_status.table.latest')}</th>
-              <th>{t('scoop_status.table.status')}</th>
+              <th>{t('scoopStatus.table.name')}</th>
+              <th>{t('scoopStatus.table.installed')}</th>
+              <th>{t('scoopStatus.table.latest')}</th>
+              <th>{t('scoopStatus.table.status')}</th>
             </tr>
           </thead>
           <tbody>
@@ -61,7 +61,7 @@ function AppsWithIssuesTable(props: { apps: AppWithIssue[] }) {
                   <td>
                     <div class="flex flex-wrap gap-1">
                       {app.is_held && (
-                        <div class="badge badge-sm badge-warning">{t('scoop_status.badges.held_package')}</div>
+                        <div class="badge badge-sm badge-warning">{t('scoopStatus.badges.heldPackage')}</div>
                       )}
                       <For
                         each={app.info.filter(
@@ -78,7 +78,7 @@ function AppsWithIssuesTable(props: { apps: AppWithIssue[] }) {
                       </For>
                       {app.is_outdated && (
                         <div class="badge badge-sm badge-success">
-                          {t('scoop_status.badges.update_available')}
+                          {t('scoopStatus.badges.updateAvailable')}
                         </div>
                       )}
                     </div>
@@ -103,7 +103,7 @@ function ScoopStatusModal(props: ScoopStatusModalProps) {
     <Modal
       isOpen={props.isOpen}
       onClose={props.onClose}
-      title={t('scoop_status.title')}
+      title={t('scoopStatus.title')}
       size="large"
       footer={
         <Show when={props.status?.bucket_needs_update && props.onNavigate}>
@@ -112,7 +112,7 @@ function ScoopStatusModal(props: ScoopStatusModalProps) {
             onClick={handleGoToBuckets}
           >
             <FolderOpen class="w-4 h-4 mr-2" />
-            {t('bottons.go_to_buckets')} </button>
+            {t('buttons.goToBuckets')} </button>
         </Show>
       }
     >
@@ -125,7 +125,7 @@ function ScoopStatusModal(props: ScoopStatusModalProps) {
       <Show when={props.error}>
         <div class="alert alert-error alert-outline">
           <TriangleAlert class="w-4 h-4" />
-          <span>{t('scoop_status.error_checking_status')}: {props.error}</span>
+          <span>{t('scoopStatus.errorCheckingStatus')}: {props.error}</span>
         </div>
       </Show>
 
@@ -136,7 +136,7 @@ function ScoopStatusModal(props: ScoopStatusModalProps) {
             <div class="alert alert-warning alert-outline">
               <TriangleAlert class="w-4 h-4" />
               <span>
-                {t('scoop_status.scoop_out_of_date')}
+                {t('scoopStatus.scoopOutOfDate')}
               </span>
             </div>
           </Show>
@@ -146,7 +146,7 @@ function ScoopStatusModal(props: ScoopStatusModalProps) {
             <div class="alert alert-warning alert-outline">
               <TriangleAlert class="w-4 h-4" />
               <span>
-                {t('scoop_status.buckets_out_of_date')}
+                {t('scoopStatus.bucketsOutOfDate')}
               </span>
             </div>
           </Show>
@@ -156,7 +156,7 @@ function ScoopStatusModal(props: ScoopStatusModalProps) {
             <div class="alert alert-error alert-outline">
               <WifiOff class="w-4 h-4" />
               <span>
-                {t('scoop_status.network_failure')}
+                {t('scoopStatus.networkFailure')}
               </span>
             </div>
           </Show>
@@ -171,7 +171,7 @@ function ScoopStatusModal(props: ScoopStatusModalProps) {
             <div class="alert alert-success alert-outline">
               <CircleCheckBig class="w-4 h-4" />
               <span>
-                {t('scoop_status.all_good_message')}
+                {t('scoopStatus.allGoodMessage')}
               </span>
             </div>
           </Show>

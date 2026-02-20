@@ -24,7 +24,7 @@ const MinimizedIndicator = (props: MinimizedIndicatorProps) => {
   const getStatusText = () => {
     switch (props.status) {
       case 'in-progress':
-        return t('status.in_progress');
+        return t('status.inProgress');
       case 'success':
         return t('status.completed');
       case 'error':
@@ -144,7 +144,7 @@ const MinimizedIndicatorManager = () => {
           <button
             class="minimized-indicator minimized-indicator--more"
             onClick={() => setShowMore(true)}
-            aria-label={t('buttons.show_more')}
+            aria-label={t('buttons.showMore')}
           >
             <div class="minimized-indicator__content">
               <div class="minimized-indicator__title">
@@ -159,7 +159,7 @@ const MinimizedIndicatorManager = () => {
           <button
             class="minimized-indicator minimized-indicator--collapse"
             onClick={() => setShowMore(false)}
-            aria-label={t('buttons.show_less')}
+            aria-label={t('buttons.showLess')}
           >
             <div class="minimized-indicator__content">
               <div class="minimized-indicator__title">

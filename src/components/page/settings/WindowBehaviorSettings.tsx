@@ -193,9 +193,9 @@ function WindowBehaviorSettings() {
 
     return (
         <Card
-            title={t("settings.window_behavior.title")}
+            title={t("settings.windowBehavior.title")}
             icon={Monitor}
-            description={t("settings.window_behavior.description")}
+            description={t("settings.windowBehavior.description")}
             headerAction={
                 <SettingsToggle
                     checked={settings.window.closeToTray}
@@ -208,15 +208,15 @@ function WindowBehaviorSettings() {
             <div class="space-y-6 mt-4">
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
-                        <h4 class="font-medium text-base-content ">{t("settings.tray_apps.manage_context_menu")}</h4>
-                        <p class="text-sm text-base-content/70">{t("settings.tray_apps.manage_tray_apps_description")}</p>
+                        <h4 class="font-medium text-base-content ">{t("settings.trayApps.manageContextMenu")}</h4>
+                        <p class="text-sm text-base-content/70">{t("settings.trayApps.manageTrayAppsDescription")}</p>
                     </div>
                     <button
                         class="btn btn-outline btn-sm"
                         onClick={() => setIsTrayAppsModalOpen(true)}
                     >
                         <Settings size={16} />
-                        {t("settings.tray_apps.configure")}
+                        {t("settings.trayApps.configure")}
                     </button>
                 </div>
             </div>
@@ -225,15 +225,15 @@ function WindowBehaviorSettings() {
             <Modal
                 isOpen={isTrayAppsModalOpen()}
                 onClose={() => setIsTrayAppsModalOpen(false)}
-                title={t("settings.tray_apps.title")}
+                title={t("settings.trayApps.title")}
                 size="large"
             >
                 <div class="space-y-6">
                     {/* Enable Tray Apps Toggle */}
                     <div class="flex items-center justify-between p-4 bg-base-200 rounded-lg">
                         <div class="flex-1">
-                            <h4 class="font-medium text-base-content">{t("settings.tray_apps.enable_tray_apps")}</h4>
-                            <p class="text-sm text-base-content/70">{t("settings.tray_apps.enable_tray_apps_description")}</p>
+                            <h4 class="font-medium text-base-content">{t("settings.trayApps.enableTrayApps")}</h4>
+                            <p class="text-sm text-base-content/70">{t("settings.trayApps.enableTrayAppsDescription")}</p>
                         </div>
                         <SettingsToggle
                             checked={settings.window.trayAppsEnabled}
@@ -247,7 +247,7 @@ function WindowBehaviorSettings() {
                     <Show when={!isLoadingApps()} fallback={<div>{t("loading")}</div>}>
                         {/* Selected Apps */}
                         <div class="mb-6">
-                            <h5 class="text-lg font-medium text-base-content mb-3">{t("settings.tray_apps.selected_apps")}</h5>
+                            <h5 class="text-lg font-medium text-base-content mb-3">{t("settings.trayApps.selectedApps")}</h5>
                             <div class="space-y-3">
                                 <For each={selectedApps()}>
                                     {(app, index) => (
@@ -278,7 +278,7 @@ function WindowBehaviorSettings() {
                                 </For>
                                 <Show when={selectedApps().length === 0}>
                                     <p class="text-base text-base-content/50 italic p-3 bg-base-100 rounded-lg border">
-                                        {t("settings.tray_apps.no_selected_apps")}
+                                        {t("settings.trayApps.noSelectedApps")}
                                     </p>
                                 </Show>
                             </div>
@@ -286,7 +286,7 @@ function WindowBehaviorSettings() {
 
                         {/* Available Apps */}
                         <div>
-                            <h5 class="text-lg font-medium text-base-content mb-3">{t("settings.tray_apps.available_apps")}</h5>
+                            <h5 class="text-lg font-medium text-base-content mb-3">{t("settings.trayApps.availableApps")}</h5>
                             <div class="flex flex-wrap gap-3">
                                 <For each={getAvailableApps()}>
                                     {(app) => (
@@ -301,7 +301,7 @@ function WindowBehaviorSettings() {
                             </div>
                             <Show when={getAvailableApps().length === 0}>
                                 <p class="text-base text-base-content/50 italic p-3 bg-base-100 rounded-lg border">
-                                    {t("settings.tray_apps.no_available_apps")}
+                                    {t("settings.trayApps.noAvailableApps")}
                                 </p>
                             </Show>
                         </div>

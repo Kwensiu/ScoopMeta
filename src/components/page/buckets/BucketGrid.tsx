@@ -44,7 +44,7 @@ function BucketGrid(props: BucketGridProps) {
                 disabled={props.updatingBuckets && props.updatingBuckets.size > 0}
               >
                 <RefreshCw class="w-4 h-4" />
-                {t("bucket.grid.update_all_git")}
+                {t("bucket.grid.updateAllGit")}
               </button>
             </Show>
             <Show when={props.onRefresh}>
@@ -53,7 +53,7 @@ function BucketGrid(props: BucketGridProps) {
                 onClick={props.onRefresh}
               >
                 <RefreshCw class="w-4 h-4" />
-                {t("bucket.grid.reload_local")}
+                {t("bucket.grid.reloadLocal")}
               </button>
             </Show>
           </div>
@@ -70,9 +70,9 @@ function BucketGrid(props: BucketGridProps) {
       <Show when={!props.loading}>
         <Show when={props.buckets.length > 0} fallback={
           <div class="text-center py-8">
-            <p class="text-base-content/70">{t("bucket.grid.no_buckets_found")}</p>
+            <p class="text-base-content/70">{t("bucket.grid.noBucketsFound")}</p>
             <p class="text-sm text-base-content/50 mt-2">
-              {t("bucket.grid.no_buckets_description")}
+              {t("bucket.grid.noBucketsDescription")}
             </p>
             <Show when={props.onRefresh}>
               <div class="mt-4">

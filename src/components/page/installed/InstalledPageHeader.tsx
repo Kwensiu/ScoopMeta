@@ -72,7 +72,7 @@ function InstalledPageHeader(props: InstalledHeaderProps) {
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder={t("installed.header.search_placeholder")}
+                placeholder={t("installed.header.searchPlaceholder")}
                 class="input input-bordered w-full join-item bg-base-200"
                 value={props.searchQuery()}
                 onInput={(e) => props.setSearchQuery(e.currentTarget.value)}
@@ -107,7 +107,7 @@ function InstalledPageHeader(props: InstalledHeaderProps) {
             fallback={
               <button
                 class="btn btn-ghost btn-circle tooltip tooltip-bottom"
-                data-tip={t("installed.header.check_status")}
+                data-tip={t("installed.header.checkStatus")}
                 onClick={props.onCheckStatus}
                 disabled={props.statusLoading?.()}
               >
@@ -127,7 +127,7 @@ function InstalledPageHeader(props: InstalledHeaderProps) {
           >
             <button class="btn btn-secondary gap-2" onClick={props.onUpdateAll}>
               <CircleArrowUp class="w-4 h-4" />
-              <span class="hidden md:inline">{t("installed.header.update_all")}&nbsp;</span>
+              <span class="hidden md:inline">{t("installed.header.updateAll")}&nbsp;</span>
               <span>({props.updatableCount()})</span>
             </button>
           </Show>
@@ -160,7 +160,7 @@ function InstalledPageHeader(props: InstalledHeaderProps) {
           {/* View Toggle Button */}
           <button
             class="btn btn-ghost tooltip tooltip-bottom border border-base-100/50"
-            data-tip={props.viewMode() === 'grid' ? t("installed.header.switch_to_list_view") : t("installed.header.switch_to_grid_view")}
+            data-tip={props.viewMode() === 'grid' ? t("installed.header.switchToListView") : t("installed.header.switchToGridView")}
             onClick={toggleViewMode}
           >
             <Show when={props.viewMode() === 'grid'}>

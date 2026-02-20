@@ -105,7 +105,7 @@ function ScoopInfo(props: ScoopInfoProps) {
     return (
         <>
             <Card
-                title={t('doctor.scoop_info.title')}
+                title={t('doctor.scoopInfo.title')}
                 icon={Settings}
                 headerAction={
                     <div class="flex items-center gap-2">
@@ -113,7 +113,7 @@ function ScoopInfo(props: ScoopInfoProps) {
                             <button
                                 class="btn btn-ghost btn-sm"
                                 onClick={openEditModal}
-                                title={t('doctor.scoop_info.edit_configuration')}
+                                title={t('doctor.scoopInfo.editConfiguration')}
                             >
                                 <Edit class="w-5 h-5" />
                             </button>
@@ -121,7 +121,7 @@ function ScoopInfo(props: ScoopInfoProps) {
                             <button
                                 class="btn btn-ghost btn-sm"
                                 onClick={props.onOpenDirectory}
-                                title={t('doctor.scoop_info.open_scoop_directory')}
+                                title={t('doctor.scoopInfo.openScoopDirectory')}
                             >
                                 <Folder class="w-5 h-5" />
                             </button>
@@ -162,7 +162,7 @@ function ScoopInfo(props: ScoopInfoProps) {
                                     </For>
                                 </div>
                             ) : (
-                                <p class="ml-2">{t('doctor.scoop_info.no_configuration_found')}</p>
+                                <p class="ml-2">{t('doctor.scoopInfo.noConfigurationFound')}</p>
                             )}
                         </div>
                     </div>
@@ -172,21 +172,21 @@ function ScoopInfo(props: ScoopInfoProps) {
             <Modal
                 isOpen={isEditModalOpen()}
                 onClose={closeEditModal}
-                title={t('doctor.scoop_info.edit_scoop_configuration')}
+                title={t('doctor.scoopInfo.editScoopConfiguration')}
                 footer={
                     <div class="flex justify-end gap-2">
                         <button
                             class="btn btn-error"
                             onClick={closeEditModal}
                         >
-                            {t('doctor.scoop_info.cancel')}
+                            {t('doctor.scoopInfo.cancel')}
                         </button>
                         <button
                             class="btn btn-primary"
                             onClick={saveConfig}
                             disabled={isSaving()}
                         >
-                            {isSaving() ? t('doctor.scoop_info.saving') : t('doctor.scoop_info.save')}
+                            {isSaving() ? t('doctor.scoopInfo.saving') : t('doctor.scoopInfo.save')}
                         </button>
                     </div>
                 }

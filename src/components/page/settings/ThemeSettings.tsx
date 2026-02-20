@@ -22,8 +22,8 @@ function ThemeSettings() {
                         }
                     }}
                 >
-                    <option value="light">{t("settings.theme.light_mode")}</option>
-                    <option value="dark">{t("settings.theme.dark_mode")}</option>
+                    <option value="light">{t("settings.theme.lightMode")}</option>
+                    <option value="dark">{t("settings.theme.darkMode")}</option>
                 </select>
             }
         />

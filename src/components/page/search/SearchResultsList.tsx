@@ -34,7 +34,7 @@ function SearchResultsList(props: SearchResultsListProps) {
             >
                 <div class="text-center py-16">
                     <p class="text-xl">
-                        {t("search.results.no_packages_found", {
+                        {t("search.results.noPackagesFound", {
                             type: t(`search.tabs.${props.activeTab === "packages" ? "packages" : "includes"}`),
                             query: props.searchTerm
                         })}
@@ -54,7 +54,7 @@ function SearchResultsList(props: SearchResultsListProps) {
                                     <div class="flex-grow min-w-0">
                                         <h3 class="card-title truncate">{pkg.name}</h3>
                                         <p class="truncate">
-                                            {t("search.results.from_bucket", { bucket: pkg.source })}
+                                            {t("search.results.fromBucket", { bucket: pkg.source })}
                                         </p>
                                     </div>
                                     <div class="flex-shrink-0 ml-4 text-right flex items-center gap-2">
@@ -99,7 +99,7 @@ function SearchResultsList(props: SearchResultsListProps) {
                     </button>
 
                     <span class="text-sm">
-                        {t("search.results.page_info", {
+                        {t("search.results.pageInfo", {
                             current: props.currentPage,
                             total: totalPages()
                         })}

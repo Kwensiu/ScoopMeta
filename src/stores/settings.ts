@@ -122,6 +122,22 @@ function createSettingsStore() {
     return globalStore;
   };
 
+  // Supported locales list for extensibility
+  const supportedLocales = ['en', 'zh'];
+
+  const detectSystemLanguage = (): string => {
+    if (typeof navigator !== 'undefined') {
+      const lang = (navigator.language || navigator.languages?.[0] || 'en').split('-')[0];
+      return supportedLocales.includes(lang) ? lang : 'en';
+    }
+    return 'en';
+  };
+
+  // Dynamic defaults for first launch detection
+  const getFirstLaunchDefaults = (): Partial<Settings> => ({
+    language: detectSystemLanguage(),
+  });
+
   const getInitialSettings = async (): Promise<Settings> => {
     const storeInstance = await initStore();
     
@@ -129,7 +145,6 @@ function createSettingsStore() {
     const needsFactoryReset = await checkFactoryReset();
     
     if (needsFactoryReset) {
-      console.log('Factory reset detected, loading default settings');
       // Clear any existing settings and return defaults
       if (storeInstance) {
         try {
@@ -138,7 +153,7 @@ function createSettingsStore() {
           console.error('Error clearing settings during factory reset:', error);
         }
       }
-      return defaultSettings;
+      return { ...defaultSettings, ...getFirstLaunchDefaults() };
     }
     
     if (storeInstance) {
@@ -182,7 +197,7 @@ function createSettingsStore() {
               ...stored.ui,
             },
             scoopPath: stored.scoopPath,
-            language: stored.language || defaultSettings.language,
+            language: stored.language || (() => { console.log('No stored language, detecting system language'); return detectSystemLanguage(); })(),
             trayAppsList: stored.trayAppsList || defaultSettings.trayAppsList,
           };
         }
@@ -190,7 +205,9 @@ function createSettingsStore() {
         console.error('Error loading settings from store:', error);
       }
     }
-    return defaultSettings;
+    // First launch: no stored settings
+    console.log('First launch detected, using dynamic defaults');
+    return { ...defaultSettings, ...getFirstLaunchDefaults() };
   };
 
   const checkFactoryReset = async (): Promise<boolean> => {

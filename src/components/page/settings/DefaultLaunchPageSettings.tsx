@@ -9,11 +9,11 @@ function DefaultLaunchPageSettings() {
     const { settings, setDefaultLaunchPage } = settingsStore;
 
     const pages = createMemo<{ value: View; label: string }[]>(() => [
-        { value: "search", label: t("settings.default_launch_page.search") },
-        { value: "bucket", label: t("settings.default_launch_page.buckets") },
-        { value: "installed", label: t("settings.default_launch_page.installed") },
-        { value: "doctor", label: t("settings.default_launch_page.doctor") },
-        { value: "settings", label: t("settings.default_launch_page.settings") },
+        { value: "search", label: t("settings.defaultLaunchPage.search") },
+        { value: "bucket", label: t("settings.defaultLaunchPage.buckets") },
+        { value: "installed", label: t("settings.defaultLaunchPage.installed") },
+        { value: "doctor", label: t("settings.defaultLaunchPage.doctor") },
+        { value: "settings", label: t("settings.defaultLaunchPage.settings") },
     ]);
 
     const handlePageChange = async (e: Event) => {
@@ -23,9 +23,9 @@ function DefaultLaunchPageSettings() {
 
     return (
         <Card
-            title={t("settings.default_launch_page.title")}
+            title={t("settings.defaultLaunchPage.title")}
             icon={Home}
-            description={t("settings.default_launch_page.description")}
+            description={t("settings.defaultLaunchPage.description")}
             headerAction={
                 <label class="label cursor-pointer gap-3">
                     <select

@@ -79,7 +79,7 @@ function SearchPage() {
           </div>
           <button
             class="btn btn-square tooltip tooltip-top hover:btn-outline"
-            data-tip={t("search.refresh_results")}
+            data-tip={t("search.refreshResults")}
             onClick={handleRefresh}
             disabled={refreshing() || !searchTerm()}
           >
@@ -103,7 +103,7 @@ function SearchPage() {
               value={bucketFilter()}
               onChange={(e) => setBucketFilter(e.currentTarget.value)}
             >
-              <option value="">{t("search.filter.all_buckets")}</option>
+              <option value="">{t("search.filter.allBuckets")}</option>
               {uniqueBuckets().map(bucket => (
                 <option value={bucket}>{bucket}</option>
               ))}
