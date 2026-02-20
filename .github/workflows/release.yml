@@ -93,13 +93,22 @@ jobs:
           "sigPath=$sigPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           "exePath=./src-tauri/target/release/$productName.exe" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
+      - name: Run Release Drafter
+        uses: release-drafter/release-drafter@v6
+        id: release-drafter
+        with:
+          config-name: release-drafter.yml
+          publish: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create GitHub Release with artifacts
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
-          bodyFile: RELEASE_NOTES.md
+          body: ${{ steps.release-drafter.outputs.body }}
           draft: false
           prerelease: false
           artifacts: >-
