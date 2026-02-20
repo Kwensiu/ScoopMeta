@@ -575,7 +575,7 @@ function PackageInfoModal(props: PackageInfoModalProps) {
                 </Show>
               </Show>
             </div>
-            <div class="modal-action p-4 border-t border-base-300 flex flex-wrap justify-between">
+            <div class="modal-action mt-0 p-4 border-t border-base-300 flex flex-wrap justify-between">
               <div class="flex space-x-2 mb-2 sm:mb-0">
                 {/* Update (Force Update) Bottom in PackageInfoModal */}
                 <Show when={props.pkg?.is_installed}>

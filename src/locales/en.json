@@ -120,6 +120,7 @@
     "closeDialog": "Close",
     "collapse": "Collapse",
     "confirm": "Confirm",
+    "copyToClipboard": "Copy to clipboard",
     "goToBuckets": "Go to bucket",
     "install": "Install",
     "removeAll": "Remove All",
@@ -159,6 +160,14 @@
       "description": "This tool checks for common problems with your Scoop setup.",
       "install": "Install",
       "installing": "Installing...",
+      "items": {
+        "gitInstalled": "Git is installed",
+        "helperInstalled": "Helper '{{name}}' is installed",
+        "longPathsEnabled": "Long paths are enabled",
+        "mainBucketInstalled": "Main bucket is installed",
+        "scoopOnNtfs": "Scoop is on an NTFS filesystem (found: {{filesystem}})",
+        "windowsDeveloperModeEnabled": "Windows Developer Mode is enabled"
+      },
       "suggestion": "Suggestion:",
       "title": "Scoop Health Check"
     },
@@ -268,6 +277,10 @@
   "language": {
     "description": "Select your preferred language for the application interface.",
     "title": "Language"
+  },
+  "manifestModal": {
+    "loading": "Loading manifest...",
+    "title": "Manifest:"
   },
   "messages": {
     "initTimeout": "Initialization is taking longer than expected.",

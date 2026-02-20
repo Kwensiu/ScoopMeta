@@ -6,7 +6,8 @@ import { t } from "../../../i18n";
 export interface CheckupItem {
     id: string | null;
     status: boolean;
-    text: string;
+    key: string;
+    params: any;
     suggestion: string | null;
 }
 
@@ -54,7 +55,7 @@ function Checkup(props: CheckupProps) {
                                     <Show when={item.status} fallback={<CircleX class="w-5 h-5 mr-3 text-error" />}>
                                         <CircleCheckBig class="w-5 h-5 mr-3 text-success" />
                                     </Show>
-                                    <span class="flex-grow">{item.text}</span>
+                                    <span class="grow">{t(`doctor.checkup.items.${item.key}`, item.params || {})}</span>
                                     <Show when={item.id && !item.status}>
                                         <button
                                             class="btn btn-xs btn-outline btn-primary"

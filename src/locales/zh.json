@@ -120,6 +120,7 @@
     "closeDialog": "关闭",
     "collapse": "收起",
     "confirm": "确认",
+    "copyToClipboard": "复制到剪贴板",
     "goToBuckets": "前往仓库",
     "install": "安装",
     "removeAll": "移除全部",
@@ -159,6 +160,14 @@
       "description": "此工具检查您的 Scoop 设置中的常见问题。",
       "install": "安装",
       "installing": "正在安装...",
+      "items": {
+        "gitInstalled": "Git 已安装",
+        "helperInstalled": "软件包 '{{name}}' 已安装",
+        "longPathsEnabled": "长路径已启用",
+        "mainBucketInstalled": "Main 仓库已安装",
+        "scoopOnNtfs": "Scoop 位于 {{filesystem}} 文件系统上（找到：{{filesystem}}）",
+        "windowsDeveloperModeEnabled": "Windows 开发者模式已启用"
+      },
       "suggestion": "建议：",
       "title": "Scoop 健康检查"
     },
@@ -268,6 +277,10 @@
   "language": {
     "description": "选择您偏好的应用程序界面语言。",
     "title": "语言"
+  },
+  "manifestModal": {
+    "loading": "加载 Manifest...",
+    "title": "Manifest:"
   },
   "messages": {
     "initTimeout": "初始化时间比预期长。",

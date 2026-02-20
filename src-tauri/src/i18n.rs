@@ -87,13 +87,13 @@ fn get_default_tray_strings() -> serde_json::Value {
     serde_json::json!({
         "show": "Show Rscoop",
         "hide": "Hide Rscoop",
-        "refresh_apps": "Refresh Apps",
-        "scoop_apps": "Scoop Apps",
+        "refreshApps": "Refresh Apps",
+        "scoopApps": "Scoop Apps",
         "quit": "Quit",
-        "notification_title": "Rscoop - Minimized to Tray",
-        "notification_message": "Rscoop has been minimized to the system tray and will continue running in the background.\n\nYou can:\n• Click the tray icon to restore the window\n• Right-click the tray icon to access the context menu\n• Change this behavior in Settings > Window Behavior\n\nWhat would you like to do?",
-        "close_and_disable": "Close and Disable Tray",
-        "keep_in_tray": "Keep in Tray"
+        "notificationTitle": "Rscoop - Minimized to Tray",
+        "notificationMessage": "Rscoop has been minimized to the system tray and will continue running in the background.\n\nYou can:\n• Click the tray icon to restore the window\n• Right-click the tray icon to access the context menu\n• Change this behavior in Settings > Window Behavior\n\nWhat would you like to do?",
+        "closeAndDisable": "Close and Disable Tray",
+        "keepInTray": "Keep in Tray"
     })
 }
 

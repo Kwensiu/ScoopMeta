@@ -4,6 +4,7 @@ import json from 'highlight.js/lib/languages/json';
 import { Copy, Check } from "lucide-solid";
 import Modal from "./common/Modal";
 import settingsStore from "../stores/settings";
+import { t } from "../i18n";
 
 hljs.registerLanguage('json', json);
 
@@ -51,20 +52,20 @@ function ManifestModal(props: ManifestModalProps) {
       onClose={props.onClose}
       title={
         <>
-          Manifest: <span class="text-info font-mono">{props.packageName}</span>
+          {t('manifestModal.title')} <span class="text-info font-mono">{props.packageName}</span>
         </>
       }
       size="large"
       class="bg-base-100"
       zIndex="z-52"
       footer={
-        <button class="btn-close-outline" onClick={props.onClose}>Close</button>
+        <button class="btn-close-outline" onClick={props.onClose}>{t('buttons.close')}</button>
       }
     >
       <Show when={props.loading}>
         <div class="flex flex-col justify-center items-center h-64 gap-4">
           <span class="loading loading-spinner loading-lg text-primary"></span>
-          <span class="text-base-content/60">Loading manifest...</span>
+          <span class="text-base-content/60">{t('manifestModal.loading')}</span>
         </div>
       </Show>
 
@@ -84,7 +85,7 @@ function ManifestModal(props: ManifestModalProps) {
             <button
               class={`btn btn-sm btn-square btn-ghost ${buttonTextColor()} ${buttonBgHover()}`}
               onClick={handleCopy}
-              title="Copy to clipboard"
+              title={t('buttons.copyToClipboard')}
             >
               <Show when={copied()} fallback={<Copy class="w-4 h-4" />}>
                 <Check class="w-4 h-4 text-success" />

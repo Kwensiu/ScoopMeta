@@ -93,14 +93,42 @@ jobs:
           "sigPath=$sigPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           "exePath=./src-tauri/target/release/$productName.exe" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
-      - name: Run Release Drafter
-        uses: release-drafter/release-drafter@v6
-        id: release-drafter
-        with:
-          config-name: release-drafter.yml
-          publish: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate release notes from commits
+        id: release-notes
+        shell: bash
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+          VERSION="${{ steps.meta.outputs.version }}"
+          
+          if [ -z "$LAST_TAG" ]; then
+            BODY=$(cat <<EOF
+          # Release Notes
+
+          ## [$VERSION]
+
+          - Initial release
+
+          This release includes various improvements and bug fixes.
+          EOF
+          )
+          else
+            COMMITS=$(git log --oneline $LAST_TAG..HEAD --no-merges | sed 's/^/- /')
+            BODY=$(cat <<EOF
+          # Release Notes
+
+          ## [$VERSION]
+
+          ### Changes
+          $COMMITS
+
+          This release includes various improvements and bug fixes.
+          EOF
+          )
+          fi
+          
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release with artifacts
         uses: ncipollo/release-action@v1
@@ -108,7 +136,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
-          body: ${{ steps.release-drafter.outputs.body }}
+          body: ${{ steps.release-notes.outputs.body }}
           draft: false
           prerelease: false
           artifacts: >-

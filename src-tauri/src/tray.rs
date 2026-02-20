@@ -61,7 +61,7 @@ pub fn setup_system_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
                         let _ = window.hide();
                     }
                 }
-                "refresh_apps" => {
+                "refreshApps" => {
                     // Refresh the tray menu
                     let app_handle = app.clone();
                     tauri::async_runtime::spawn(async move {
@@ -120,10 +120,10 @@ fn build_tray_menu(
     let hide_text = menu_strings.get("hide")
         .and_then(|v| v.as_str())
         .unwrap_or("Hide Rscoop");
-    let refresh_apps_text = menu_strings.get("refresh_apps")
+    let refresh_apps_text = menu_strings.get("refreshApps")
         .and_then(|v| v.as_str())
         .unwrap_or("Refresh Apps");
-    let scoop_apps_text = menu_strings.get("scoop_apps")
+    let scoop_apps_text = menu_strings.get("scoopApps")
         .and_then(|v| v.as_str())
         .unwrap_or("Scoop Apps");
     let quit_text = menu_strings.get("quit")
@@ -134,7 +134,7 @@ fn build_tray_menu(
     let show = tauri::menu::MenuItemBuilder::with_id("show", show_text).build(app)?;
     let hide = tauri::menu::MenuItemBuilder::with_id("hide", hide_text).build(app)?;
     let refresh_apps =
-        tauri::menu::MenuItemBuilder::with_id("refresh_apps", refresh_apps_text).build(app)?;
+        tauri::menu::MenuItemBuilder::with_id("refreshApps", refresh_apps_text).build(app)?;
 
     let mut menu_items: Vec<Box<dyn tauri::menu::IsMenuItem<tauri::Wry>>> = Vec::new();
     menu_items.push(Box::new(show));
@@ -335,19 +335,19 @@ pub fn show_system_notification_blocking(app: &tauri::AppHandle) {
 
     // Extract strings with fallbacks
     let title = strings
-        .get("notification_title")
+        .get("notificationTitle")
         .and_then(|v| v.as_str())
         .unwrap_or("Rscoop - Minimized to Tray");
     let message = strings
-        .get("notification_message")
+        .get("notificationMessage")
         .and_then(|v| v.as_str())
         .unwrap_or("Rscoop has been minimized to the system tray and will continue running in the background.\n\nYou can:\n• Click the tray icon to restore the window\n• Right-click the tray icon to access the context menu\n• Change this behavior in Settings > Window Behavior\n\nWhat would you like to do?");
     let close_button = strings
-        .get("close_and_disable")
+        .get("closeAndDisable")
         .and_then(|v| v.as_str())
         .unwrap_or("Close and Disable Tray");
     let keep_button = strings
-        .get("keep_in_tray")
+        .get("keepInTray")
         .and_then(|v| v.as_str())
         .unwrap_or("Keep in Tray");
 

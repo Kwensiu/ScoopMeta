@@ -21,8 +21,10 @@ pub struct CheckupItem {
     pub id: Option<String>,
     /// The status of the check, `true` for success/pass, `false` for failure/warning.
     pub status: bool,
-    /// A descriptive text of what was checked.
-    pub text: String,
+    /// A key for internationalization.
+    pub key: String,
+    /// Optional parameters for the key.
+    pub params: Option<serde_json::Value>,
     /// An optional suggestion for the user to fix a failed check.
     pub suggestion: Option<String>,
 }
@@ -37,7 +39,8 @@ async fn check_git_installed() -> CheckupItem {
     CheckupItem {
         id: None,
         status: git_installed,
-        text: "Git is installed".to_string(),
+        key: "gitInstalled".to_string(),
+        params: None,
         suggestion: if git_installed {
             None
         } else {
@@ -55,7 +58,8 @@ fn check_main_bucket_installed(scoop_path: &Path) -> CheckupItem {
     CheckupItem {
         id: None,
         status: main_bucket_installed,
-        text: "Main bucket is installed".to_string(),
+        key: "mainBucketInstalled".to_string(),
+        params: None,
         suggestion: if main_bucket_installed {
             None
         } else {
@@ -83,7 +87,8 @@ fn check_missing_helpers(scoop_path: &Path) -> Vec<CheckupItem> {
                     Some(helper.to_string())
                 },
                 status: is_installed,
-                text: format!("Helper '{}' is installed", helper),
+                key: "helperInstalled".to_string(),
+                params: Some(serde_json::json!({"name": helper})),
                 suggestion: if is_installed {
                     None
                 } else {

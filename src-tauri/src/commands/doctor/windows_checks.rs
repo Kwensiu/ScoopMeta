@@ -26,7 +26,8 @@ pub fn check_windows_developer_mode() -> CheckupItem {
     CheckupItem {
         id: None,
         status,
-        text: "Windows Developer Mode is enabled".to_string(),
+        key: "windowsDeveloperModeEnabled".to_string(),
+        params: None,
         suggestion: if status { None } else { suggestion },
     }
 }
@@ -48,7 +49,8 @@ pub fn check_long_paths_enabled() -> CheckupItem {
     CheckupItem {
         id: None,
         status,
-        text: "Long paths are enabled".to_string(),
+        key: "longPathsEnabled".to_string(),
+        params: None,
         suggestion: if status { None } else { suggestion },
     }
 }
@@ -135,7 +137,8 @@ pub fn check_scoop_on_ntfs(scoop_path: &Path) -> CheckupItem {
     CheckupItem {
         id: None,
         status: is_ntfs,
-        text: format!("Scoop is on an NTFS filesystem (found: {})", fs_type),
+        key: "scoopOnNtfs".to_string(),
+        params: Some(serde_json::json!({"filesystem": fs_type})),
         suggestion: if is_ntfs {
             None
         } else {

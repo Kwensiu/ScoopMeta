@@ -1,4 +1,5 @@
 import Modal from "./common/Modal";
+import { t } from "../i18n";
 
 interface ConfirmationModalProps {
     isOpen: boolean;
@@ -20,10 +21,10 @@ function ConfirmationModal(props: ConfirmationModalProps) {
             footer={
                 <>
                     <button class="btn-close-outline" onClick={props.onCancel}>
-                        {props.cancelText || "Cancel"}
+                        {props.cancelText || t('buttons.cancel')}
                     </button>
                     <button class="btn btn-error" onClick={props.onConfirm}>
-                        {props.confirmText || "Confirm"}
+                        {props.confirmText || t('buttons.confirm')}
                     </button>
                 </>
             }
