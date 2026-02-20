@@ -21,7 +21,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -40,14 +45,14 @@ jobs:
         run: choco install upx -y
 
       - name: Install project dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       # One command builds frontend, compiles Rust, and bundles installers
       - name: Build & bundle application (Tauri)
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-        run: npm run tauri -- build
+        run: pnpm run tauri -- build
 
       - name: Extract metadata (product name & version)
         id: meta

@@ -3,7 +3,7 @@
 version = 4
 
 [[package]]
-name = "Rscoop"
+name = "ScoopMeta"
 version = "1.6.2"
 dependencies = [
  "aes-gcm",
