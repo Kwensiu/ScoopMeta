@@ -1,5 +1,6 @@
 import { createSignal, createEffect, on, Setter, onMount, createMemo } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { ScoopPackage, ScoopInfo } from "../types/scoop";
 import { usePackageOperations } from "./usePackageOperations";
 import { usePackageInfo } from "./usePackageInfo";
@@ -10,6 +11,7 @@ interface UseSearchReturn {
   searchTerm: () => string;
   setSearchTerm: Setter<string>;
   loading: () => boolean;
+  error: () => string | null;
   activeTab: () => "packages" | "includes";
   setActiveTab: Setter<"packages" | "includes">;
   resultsToShow: () => ScoopPackage[];
@@ -32,7 +34,7 @@ interface UseSearchReturn {
   handleInstall: (pkg: ScoopPackage) => void;
   handleUninstall: (pkg: ScoopPackage) => void;
   handleInstallConfirm: () => void;
-  closeOperationModal: (operationId: string, wasSuccess: boolean) => void;
+  closeOperationModal: (operationId: string, wasSuccess: boolean) => Promise<void>;
 
   // Cleanup function
   cleanup: () => void;
@@ -41,7 +43,7 @@ interface UseSearchReturn {
   // Restore search results
   restoreSearchResults: () => void;
   // Check if has cached results
-  hasCachedResults: () => boolean | null;
+  hasCachedResults: () => boolean;
   
   // Bucket filter
   bucketFilter: () => string;
@@ -53,16 +55,18 @@ let currentSearchTermCache: string | null = null;
 
 export function useSearch(): UseSearchReturn {
     const [searchTerm, setSearchTerm] = createTauriSignal<string>(
-        "rscoop-search-term",
+        "scoopmeta-search-term",
         ""
     );
     
+    const [error, setError] = createSignal<string | null>(null);
     const [results, setResults] = createSignal<ScoopPackage[]>([]);
     const [loading, setLoading] = createSignal(false);
     const [activeTab, setActiveTab] = createTauriSignal<"packages" | "includes">(
         "search-active-tab",
         "packages"
     );
+    const [cacheVersion, setCacheVersion] = createSignal(0);
     const [bucketFilter, setBucketFilter] = createSignal<string>("");
     
     let isRestoring = false;
@@ -72,17 +76,25 @@ export function useSearch(): UseSearchReturn {
     const packageInfo = usePackageInfo();
 
     let debounceTimer: ReturnType<typeof setTimeout>;
+    let currentCacheVersion: number = 0;
     let currentSearchController: AbortController | null = null;
 
-    onMount(() => {
+    onMount(async () => {
         restoreSearchResults();
+        const unlistenBuckets = await listen("buckets-changed", () => setCacheVersion(v => v + 1));
+        const unlistenPackages = await listen("packages-refreshed", () => setCacheVersion(v => v + 1));
+        return () => {
+            unlistenBuckets();
+            unlistenPackages();
+        };
     });
 
     // Memoized check for cached results
     const hasCachedResults = createMemo(() => {
-        return searchResultsCache && 
+        return Boolean(searchResultsCache && 
                currentSearchTermCache === searchTerm() && 
-               searchTerm().trim() !== "";
+               searchTerm().trim() !== "" &&
+               currentCacheVersion === cacheVersion());
     });
 
     const handleSearch = async (force: boolean = false) => {
@@ -100,6 +112,7 @@ export function useSearch(): UseSearchReturn {
             searchResultsCache = null;
             currentSearchTermCache = null;
             setLoading(false);
+            setError(null);
             return;
         }
 
@@ -107,6 +120,7 @@ export function useSearch(): UseSearchReturn {
         const { signal } = currentSearchController;
 
         setLoading(true);
+        setError(null);
         try {
             const response = await invoke<{ packages: ScoopPackage[], is_cold: boolean }>("search_scoop", {
                 term: searchTerm(),
@@ -115,16 +129,16 @@ export function useSearch(): UseSearchReturn {
                 setResults(response.packages);
                 searchResultsCache = response.packages;
                 currentSearchTermCache = searchTerm();
+                currentCacheVersion = cacheVersion();
                 console.log("Search completed and results cached");
             }
         } catch (error: any) {
             if (error.name !== 'AbortError') {
                 console.error("Search error:", error);
+                setError("搜索失败，请检查网络或稍后重试");
             }
         } finally {
-            if (!signal.aborted || force) {
-                setLoading(false);
-            }
+            setLoading(false);
             currentSearchController = null;
         }
     };
@@ -141,7 +155,7 @@ export function useSearch(): UseSearchReturn {
     const restoreSearchResults = () => {
         isRestoring = true;
         console.log("Attempting to restore search results");
-        if (searchResultsCache && currentSearchTermCache === searchTerm() && searchTerm().trim() !== "") {
+        if (searchResultsCache && currentSearchTermCache === searchTerm() && searchTerm().trim() !== "" && currentCacheVersion === cacheVersion()) {
             setResults(searchResultsCache);
             setLoading(false);
             console.log("Restored search results from cache");
@@ -166,6 +180,7 @@ export function useSearch(): UseSearchReturn {
             searchResultsCache = null;
             currentSearchTermCache = null;
             setLoading(false);
+            setError(null);
             return;
         }
         
@@ -215,6 +230,7 @@ export function useSearch(): UseSearchReturn {
     return {
         searchTerm,
         setSearchTerm,
+        error,
         loading,
         activeTab,
         setActiveTab,
