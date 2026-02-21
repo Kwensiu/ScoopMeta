@@ -8,8 +8,8 @@ use tauri::State;
 // Note: Retry logic constants are defined locally in functions as needed
 
 // Application identifiers
-const TAURI_APP_ID: &str = "com.scoopmeta.app";
-const OLD_APP_DIR: &str = "scoopmeta";
+const TAURI_APP_ID: &str = "com.pailer.ks";
+const OLD_APP_DIR: &str = "pailer";
 
 // Store data file names (new unified format)
 const FRONTEND_STORE_FILE: &str = "settings.json";
@@ -52,7 +52,7 @@ pub fn get_app_data_dir() -> Result<String, String> {
         }
     }
 
-    // Fallback to the old scoopmeta directory for backward compatibility
+    // Fallback to the old pailer directory for backward compatibility
     let data_dir = dirs::data_local_dir()
         .and_then(|d| Some(d.join(OLD_APP_DIR)))
         .ok_or("Could not determine data directory")?;
@@ -173,17 +173,17 @@ fn is_webview_locked_dir(dir_path: &std::path::Path) -> bool {
 pub fn clear_application_data() -> Result<(), String> {
     // First try to get the Tauri app data directory
     let data_dir = if let Some(app_data_dir) = dirs::data_dir() {
-        let app_data_dir = app_data_dir.join("com.scoopmeta.app");
+        let app_data_dir = app_data_dir.join("com.pailer.ks");
         if app_data_dir.exists() {
             app_data_dir
         } else {
             dirs::data_local_dir()
-                .and_then(|d| Some(d.join("scoopmeta")))
+                .and_then(|d| Some(d.join("pailer")))
                 .ok_or("Could not determine data directory")?
         }
     } else {
         dirs::data_local_dir()
-            .and_then(|d| Some(d.join("scoopmeta")))
+            .and_then(|d| Some(d.join("pailer")))
             .ok_or("Could not determine data directory")?
     };
     
@@ -344,7 +344,7 @@ pub fn get_app_logs() -> Result<String, String> {
             log_info.push_str("  Directory does not exist yet.\n");
         }
         
-        let log_path = log_dir.join("scoopmeta.log");
+        let log_path = log_dir.join("pailer.log");
         if log_path.exists() {
             log_info.push_str(&format!("  Expected location: {}\n", log_path.display()));
         }
@@ -360,7 +360,7 @@ pub fn get_app_logs() -> Result<String, String> {
 
     log_info.push_str("2. Production Build:\n");
     log_info.push_str("   - Logs are automatically written to disk\n");
-    log_info.push_str("   - Check the log files in %APPDATA%\\com.scoopmeta.app\\logs\\\n");
+    log_info.push_str("   - Check the log files in %APPDATA%\\com.pailer.ks\\logs\\\n");
     log_info.push_str("   - Open in any text editor\n\n");
 
     log_info.push_str("3. Frontend Logs (Browser Console):\n");
@@ -378,11 +378,11 @@ pub fn get_app_logs() -> Result<String, String> {
 /// Reads the current application log file
 #[tauri::command]
 pub fn read_app_log_file() -> Result<String, String> {
-    // Determine log file path - use APPDATA\com.scoopmeta.app\logs\scoopmeta.log on Windows
+    // Determine log file path - use APPDATA\com.pailer.ks\logs\pailer.log on Windows
     let log_file = if let Some(data_dir) = dirs::data_dir() {
-        data_dir.join("com.scoopmeta.app").join("logs").join("scoopmeta.log")
+        data_dir.join("com.pailer.ks").join("logs").join("pailer.log")
     } else {
-        PathBuf::from("./logs/scoopmeta.log")
+        PathBuf::from("./logs/pailer.log")
     };
 
     // Validate file exists and check size
@@ -546,10 +546,10 @@ pub fn clear_registry_data() -> Result<(), String> {
     
     // Clear registry entries using reg command
     let registry_keys = vec![
-        r"HKEY_CURRENT_USER\Software\com.scoopmeta.app",
-        r"HKEY_CURRENT_USER\Software\ScoopMeta",
-        r"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\ScoopMeta",
-        r"HKEY_LOCAL_MACHINE\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\ScoopMeta",
+        r"HKEY_CURRENT_USER\Software\com.pailer.ks",
+        r"HKEY_CURRENT_USER\Software\Pailer",
+        r"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\Pailer",
+        r"HKEY_LOCAL_MACHINE\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Pailer",
     ];
     
     for key in registry_keys {
@@ -712,6 +712,6 @@ fn get_log_dir() -> Option<PathBuf> {
         }
     }
     
-    // Fallback to the old scoopmeta directory
+    // Fallback to the old pailer directory
     dirs::data_local_dir().map(|d| d.join(OLD_APP_DIR).join("logs"))
 }

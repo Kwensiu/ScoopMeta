@@ -57,9 +57,9 @@ pub async fn get_update_info_for_channel(app_handle: AppHandle) -> Result<serde_
     let channel = get_update_channel(app_handle.clone()).await?;
     
     let endpoint = if channel == "test" {
-        "https://raw.githubusercontent.com/Kwensiu/ScoopMeta/refs/heads/test/docs/test-update.json"
+        "https://raw.githubusercontent.com/Kwensiu/Pailer/refs/heads/test/docs/test-update.json"
     } else {
-        "https://github.com/Kwensiu/ScoopMeta/releases/latest/download/update.json"
+        "https://github.com/Kwensiu/Pailer/releases/latest/download/update.json"
     };
     
     // Create a custom response with the appropriate endpoint

@@ -55,7 +55,7 @@ let currentSearchTermCache: string | null = null;
 
 export function useSearch(): UseSearchReturn {
     const [searchTerm, setSearchTerm] = createTauriSignal<string>(
-        "scoopmeta-search-term",
+        "pailer-search-term",
         ""
     );
     

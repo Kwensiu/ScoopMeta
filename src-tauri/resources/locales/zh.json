@@ -5,7 +5,7 @@
     "packages": "软件包",
     "search": "搜索",
     "settings": "设置",
-    "title": "ScoopMeta"
+    "title": "Pailer"
   },
   "appUpdate": {
     "available": "有可用的版本更新 v{{version}} ",
@@ -189,7 +189,7 @@
     "proxySettings": {
       "clear": "清除",
       "clearSuccess": "Scoop 代理清除成功！",
-      "description": "设置 Scoop 的代理地址。不是 ScoopMeta GUI 的代理。",
+      "description": "设置 Scoop 的代理地址。不是 Pailer GUI 的代理。",
       "loadError": "无法加载 Scoop 代理设置。",
       "loading": "加载中...",
       "proxyAddress": "代理地址",
@@ -365,7 +365,7 @@
     "about": {
       "checkNow": "立即检查",
       "checkingForUpdates": "正在检查更新...",
-      "customizedVersion": "由 Kwensiu 定制的 ScoopMeta 分支版本",
+      "customizedVersion": "由 Kwensiu 定制的 Pailer 分支版本",
       "description": "一个现代化的 Scoop 图形界面客户端，旨在简化 Windows 上的 Scoop 管理。",
       "docs": "文档",
       "downloadingNoSize": "正在下载...",
@@ -408,7 +408,7 @@
       "openDirectory": "打开目录",
       "resetting": "正在恢复...",
       "sure": "确认？",
-      "title": "ScoopMeta 数据"
+      "title": "Pailer 数据"
     },
     "autoCleanup": {
       "cleanOldVersions": "清理旧版本",
@@ -431,7 +431,7 @@
       "daysFormat": "{{count}} 天",
       "debug": "调试：10 秒间隔",
       "debugDescription": "每 10 秒运行一次调度程序（仅限调试）",
-      "description": "ScoopMeta 将自动更新在所有已安装的仓库，以保持最新的清单。",
+      "description": "Pailer 将自动更新在所有已安装的仓库，以保持最新的清单。",
       "error": "保存自动更新间隔失败。",
       "every24Hours": "每 24 小时",
       "every24HoursDescription": "每天运行一次",
@@ -489,7 +489,7 @@
       "title": "默认启动页面"
     },
     "heldPackages": {
-      "description": "使用 scoop hold 命令保留的软件包，无法通过 ScoopMeta 或 Scoop 更新。",
+      "description": "使用 scoop hold 命令保留的软件包，无法通过 Pailer 或 Scoop 更新。",
       "noPackagesHeld": "当前没有保留的软件包。",
       "title": "保留软件包管理",
       "unhold": "取消保留"
@@ -514,9 +514,9 @@
       "validationFailed": "验证失败："
     },
     "startup": {
-      "description": "配置 ScoopMeta 是否应该在 Windows 启动时自动运行。",
+      "description": "配置 Pailer 是否应该在 Windows 启动时自动运行。",
       "silentStartup": {
-        "description": "启用后，ScoopMeta 自启动时会最小化到系统托盘，不显示主窗口。",
+        "description": "启用后，Pailer 自启动时会最小化到系统托盘，不显示主窗口。",
         "title": "静默启动"
       },
       "title": "自启设置"
@@ -530,14 +530,14 @@
     "title": "设置",
     "tray": {
       "closeAndDisable": "关闭并禁用托盘",
-      "hide": "隐藏 ScoopMeta",
+      "hide": "隐藏 Pailer",
       "keepInTray": "保持在托盘中",
-      "notificationMessage": "ScoopMeta 已最小化到系统托盘，并在后台继续运行。\n\n您可以：\n• 点击托盘图标恢复窗口\n• 右键托盘图标访问上下文菜单\n• 在设置 > 窗口行为中更改此行为\n\n您想要做什么？",
-      "notificationTitle": "ScoopMeta - 已最小化到托盘",
+      "notificationMessage": "Pailer 已最小化到系统托盘，并在后台继续运行。\n\n您可以：\n• 点击托盘图标恢复窗口\n• 右键托盘图标访问上下文菜单\n• 在设置 > 窗口行为中更改此行为\n\n您想要做什么？",
+      "notificationTitle": "Pailer - 已最小化到托盘",
       "quit": "退出",
       "refreshApps": "刷新应用",
       "scoopApps": "Scoop 应用",
-      "show": "显示 ScoopMeta"
+      "show": "显示 Pailer"
     },
     "trayApps": {
       "availableApps": "可用的应用程序",
@@ -573,7 +573,7 @@
       "title": "VirusTotal 集成"
     },
     "windowBehavior": {
-      "description": "启用托盘支持，允许 ScoopMeta 在关闭后于系统托盘中运行。",
+      "description": "启用托盘支持，允许 Pailer 在关闭后于系统托盘中运行。",
       "title": "托盘支持"
     }
   },

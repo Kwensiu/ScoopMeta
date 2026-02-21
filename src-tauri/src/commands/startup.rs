@@ -1,4 +1,4 @@
-// Many thanks to Kwensiu for the original code on the forked repo: https://github.com/Kwensiu/Rscoop
+// Many thanks to Kwensiu for the original code on the forked repo: https://github.com/Kwensiu/Rscoop by AmarBego
 //! Commands for managing application startup settings on Windows.
 
 use std::env;
@@ -7,7 +7,7 @@ use tauri;
 use winreg::{enums::*, RegKey};
 
 const REG_KEY_PATH: &str = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
-const REG_KEY_NAME: &str = "ScoopMeta";
+const REG_KEY_NAME: &str = "Pailer";
 const SILENT_STARTUP_KEY: &str = "ScoopMetaSilentStartup";
 
 /// Checks if the application is configured to start automatically on Windows boot.

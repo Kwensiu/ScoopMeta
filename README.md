@@ -1,4 +1,4 @@
-# ScoopMeta
+# Pailer
 
 English | [简体中文](README-zh.md)
 
@@ -8,7 +8,7 @@ It adds some additional features and modifications not yet implemented upstream.
 
 ## Installation
 
-Download the latest release from the [Releases](https://github.com/Kwensiu/ScoopMeta/releases) page.
+Download the latest release from the [Releases](https://github.com/Kwensiu/Pailer/releases) page.
 
 ## Features
 

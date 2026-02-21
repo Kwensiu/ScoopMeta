@@ -22,7 +22,7 @@ const getInitialLocale = (): Locale => {
   }
   
   // Check if a locale is saved in localStorage (legacy fallback)
-  const savedLocale = localStorage.getItem('scoopmeta-language');
+  const savedLocale = localStorage.getItem('pailer-language');
   if (savedLocale && supportedLocales.includes(savedLocale)) {
     return savedLocale as Locale;
   }
@@ -48,7 +48,7 @@ const { locale, setLocale, dict, t } = createRoot(() => {
     if (currentLocale !== previousLocale) {
       try {
         // Also save to localStorage as backup
-        localStorage.setItem('scoopmeta-language', currentLocale);
+        localStorage.setItem('pailer-language', currentLocale);
       } catch (error) {
         console.warn('Failed to save language to localStorage:', error);
       }
@@ -75,7 +75,7 @@ const { locale, setLocale, dict, t } = createRoot(() => {
     }
   }, {
     initialValue: i18n.flatten({
-      'app.title': 'ScoopMeta',
+      'app.title': 'Pailer',
       'messages.loading': 'Loading...',
       'status.error': 'Error',
       'buttons.close': 'Close'
@@ -101,7 +101,7 @@ const updateLanguage = async (newLang: Locale) => {
 
   await settingsStore.setCoreSettings({ language: newLang });
 
-  localStorage.setItem('scoopmeta-language', newLang);
+  localStorage.setItem('pailer-language', newLang);
 };
 
 export const toggleLanguage = async () => {

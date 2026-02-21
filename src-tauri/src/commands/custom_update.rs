@@ -43,9 +43,9 @@ pub async fn check_for_custom_update(app_handle: AppHandle) -> Result<CustomUpda
     
     // Determine the repository based on channel
     let (repo_owner, repo_name) = if channel == "test" {
-        ("Kwensiu", "ScoopMeta")
+        ("Kwensiu", "Pailer")
     } else {
-        ("Kwensiu", "ScoopMeta")
+        ("Kwensiu", "Pailer")
     };
     
     // Get the latest release from GitHub API
@@ -63,7 +63,7 @@ pub async fn check_for_custom_update(app_handle: AppHandle) -> Result<CustomUpda
     let client = reqwest::Client::new();
     let response = client
         .get(&api_url)
-        .header("User-Agent", "ScoopMeta-Updater")
+        .header("User-Agent", "Pailer-Updater")
         .send()
         .await
         .map_err(|e| format!("Failed to fetch release info: {}", e))?;
@@ -129,9 +129,9 @@ pub async fn check_for_custom_update(app_handle: AppHandle) -> Result<CustomUpda
 /// Get signature for a specific version from the update.json file
 async fn get_signature_for_version(_version: &str, channel: &str) -> Result<String, String> {
     let update_json_url = if channel == "test" {
-        format!("https://raw.githubusercontent.com/Kwensiu/ScoopMeta/refs/heads/test/docs/test-update.json")
+        format!("https://raw.githubusercontent.com/Kwensiu/Pailer/refs/heads/test/docs/test-update.json")
     } else {
-        format!("https://github.com/Kwensiu/ScoopMeta/releases/latest/download/update.json")
+        format!("https://github.com/Kwensiu/Pailer/releases/latest/download/update.json")
     };
     
     log::debug!("Fetching signature from: {}", update_json_url);
@@ -139,7 +139,7 @@ async fn get_signature_for_version(_version: &str, channel: &str) -> Result<Stri
     let client = reqwest::Client::new();
     let response = client
         .get(&update_json_url)
-        .header("User-Agent", "ScoopMeta-Updater")
+        .header("User-Agent", "Pailer-Updater")
         .send()
         .await
         .map_err(|e| format!("Failed to fetch update.json: {}", e))?;
@@ -186,7 +186,7 @@ pub async fn download_and_install_custom_update(
     let client = reqwest::Client::new();
     let response = client
         .get(&update_info.download_url)
-        .header("User-Agent", "ScoopMeta-Updater")
+        .header("User-Agent", "Pailer-Updater")
         .send()
         .await
         .map_err(|e| format!("Failed to download installer: {}", e))?;

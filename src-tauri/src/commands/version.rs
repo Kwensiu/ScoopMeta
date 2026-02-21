@@ -10,7 +10,7 @@ pub fn check_and_update_version(app: AppHandle) -> Result<bool, String> {
     // Always try to use the new Roaming app data directory first
     let new_data_dir = dirs::data_dir()
         .ok_or_else(|| "Could not resolve roaming app data directory".to_string())?
-        .join("com.scoopmeta.app");
+        .join("com.pailer.ks");
 
     // Ensure the new directory exists
     if !new_data_dir.exists() {
@@ -30,7 +30,7 @@ pub fn check_and_update_version(app: AppHandle) -> Result<bool, String> {
     // Check if there's an old version file in the legacy location and migrate it if needed
     let old_data_dir = dirs::data_local_dir()
         .ok_or_else(|| "Could not resolve local app data directory".to_string())?
-        .join("scoopmeta");
+        .join("pailer");
     
     let old_version_path = old_data_dir.join("version.txt");
     

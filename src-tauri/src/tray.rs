@@ -24,7 +24,7 @@ pub fn setup_system_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
     let menu = build_tray_menu(app, shortcuts_map.clone())?;
 
     let _tray = TrayIconBuilder::with_id("main")
-        .tooltip("ScoopMeta - Scoop Package Manager")
+        .tooltip("Pailer - Scoop Package Manager")
         .icon(app.default_window_icon().unwrap().clone())
         .menu(&menu)
         .show_menu_on_left_click(false)
@@ -116,10 +116,10 @@ fn build_tray_menu(
     // Extract strings with defaults
     let show_text = menu_strings.get("show")
         .and_then(|v| v.as_str())
-        .unwrap_or("Show ScoopMeta");
+        .unwrap_or("Show Pailer");
     let hide_text = menu_strings.get("hide")
         .and_then(|v| v.as_str())
-        .unwrap_or("Hide ScoopMeta");
+        .unwrap_or("Hide Pailer");
     let refresh_apps_text = menu_strings.get("refreshApps")
         .and_then(|v| v.as_str())
         .unwrap_or("Refresh Apps");
@@ -337,11 +337,11 @@ pub fn show_system_notification_blocking(app: &tauri::AppHandle) {
     let title = strings
         .get("notificationTitle")
         .and_then(|v| v.as_str())
-        .unwrap_or("ScoopMeta - Minimized to Tray");
+        .unwrap_or("Pailer - Minimized to Tray");
     let message = strings
         .get("notificationMessage")
         .and_then(|v| v.as_str())
-        .unwrap_or("ScoopMeta has been minimized to the system tray and will continue running in the background.\n\nYou can:\n• Click the tray icon to restore the window\n• Right-click the tray icon to access the context menu\n• Change this behavior in Settings > Window Behavior\n\nWhat would you like to do?");
+        .unwrap_or("Pailer has been minimized to the system tray and will continue running in the background.\n\nYou can:\n• Click the tray icon to restore the window\n• Right-click the tray icon to access the context menu\n• Change this behavior in Settings > Window Behavior\n\nWhat would you like to do?");
     let close_button = strings
         .get("closeAndDisable")
         .and_then(|v| v.as_str())

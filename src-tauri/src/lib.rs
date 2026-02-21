@@ -49,7 +49,7 @@ pub fn run() {
         );
 
         // Try to write to log file if possible
-        if let Some(log_dir) = dirs::data_dir().map(|dir| dir.join("com.scoopmeta.app").join("logs")) {
+        if let Some(log_dir) = dirs::data_dir().map(|dir| dir.join("com.pailer.ks").join("logs")) {
             if let Ok(mut log_file) = std::fs::OpenOptions::new()
                 .create(true)
                 .append(true)
@@ -88,7 +88,7 @@ pub fn run() {
 
     // Determine log directory path
     let log_dir = dirs::data_dir()
-        .map(|dir| dir.join("com.scoopmeta.app").join("logs"))
+        .map(|dir| dir.join("com.pailer.ks").join("logs"))
         .unwrap_or_else(|| PathBuf::from("./logs"));
 
     cleanup_old_logs(&log_dir);
