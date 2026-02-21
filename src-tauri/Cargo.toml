@@ -54,6 +54,7 @@ lazy_static = "1.4.0"
 tempfile = "3.19"
 aes-gcm = "0.10"
 base64 = "0.22"
+rand = "0.10.0"
 
 [target."cfg(windows)".dependencies]
 tauri-plugin-updater = "2.7.1"
