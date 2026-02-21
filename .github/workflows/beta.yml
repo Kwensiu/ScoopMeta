@@ -1,4 +1,4 @@
-name: Release Build
+name: Beta Build
 
 on:
   workflow_dispatch:
@@ -7,9 +7,13 @@ on:
         description: 'Version number'
         required: true
         type: string
+      beta_number:
+        description: 'Beta number'
+        required: true
+        type: string
   push:
     tags:
-      - 'v*.*.*'
+      - 'beta-*'
 
 permissions:
   contents: write
@@ -58,7 +62,7 @@ jobs:
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          TAURI_CONFIG_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || '' }}
+          TAURI_CONFIG_VERSION: ${{ github.event_name == 'workflow_dispatch' && format('{0}-beta.{1}', inputs.version, inputs.beta_number) || '' }}
         run: pnpm run tauri -- build
 
       - name: Extract metadata (product name & version)
@@ -66,7 +70,7 @@ jobs:
         shell: pwsh
         run: |
           if ($env:GITHUB_EVENT_NAME -eq 'workflow_dispatch') {
-            $version = "${{ inputs.version }}"
+            $version = "${{ inputs.version }}-beta.${{ inputs.beta_number }}"
           } else {
             $cfg = Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json
             $version = $cfg.version
@@ -111,66 +115,12 @@ jobs:
           "sigPath=$sigPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           "exePath=./src-tauri/target/release/$productName.exe" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
-      - name: Generate release notes from commits
-        id: release-notes
-        shell: bash
-        run: |
-          LAST_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
-          VERSION="${{ steps.meta.outputs.version }}"
-          
-          if [ -z "$LAST_TAG" ]; then
-            BODY=$(cat <<EOF
-          # Release Notes
-
-          ## [$VERSION]
-
-          - Initial release
-
-          This release includes various improvements and bug fixes.
-          EOF
-          )
-          else
-            COMMITS=$(git log --oneline $LAST_TAG..HEAD --no-merges | sed 's/^/- /')
-            BODY=$(cat <<EOF
-          # Release Notes
-
-          ## [$VERSION]
-
-          ### Changes
-          $COMMITS
-
-          This release includes various improvements and bug fixes.
-          EOF
-          )
-          fi
-          
-          echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "$BODY" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: release-artifacts-${{ steps.meta.outputs.version }}
+          name: beta-artifacts-${{ steps.meta.outputs.version }}
           path: |
             ./src-tauri/target/release/${{ steps.meta.outputs.product }}.exe
             ./src-tauri/target/release/bundle/nsis/${{ steps.meta.outputs.product }}_${{ steps.meta.outputs.version }}_x64-setup.exe
             ./src-tauri/target/release/bundle/nsis/${{ steps.meta.outputs.product }}_${{ steps.meta.outputs.version }}_x64-setup.exe.sig
             ./update.json
-
-      - name: Create GitHub Release with artifacts
-        if: github.event_name == 'push'
-        uses: ncipollo/release-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          body: ${{ steps.release-notes.outputs.body }}
-          draft: false
-          prerelease: false
-          artifacts: >-
-            ./src-tauri/target/release/${{ steps.meta.outputs.product }}.exe,
-            ./src-tauri/target/release/bundle/nsis/${{ steps.meta.outputs.product }}_${{ steps.meta.outputs.version }}_x64-setup.exe,
-            ./src-tauri/target/release/bundle/nsis/${{ steps.meta.outputs.product }}_${{ steps.meta.outputs.version }}_x64-setup.exe.sig,
-            ./update.json
-          artifactErrorsFailBuild: true

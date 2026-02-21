@@ -1,7 +1,7 @@
 [package]
 name = "Pailer"
-version = "1.6.2"
-description = "A modern, powerful GUI for Scoop - Pailer fork"
+version = "0.0.1"
+description = "A modern, powerful GUI for Scoop - Pailer"
 authors = ["Kwensiu"]
 license = "MIT"
 repository = "https://github.com/Kwensiu/Pailer"
