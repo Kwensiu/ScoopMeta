@@ -20,7 +20,11 @@ pub async fn update_package(
         ScoopOp::Update
     };
     
-    let operation_id = Some(format!("update-{}-{}", package_name, std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs()));
+    let operation_id = if force.unwrap_or(false) {
+        Some(format!("force-update-{}-{}", package_name, std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs()))
+    } else {
+        Some(format!("update-{}-{}", package_name, std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs()))
+    };
     
     scoop::execute_scoop(window, op, Some(&package_name), None, operation_id).await?;
 

@@ -268,31 +268,25 @@ function OperationModal(props: OperationModalProps) {
     const currentOperation = operation();
     if (currentOperation && currentOperation.status === 'in-progress') {
       emit('cancel-operation');
+      setOperationStatus(operationId(), 'cancelled');
     }
-    // Also close the modal when cancel is clicked
-    handleCloseOrCancelPanel(false);
   };
 
   const handleMainButtonClick = () => {
     const currentOperation = operation();
-    if (currentOperation && (currentOperation.status === 'success' || currentOperation.status === 'error')) {
-      handleCloseOrCancelPanel(currentOperation.status === 'success');
-    } else {
+    if (currentOperation?.status === 'in-progress') {
       handleCancelOperation();
+    } else {
+      handleCloseOrCancelPanel(currentOperation?.status === 'success');
     }
   };
 
   const getCloseButtonText = () => {
     const currentOperation = operation();
-    if (currentOperation?.status === 'error') {
-      return t('buttons.close');
+    if (currentOperation?.status === 'in-progress') {
+      return t('buttons.cancel');
     }
-
-    if (currentOperation?.status === 'success') {
-      return t('buttons.close');
-    }
-
-    return t('buttons.cancel');
+    return t('buttons.close');
   };
 
   const handleMinimize = () => {
